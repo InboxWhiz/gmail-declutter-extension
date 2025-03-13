@@ -52,6 +52,16 @@ async function insertDeclutterBody() {
         document.head.appendChild(style);
     }
 
+    // Add FontAwesome link if not already there
+    const existingFontAwesome = document.querySelector('#font-awesome-style');
+    if (!existingFontAwesome) {
+        const fontAwesome = document.createElement('link');
+        fontAwesome.rel = 'stylesheet';
+        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css';
+        fontAwesome.id = 'font-awesome-style';
+        document.head.appendChild(fontAwesome);
+    }
+
     // Add onClick to close button
     const closeButton = decutterBody.querySelector(".close-button");
     closeButton.addEventListener("click", () => {
