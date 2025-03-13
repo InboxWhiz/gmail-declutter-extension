@@ -1,0 +1,32 @@
+.declutter-line {
+    background-color: white;
+    font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #F2F6FC;
+}
+
+.begin {
+    display: flex;
+    align-items: center;
+    padding: 0 7px;
+}
+
+.sender-details {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 7px 10px;
+}
+
+.sender-email {
+    color: #5F6368;
+    font-size: 0.75rem;
+    margin-top: 3px;
+}
+
+.email-count span {
+    font-weight: bold;
+    padding: 0 7px;
+}

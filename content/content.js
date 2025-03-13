@@ -30,7 +30,6 @@ async function insertDeclutterButton() {
 
     // Append to Gmail
     supportIcon.insertAdjacentElement("beforebegin", button);
-    console.log("Declutter button inserted");
 }
 
 async function insertDeclutterBody() {
@@ -64,44 +63,51 @@ async function insertDeclutterBody() {
     tabParent.prepend(decutterBody);
 };
 
-function createDeclutterBodyLine(senderName, senderEmail, emailCountNum) {
-    const line = document.createElement("tr");
-    line.style = `
-        color: rgb(32, 33, 36);
-        border: 3px solid red;
-        font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
-        font-size: .875rem;
-        padding: 5px;
-    `;
+async function createSenderLine(senderName, senderEmail, emailCountNum) {
+    // Load HTML fragment
+    const res = await fetch(chrome.runtime.getURL('content/ui/sender_line.html'));
+    const html = await res.text();
 
-    // Sender details
-    const senderDetails = document.createElement("td");
-    senderDetails.style = `
-        display: inline-flex; 
-        flex-direction: column;
-        margin: 20px;
-    `;
-    const senderNameElement = document.createElement("span");
+    // Parse HTML into DOM element
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    const senderLine = wrapper.firstElementChild;
+
+    // Inject CSS if not already there
+    const existing = document.querySelector('#sender-line-style');
+    if (!existing) {
+        const style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = chrome.runtime.getURL('content/ui/sender_line.css');
+        style.id = 'sender-line-style';
+        document.head.appendChild(style);
+    }
+
+    // Set sender name, email, and email count
+    const senderNameElement = senderLine.querySelector(".sender-name");
+    const senderEmailElement = senderLine.querySelector(".sender-email");
+    const emailCountElement = senderLine.querySelector(".email-count span");
+
     senderNameElement.textContent = senderName;
-    const senderEmailElement = document.createElement("span");
     senderEmailElement.textContent = senderEmail;
-    senderEmailElement.style = `
-        color: #5F6368;
-        font-size: 0.75rem;
-        margin-top: 3px
-    `;
-    senderDetails.appendChild(senderNameElement);
-    senderDetails.appendChild(senderEmailElement);
+    emailCountElement.textContent = emailCountNum;
 
-    // Email count
-    const emailCount = document.createElement("td");
-    emailCount.innerHTML = `<span style='font-weight: bold;'>${emailCountNum}</span>`;
-
-    line.appendChild(senderDetails);
-    line.appendChild(emailCount);
-    return line;
+    return senderLine;
 
 };
+
+async function insertSampleSenders() {
+
+    const line1 = await createSenderLine("Sample name", "sampleemail@gmail.com", 0);
+    const line2 = await createSenderLine("Sample hi", "sampmail@gmail.com", 670);
+
+    setTimeout(() => {
+        const declutterBodyTable = document.querySelector("#senders");
+        declutterBodyTable.parentElement.querySelector(".loading-message").style.display = "none";
+        declutterBodyTable.appendChild(line1);
+        declutterBodyTable.appendChild(line2);
+    }, 2000);
+}
 
 function openDeclutterTab() {
     declutterTabOpen = true;
@@ -134,6 +140,8 @@ const observer = new MutationObserver((mutations, observer) => {
         insertDeclutterButton();
         insertDeclutterBody();
 
+        insertSampleSenders();
+
     }
 });
 
@@ -152,7 +160,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         topSenders.forEach(([sender, count]) => {
             const senderName = sender.split("<")[0].trim();
             const senderEmail = sender.split("<")[1].replace(">", "").trim();
-            const line = createDeclutterBodyLine(senderName, senderEmail, count);
+            const line = createSenderLine(senderName, senderEmail, count);
             declutterBodyTable.appendChild(line);
         });
     }
