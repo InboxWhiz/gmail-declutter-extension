@@ -26,6 +26,7 @@ async function insertDeclutterButton() {
     // On click, open the Declutter tab
     button.addEventListener("click", () => {
         declutterTabOpen ? closeDeclutterTab() : openDeclutterTab();
+        button.classList.toggle("active");
     });
 
     // Append to Gmail

@@ -15,13 +15,24 @@
     border-radius: 24px;
 }
 
+#declutter-button a>svg {
+    fill: #F8FAFD;
+}
+
+/* On selected */
+#declutter-button.active a {
+    background-color: #D4D6D9;
+}
+
+#declutter-button.active a>svg {
+    fill: #D4D6D9;
+}
+
+/* On hover */
 #declutter-button a:hover {
     background-color: #EAEBEE;
 }
 
-#declutter-button a > svg {
-    fill: #F8FAFD;
-}
-#declutter-button a:hover > svg {
+#declutter-button a:hover>svg {
     fill: #EAEBEE;
 }
