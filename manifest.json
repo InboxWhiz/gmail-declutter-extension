@@ -1,30 +1,45 @@
 {
-    "manifest_version": 3,
-    "name": "Gmail Declutter",
-    "version": "1.0",
-    "description": "Declutter your Gmail in seconds — unsubscribe and remove bulk emails effortlessly.",
-    "icons": {
-        "16": "images/icon-16.png",
-        "32": "images/icon-32.png",
-        "48": "images/icon-48.png",
-        "128": "images/icon-128.png"
-    },
-    "web_accessible_resources": [
-      {
-        "resources": [
-          "assets/declutter-icon.png"
-        ],
-        "matches": ["https://mail.google.com/*"]
-      }
-    ],
-    "content_scripts": [
-        {
-            "js": [
-                "scripts/content.js"
-            ],
-            "matches": [
-                "https://mail.google.com/*"
-            ]
-        }
+  "manifest_version": 3,
+  "name": "Gmail Declutter",
+  "version": "1.0",
+  "description": "Declutter your Gmail in seconds — unsubscribe and remove bulk emails effortlessly.",
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/ui/declutter_icon.html",
+        "content/ui/declutter_icon.css",
+        "content/inject/inject-ui.js",
+        "content/assets/declutter-icon.png"
+      ],
+      "matches": [
+        "https://mail.google.com/*"
+      ]
+    }
+  ],
+  "content_scripts": [
+    {
+      "js": ["content/content.js"],
+      "matches": ["https://mail.google.com/*"],
+      "type": "module"
+    }
+  ],
+  "background": {
+    "service_worker": "scripts/service-worker.js",
+    "type": "module"
+  },
+  "permissions": [
+    "identity"
+  ],
+  "oauth2": {
+    "client_id": "396720193118-fggljh2amq0jlgq4v861vqn6rb88q9dt.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.readonly"
     ]
+  }
 }
