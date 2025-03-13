@@ -14,7 +14,8 @@
       "resources": [
         "content/ui/declutter_icon.html",
         "content/ui/declutter_icon.css",
-        "content/inject/inject-ui.js",
+        "content/ui/declutter_body.html",
+        "content/ui/declutter_body.css",
         "content/assets/declutter-icon.png"
       ],
       "matches": [

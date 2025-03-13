@@ -1,0 +1,45 @@
+#declutter-body {
+    display: none;
+    background-color: white;
+    border-radius: 16px;
+    margin-left: 16px;
+    font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+}
+
+.declutter-body-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.declutter-body-title {
+    font-size: 1rem;
+    padding-left: 20px;
+}
+
+.close-button{
+    background-image: url(https://www.gstatic.com/images/icons/material/system_gm/1x/close_black_20dp.png);
+    background-color:white;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 20px;
+    border: none;
+    height: 40px;
+    width: 40px;
+    margin: 6px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: #E7E7E7;
+}
+
+.loading-message {
+    padding-left: 20px;
+}
+
+#senders-table {
+    padding: 10px;
+}

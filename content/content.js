@@ -26,7 +26,6 @@ async function insertDeclutterButton() {
     // On click, open the Declutter tab
     button.addEventListener("click", () => {
         declutterTabOpen ? closeDeclutterTab() : openDeclutterTab();
-        button.classList.toggle("active");
     });
 
     // Append to Gmail
@@ -34,52 +33,35 @@ async function insertDeclutterButton() {
     console.log("Declutter button inserted");
 }
 
-function createDeclutterBody() {
-    const declutterBody = document.createElement("div");
-    declutterBody.id = "declutter-body";
-    declutterBody.style = `
-        display: none;
-        background-color: white;
-        border-radius: 16px;
-        margin-left: 16px;
-    `;
+async function insertDeclutterBody() {
+    // Load HTML fragment
+    const res = await fetch(chrome.runtime.getURL('content/ui/declutter_body.html'));
+    const html = await res.text();
 
-    // Title
-    const declutterBodyTitle = document.createElement("p");
-    declutterBodyTitle.textContent = "Declutter";
-    declutterBodyTitle.style = "font-size: 1rem; padding-left: 20px;";
+    // Parse HTML into DOM element
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    const decutterBody = wrapper.firstElementChild;
 
-    // Close button
-    const declutterBodyClose = document.createElement("button");
-    declutterBodyClose.class = "OB";
-    declutterBodyClose.setAttribute("aria-label", "Close");
-    declutterBodyClose.onclick = closeDeclutterTab;
+    // Inject CSS if not already there
+    const existing = document.querySelector('#declutter-body-style');
+    if (!existing) {
+        const style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = chrome.runtime.getURL('content/ui/declutter_body.css');
+        style.id = 'declutter-body-style';
+        document.head.appendChild(style);
+    }
 
-    // Header with title and close button
-    const declutterBodyHeader = document.createElement("div");
-    declutterBodyHeader.style = `
-        display: flex;
-        justify-content: space-between;
-    `;
-    declutterBodyHeader.appendChild(declutterBodyTitle);
-    declutterBodyHeader.appendChild(declutterBodyClose);
-    declutterBody.appendChild(declutterBodyHeader);
+    // Add onClick to close button
+    const closeButton = decutterBody.querySelector(".close-button");
+    closeButton.addEventListener("click", () => {
+        closeDeclutterTab();
+    });
 
-    // Loading message
-    const loadingMessage = document.createElement("p");
-    loadingMessage.textContent = "Loading messages...";
-    loadingMessage.style = "padding-left: 20px;";
-    declutterBody.appendChild(loadingMessage);
-
-    // Table
-    const declutterBodyTable = document.createElement("table");
-    declutterBodyTable.id = "declutter-body-table";
-    declutterBodyTable.style = `
-        padding: 10px;
-    `;
-    declutterBody.appendChild(declutterBodyTable);
-
-    return declutterBody;
+    // Append to Gmail
+    const tabParent = document.querySelector(".aUx");
+    tabParent.prepend(decutterBody);
 };
 
 function createDeclutterBodyLine(senderName, senderEmail, emailCountNum) {
@@ -124,9 +106,9 @@ function createDeclutterBodyLine(senderName, senderEmail, emailCountNum) {
 function openDeclutterTab() {
     declutterTabOpen = true;
 
-    // // Hide original tab content
-    // const originalTabContent = document.querySelector(".UI");
-    // originalTabContent.style.display = "none";
+    // Select the declutter button
+    const declutterButton = document.querySelector("#declutter-button");
+    declutterButton.classList.toggle("active");
 
     // Show Declutter tab content
     const declutterBody = document.querySelector("#declutter-body");
@@ -135,6 +117,12 @@ function openDeclutterTab() {
 
 function closeDeclutterTab() {
     declutterTabOpen = false;
+
+    // Deselect the declutter button
+    const declutterButton = document.querySelector("#declutter-button");
+    declutterButton.classList.toggle("active");
+
+    // Hide Declutter tab content
     const declutterBody = document.querySelector("#declutter-body");
     declutterBody.style.display = "none";
 }
@@ -144,12 +132,7 @@ const observer = new MutationObserver((mutations, observer) => {
         observer.disconnect(); // Stop observing once the element is found
 
         insertDeclutterButton();
-
-        // Add the Declutter tab body
-        const tabParent = document.querySelector(".aUx");
-        const declutterBody = createDeclutterBody();
-        tabParent.prepend(declutterBody);
-
+        insertDeclutterBody();
 
     }
 });
