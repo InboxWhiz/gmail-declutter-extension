@@ -81,4 +81,6 @@
 
 #senders {
     padding: 10px;
+    overflow-y: scroll;
+    height: 80%;
 }

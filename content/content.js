@@ -1,6 +1,7 @@
 var declutterTabOpen = false;
 chrome.runtime.sendMessage({ action: "fetchTopSenders" });
 
+// Update senders if the senders list changes
 chrome.storage.onChanged.addListener((changes, namespace) => {
 
     if (changes.senders) {
