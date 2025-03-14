@@ -1,4 +1,18 @@
 var declutterTabOpen = false;
+chrome.runtime.sendMessage({ action: "fetchTopSenders" });
+
+chrome.storage.onChanged.addListener((changes, namespace) => {
+
+    if (changes.senders) {
+
+        chrome.storage.local.get(["senders"]).then((result) => {
+            const senders = result.senders;
+            if (senders) {
+                insertSenders(senders);
+            }
+        });
+    }
+});
 
 async function insertDeclutterButton() {
     // Get location of insertion point
@@ -106,16 +120,36 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
 
 };
 
-async function insertSampleSenders() {
+// async function insertSampleSenders() {
 
-    const line1 = await createSenderLine("Sample name", "sampleemail@gmail.com", 0);
-    const line2 = await createSenderLine("Sample hi", "sampmail@gmail.com", 670);
+//     const line1 = await createSenderLine("Sample name", "sampleemail@gmail.com", 0);
+//     const line2 = await createSenderLine("Sample hi", "sampmail@gmail.com", 670);
+
+//     setTimeout(() => {
+//         const declutterBodyTable = document.querySelector("#senders");
+//         declutterBodyTable.parentElement.querySelector(".loading-message").style.display = "none";
+//         declutterBodyTable.appendChild(line1);
+//         declutterBodyTable.appendChild(line2);
+//     }, 2000);
+// }
+
+async function insertSenders(sendersList) {
+
+    var senderLines = []
+    for (let i in sendersList) {
+        var line = await createSenderLine(sendersList[i][1], sendersList[i][0], sendersList[i][2]);
+        senderLines.push(line);
+    }
 
     setTimeout(() => {
         const declutterBodyTable = document.querySelector("#senders");
+
+        declutterBodyTable.innerHTML = ""; // Clear existing rows
         declutterBodyTable.parentElement.querySelector(".loading-message").style.display = "none";
-        declutterBodyTable.appendChild(line1);
-        declutterBodyTable.appendChild(line2);
+
+        for (line in senderLines) {
+            declutterBodyTable.appendChild(senderLines[line]);
+        }
     }, 2000);
 }
 
@@ -150,28 +184,17 @@ const observer = new MutationObserver((mutations, observer) => {
         insertDeclutterButton();
         insertDeclutterBody();
 
-        insertSampleSenders();
+        chrome.storage.local.get(["senders"]).then((result) => {
+            const senders = result.senders;
+            console.log("Senders:", senders);
+            if (senders) {
+                insertSenders(senders);
+            }
+        });
+
+        // insertSampleSenders();
 
     }
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
-
-// Listen for updated sender counts from the background script
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "updateSenderCounts") {
-        const topSenders = request.senders;
-        console.log("Top senders received:", topSenders);
-
-        // Update the Declutter tab with the top senders
-        const declutterBodyTable = document.querySelector("#declutter-body-table");
-        declutterBodyTable.innerHTML = ""; // Clear existing rows
-
-        topSenders.forEach(([sender, count]) => {
-            const senderName = sender.split("<")[0].trim();
-            const senderEmail = sender.split("<")[1].replace(">", "").trim();
-            const line = createSenderLine(senderName, senderEmail, count);
-            declutterBodyTable.appendChild(line);
-        });
-    }
-});

@@ -37,7 +37,8 @@
     "type": "module"
   },
   "permissions": [
-    "identity"
+    "identity",
+    "storage"
   ],
   "oauth2": {
     "client_id": "396720193118-fggljh2amq0jlgq4v861vqn6rb88q9dt.apps.googleusercontent.com",
