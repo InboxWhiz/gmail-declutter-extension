@@ -24,6 +24,11 @@
     color: #5F6368;
     font-size: 0.75rem;
     margin-top: 3px;
+    cursor: pointer;
+}
+
+.sender-email:hover {
+    color: #007BFF;
 }
 
 .email-count span {

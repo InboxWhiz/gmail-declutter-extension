@@ -117,9 +117,27 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
     senderEmailElement.textContent = senderEmail;
     emailCountElement.textContent = emailCountNum;
 
+    // Add onClick to email link button
+    senderEmailElement.addEventListener("click", () => {
+        searchEmailSender(senderEmail);
+    });
+
+
     return senderLine;
 
 };
+
+function searchEmailSender(email) {
+    // Get the search input element
+    const searchInput = document.querySelector("input[name='q']");
+
+    // Set the search input value to the email address
+    searchInput.value = `from:${email}`;
+
+    // Submit the search form
+    const searchSubmit = document.querySelector("button[aria-label='Search mail']");
+    searchSubmit.click();
+}
 
 // async function insertSampleSenders() {
 
@@ -187,7 +205,6 @@ const observer = new MutationObserver((mutations, observer) => {
 
         chrome.storage.local.get(["senders"]).then((result) => {
             const senders = result.senders;
-            console.log("Senders:", senders);
             if (senders) {
                 insertSenders(senders);
             }
