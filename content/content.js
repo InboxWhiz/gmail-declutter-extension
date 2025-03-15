@@ -83,6 +83,27 @@ async function insertDeclutterBody() {
         closeDeclutterTab();
     });
 
+    // Add no senders modal popup functionality
+    const modal = decutterBody.querySelector("#noSenderModal");
+    const closeModalButton = decutterBody.querySelector(".close-modal");
+    const unsubscribeButton = decutterBody.querySelector("#unsubscribe-button");
+    const deleteButton = decutterBody.querySelector("#delete-button");
+
+    function openModal() {
+        modal.style.display = "block";
+    }
+    unsubscribeButton.onclick = openModal;
+    deleteButton.onclick = openModal;
+
+    closeModalButton.onclick = function () {
+        modal.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
     // Append to Gmail
     const tabParent = document.querySelector(".aUx");
     tabParent.prepend(decutterBody);
@@ -138,19 +159,6 @@ function searchEmailSender(email) {
     const searchSubmit = document.querySelector("button[aria-label='Search mail']");
     searchSubmit.click();
 }
-
-// async function insertSampleSenders() {
-
-//     const line1 = await createSenderLine("Sample name", "sampleemail@gmail.com", 0);
-//     const line2 = await createSenderLine("Sample hi", "sampmail@gmail.com", 670);
-
-//     setTimeout(() => {
-//         const declutterBodyTable = document.querySelector("#senders");
-//         declutterBodyTable.parentElement.querySelector(".loading-message").style.display = "none";
-//         declutterBodyTable.appendChild(line1);
-//         declutterBodyTable.appendChild(line2);
-//     }, 2000);
-// }
 
 async function insertSenders(sendersList) {
 
@@ -209,8 +217,6 @@ const observer = new MutationObserver((mutations, observer) => {
                 insertSenders(senders);
             }
         });
-
-        // insertSampleSenders();
 
     }
 });
