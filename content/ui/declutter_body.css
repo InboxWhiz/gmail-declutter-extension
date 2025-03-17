@@ -40,9 +40,11 @@
 .button-bar {
     padding: 0px 20px;
     min-width: 300px;
+    display: flex;
+    justify-content: space-between;
 }
 
-.button-bar button {
+.sender-actions button {
     border: none;
     border-radius: 20px;
     cursor: pointer;
@@ -75,6 +77,15 @@
     background-color: #C21807;
 }
 
+#reload-button {
+    border: none;
+    background-color: white;
+    box-shadow: none;
+}
+
+#reload-button i {
+    font-size: 18px;
+}
 
 .loading-message {
     padding-left: 20px;
