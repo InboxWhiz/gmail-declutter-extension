@@ -1,41 +1,12 @@
 var declutterTabOpen = false;
 
-// Update senders if the senders list changes
-chrome.storage.onChanged.addListener((changes, namespace) => {
-
-    if (changes.senders) {
-
-        chrome.storage.local.get(["senders"]).then((result) => {
-            const senders = result.senders;
-            if (senders) {
-                insertSenders(senders);
-            }
-        });
-    }
-});
+// Functions to build UI
 
 async function insertDeclutterButton() {
     // Get location of insertion point
     const supportIcon = Array.from(document.querySelectorAll("*")).find(el => el.getAttribute("data-tooltip") === "Support");
 
-    // Load HTML fragment
-    const res = await fetch(chrome.runtime.getURL('content/ui/declutter_icon.html'));
-    const html = await res.text();
-
-    // Parse HTML into DOM element
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = html;
-    const button = wrapper.firstElementChild;
-
-    // Inject CSS if not already there
-    const existing = document.querySelector('#declutter-button-style');
-    if (!existing) {
-        const style = document.createElement('link');
-        style.rel = 'stylesheet';
-        style.href = chrome.runtime.getURL('content/ui/declutter_icon.css');
-        style.id = 'declutter-button-style';
-        document.head.appendChild(style);
-    }
+    const button = await loadHTMLFragment('content/ui/declutter_icon.html', 'content/ui/declutter_icon.css', 'declutter-button-style');
 
     // On click, open the Declutter tab
     button.addEventListener("click", () => {
@@ -47,24 +18,8 @@ async function insertDeclutterButton() {
 }
 
 async function insertDeclutterBody() {
-    // Load HTML fragment
-    const res = await fetch(chrome.runtime.getURL('content/ui/declutter_body.html'));
-    const html = await res.text();
-
-    // Parse HTML into DOM element
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = html;
-    const decutterBody = wrapper.firstElementChild;
-
-    // Inject CSS if not already there
-    const existing = document.querySelector('#declutter-body-style');
-    if (!existing) {
-        const style = document.createElement('link');
-        style.rel = 'stylesheet';
-        style.href = chrome.runtime.getURL('content/ui/declutter_body.css');
-        style.id = 'declutter-body-style';
-        document.head.appendChild(style);
-    }
+    const decutterBody = await loadHTMLFragment('content/ui/declutter_body.html', 'content/ui/declutter_body.css', 'declutter-body-style');
+    console.log("decutterBody:", decutterBody);
 
     // Add FontAwesome link if not already there
     const existingFontAwesome = document.querySelector('#font-awesome-style');
@@ -115,24 +70,7 @@ async function insertDeclutterBody() {
 };
 
 async function createSenderLine(senderName, senderEmail, emailCountNum) {
-    // Load HTML fragment
-    const res = await fetch(chrome.runtime.getURL('content/ui/sender_line.html'));
-    const html = await res.text();
-
-    // Parse HTML into DOM element
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = html;
-    const senderLine = wrapper.firstElementChild;
-
-    // Inject CSS if not already there
-    const existing = document.querySelector('#sender-line-style');
-    if (!existing) {
-        const style = document.createElement('link');
-        style.rel = 'stylesheet';
-        style.href = chrome.runtime.getURL('content/ui/sender_line.css');
-        style.id = 'sender-line-style';
-        document.head.appendChild(style);
-    }
+    const senderLine = await loadHTMLFragment('content/ui/sender_line.html', 'content/ui/sender_line.css', 'sender-line-style');
 
     // Set sender name, email, and email count
     const senderNameElement = senderLine.querySelector(".sender-name");
@@ -148,22 +86,8 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
         searchEmailSender(senderEmail);
     });
 
-
     return senderLine;
-
 };
-
-function searchEmailSender(email) {
-    // Get the search input element
-    const searchInput = document.querySelector("input[name='q']");
-
-    // Set the search input value to the email address
-    searchInput.value = `from:${email}`;
-
-    // Submit the search form
-    const searchSubmit = document.querySelector("button[aria-label='Search mail']");
-    searchSubmit.click();
-}
 
 async function insertSenders(sendersList) {
 
@@ -184,6 +108,30 @@ async function insertSenders(sendersList) {
         }
     }, 2000);
 }
+
+// Helper functions
+
+async function loadHTMLFragment(htmlUrl, cssUrl, styleId) {
+    const res = await fetch(chrome.runtime.getURL(htmlUrl));
+    const html = await res.text();
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+
+    // Inject CSS if not already there
+    const existing = document.querySelector(styleId);
+    if (!existing) {
+        const style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = chrome.runtime.getURL(cssUrl);
+        style.id = styleId;
+        document.head.appendChild(style);
+    }
+
+    return wrapper.firstElementChild;
+}
+
+// Actions
 
 function openDeclutterTab() {
     declutterTabOpen = true;
@@ -220,6 +168,33 @@ function reloadSenders() {
     const declutterBodyTable = document.querySelector("#senders");
     declutterBodyTable.innerHTML = "";
 }
+
+function searchEmailSender(email) {
+    // Get the search input element
+    const searchInput = document.querySelector("input[name='q']");
+
+    // Set the search input value to the email address
+    searchInput.value = `from:${email}`;
+
+    // Submit the search form
+    const searchSubmit = document.querySelector("button[aria-label='Search mail']");
+    searchSubmit.click();
+}
+
+
+// Update senders if the senders list changes
+chrome.storage.onChanged.addListener((changes, namespace) => {
+
+    if (changes.senders) {
+
+        chrome.storage.local.get(["senders"]).then((result) => {
+            const senders = result.senders;
+            if (senders) {
+                insertSenders(senders);
+            }
+        });
+    }
+});
 
 const observer = new MutationObserver((mutations, observer) => {
     if (document.querySelector("[data-tooltip='Support']")) {
