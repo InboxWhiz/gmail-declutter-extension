@@ -81,6 +81,7 @@
     border: none;
     background-color: white;
     box-shadow: none;
+    cursor: pointer;
 }
 
 #reload-button i {

@@ -1,5 +1,4 @@
 var declutterTabOpen = false;
-chrome.runtime.sendMessage({ action: "fetchTopSenders" });
 
 // Update senders if the senders list changes
 chrome.storage.onChanged.addListener((changes, namespace) => {
@@ -104,6 +103,12 @@ async function insertDeclutterBody() {
         }
     }
 
+    // Add reload button functionality
+    const reloadButton = decutterBody.querySelector("#reload-button");
+    reloadButton.addEventListener("click", () => {
+        reloadSenders();
+    });
+
     // Append to Gmail
     const tabParent = document.querySelector(".aUx");
     tabParent.prepend(decutterBody);
@@ -202,6 +207,18 @@ function closeDeclutterTab() {
     // Hide Declutter tab content
     const declutterBody = document.querySelector("#declutter-body");
     declutterBody.style.display = "none";
+}
+
+function reloadSenders() {
+    chrome.runtime.sendMessage({ action: "fetchSenders" });
+
+    // Show loading message
+    const loadingMessage = document.querySelector(".loading-message");
+    loadingMessage.style.display = "block";
+
+    // Clear existing senders
+    const declutterBodyTable = document.querySelector("#senders");
+    declutterBodyTable.innerHTML = "";
 }
 
 const observer = new MutationObserver((mutations, observer) => {

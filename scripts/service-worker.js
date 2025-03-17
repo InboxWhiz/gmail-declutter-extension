@@ -1,20 +1,14 @@
-// chrome.runtime.onInstalled.addListener(() => {
-//     console.log("Extension installed, requesting Gmail authentication...");
-//     authenticateUser();
-// });
-
-// function authenticateUser() {
-//     chrome.identity.getAuthToken({ interactive: true }, (token) => {
-//         if (chrome.runtime.lastError) {
-//             console.error("Auth error:", chrome.runtime.lastError);
-//             return;
-//         }
-//         return token;
-//     });
-// }
+chrome.runtime.onInstalled.addListener(() => {
+    console.log("Extension installed, loading email senders...");
+    chrome.identity.getAuthToken({ interactive: true }, (token) => {
+        if (token) {
+            fetchAllUnreadSenders(token);
+        }
+    });
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "fetchTopSenders") {
+    if (message.action === "fetchSenders") {
         chrome.identity.getAuthToken({ interactive: true }, (token) => {
             if (token) {
                 fetchAllUnreadSenders(token);
