@@ -3,9 +3,6 @@ var declutterTabOpen = false;
 // Functions to build UI
 
 async function insertDeclutterButton() {
-    // Get location of insertion point
-    const supportIcon = Array.from(document.querySelectorAll("*")).find(el => el.getAttribute("data-tooltip") === "Support");
-
     const button = await loadHTMLFragment('content/ui/declutter_icon.html', 'content/ui/declutter_icon.css', 'declutter-button-style');
 
     // On click, open the Declutter tab
@@ -14,12 +11,12 @@ async function insertDeclutterButton() {
     });
 
     // Append to Gmail
+    const supportIcon = Array.from(document.querySelectorAll("*")).find(el => el.getAttribute("data-tooltip") === "Support");
     supportIcon.insertAdjacentElement("beforebegin", button);
 }
 
 async function insertDeclutterBody() {
     const decutterBody = await loadHTMLFragment('content/ui/declutter_body.html', 'content/ui/declutter_body.css', 'declutter-body-style');
-    console.log("decutterBody:", decutterBody);
 
     // Add FontAwesome link if not already there
     const existingFontAwesome = document.querySelector('#font-awesome-style');
@@ -38,25 +35,15 @@ async function insertDeclutterBody() {
     });
 
     // Add no senders modal popup functionality
-    const modal = decutterBody.querySelector("#noSenderModal");
-    const closeModalButton = decutterBody.querySelector(".close-modal");
-    const unsubscribeButton = decutterBody.querySelector("#unsubscribe-button");
-    const deleteButton = decutterBody.querySelector("#delete-button");
-
-    function openModal() {
+    loadModalPopup("#noSenderModal");
+    const openNoSenderModal = () => {
+        const modal = document.querySelector("#noSenderModal");
         modal.style.display = "block";
     }
-    unsubscribeButton.onclick = openModal;
-    deleteButton.onclick = openModal;
-
-    closeModalButton.onclick = function () {
-        modal.style.display = "none";
-    }
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
+    const unsubscribeButton = decutterBody.querySelector("#unsubscribe-button");
+    const deleteButton = decutterBody.querySelector("#delete-button");
+    unsubscribeButton.onclick = openNoSenderModal;
+    deleteButton.onclick = openNoSenderModal;
 
     // Add reload button functionality
     const reloadButton = decutterBody.querySelector("#reload-button");
@@ -67,7 +54,7 @@ async function insertDeclutterBody() {
     // Append to Gmail
     const tabParent = document.querySelector(".aUx");
     tabParent.prepend(decutterBody);
-};
+}
 
 async function createSenderLine(senderName, senderEmail, emailCountNum) {
     const senderLine = await loadHTMLFragment('content/ui/sender_line.html', 'content/ui/sender_line.css', 'sender-line-style');
@@ -87,7 +74,7 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
     });
 
     return senderLine;
-};
+}
 
 async function insertSenders(sendersList) {
 
@@ -118,7 +105,12 @@ async function loadHTMLFragment(htmlUrl, cssUrl, styleId) {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html;
 
-    // Inject CSS if not already there
+    loadCSS(cssUrl, styleId);
+
+    return wrapper.firstElementChild;
+}
+
+function loadCSS(cssUrl, styleId) {
     const existing = document.querySelector(styleId);
     if (!existing) {
         const style = document.createElement('link');
@@ -127,8 +119,25 @@ async function loadHTMLFragment(htmlUrl, cssUrl, styleId) {
         style.id = styleId;
         document.head.appendChild(style);
     }
+}
 
-    return wrapper.firstElementChild;
+function loadModalPopup(modalId) {
+    // Loads the modal popup and returns a function to open it.
+
+    setTimeout(() => {
+        const modal = document.querySelector(modalId);
+        const closeModalButton = modal.querySelector(".close-modal");
+
+        // Add close functionality
+        closeModalButton.onclick = function () {
+            modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }, 2000);
 }
 
 // Actions
