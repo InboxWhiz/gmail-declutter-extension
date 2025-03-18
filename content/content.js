@@ -29,25 +29,18 @@ async function insertDeclutterBody() {
     }
 
     // Add onClick to close button
-    const closeButton = decutterBody.querySelector(".close-button");
-    closeButton.addEventListener("click", () => {
+    decutterBody.querySelector(".close-button").addEventListener("click", () => {
         closeDeclutterTab();
     });
 
     // Add no senders modal popup functionality
     loadModalPopup("#noSenderModal");
-    const openNoSenderModal = () => {
-        const modal = document.querySelector("#noSenderModal");
-        modal.style.display = "block";
-    }
-    const unsubscribeButton = decutterBody.querySelector("#unsubscribe-button");
-    const deleteButton = decutterBody.querySelector("#delete-button");
-    unsubscribeButton.onclick = openNoSenderModal;
-    deleteButton.onclick = openNoSenderModal;
+    const openNoSenderModal = () => { document.querySelector("#noSenderModal").style.display = "block"; }
+    decutterBody.querySelector("#unsubscribe-button").onclick = openNoSenderModal;;
+    decutterBody.querySelector("#delete-button").onclick = openNoSenderModal;;
 
     // Add reload button functionality
-    const reloadButton = decutterBody.querySelector("#reload-button");
-    reloadButton.addEventListener("click", () => {
+    decutterBody.querySelector("#reload-button").addEventListener("click", () => {
         reloadSenders();
     });
 
@@ -146,36 +139,30 @@ function openDeclutterTab() {
     declutterTabOpen = true;
 
     // Select the declutter button
-    const declutterButton = document.querySelector("#declutter-button");
-    declutterButton.classList.toggle("active");
+    document.querySelector("#declutter-button").classList.toggle("active");
 
     // Show Declutter tab content
-    const declutterBody = document.querySelector("#declutter-body");
-    declutterBody.style.display = "block";
+    document.querySelector("#declutter-body").style.display = "block";
 }
 
 function closeDeclutterTab() {
     declutterTabOpen = false;
 
     // Deselect the declutter button
-    const declutterButton = document.querySelector("#declutter-button");
-    declutterButton.classList.toggle("active");
+    document.querySelector("#declutter-button").classList.toggle("active");
 
     // Hide Declutter tab content
-    const declutterBody = document.querySelector("#declutter-body");
-    declutterBody.style.display = "none";
+    document.querySelector("#declutter-body").style.display = "none";
 }
 
 function reloadSenders() {
     chrome.runtime.sendMessage({ action: "fetchSenders" });
 
     // Show loading message
-    const loadingMessage = document.querySelector(".loading-message");
-    loadingMessage.style.display = "block";
+    document.querySelector(".loading-message").style.display = "block";
 
     // Clear existing senders
-    const declutterBodyTable = document.querySelector("#senders");
-    declutterBodyTable.innerHTML = "";
+    document.querySelector("#senders").innerHTML = "";
 }
 
 function searchEmailSender(email) {
@@ -186,8 +173,7 @@ function searchEmailSender(email) {
     searchInput.value = `from:${email}`;
 
     // Submit the search form
-    const searchSubmit = document.querySelector("button[aria-label='Search mail']");
-    searchSubmit.click();
+    document.querySelector("button[aria-label='Search mail']").click();
 }
 
 
