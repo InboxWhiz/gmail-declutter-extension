@@ -1,4 +1,5 @@
 var declutterTabOpen = false;
+var selectedSenders = [];
 
 // Functions to build UI
 
@@ -66,6 +67,19 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
     senderEmailElement.addEventListener("click", () => {
         searchEmailSender(senderEmail);
     });
+
+    // Add functionality to checkbox
+    senderLine.querySelector("input[type='checkbox']").addEventListener("change", updateCheckbox);
+
+    function updateCheckbox() {
+        senderLine.classList.toggle("selected");
+
+        if (this.checked) {
+            selectedSenders.push(senderEmail);
+        } else {
+            selectedSenders.pop(senderEmail);
+        }
+    }
 
     return senderLine;
 }

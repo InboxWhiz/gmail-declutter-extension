@@ -1,4 +1,4 @@
-.declutter-line {
+.sender-line {
     background-color: white;
     font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
     font-size: 0.875rem;
@@ -6,6 +6,12 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #F2F6FC;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.sender-line.selected {
+    background-color: #C2DBFF;
 }
 
 .begin {
