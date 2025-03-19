@@ -1,5 +1,5 @@
 var declutterTabOpen = false;
-var selectedSenders = [];
+var selectedSenders = {};
 
 // Functions to build UI
 
@@ -79,10 +79,13 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
         senderLine.classList.toggle("selected");
 
         if (this.checked) {
-            selectedSenders.push(senderEmail);
+            selectedSenders[senderEmail] = emailCountNum;
         } else {
-            selectedSenders.pop(senderEmail);
+            delete selectedSenders[senderEmail];
         }
+        console.log(selectedSenders);
+        console.log("Selected senders: " + Object.keys(selectedSenders).length);
+        console.log("Total emails: " + Object.values(selectedSenders).reduce((a, b) => a + b, 0));
     }
 
     return senderLine;
@@ -173,8 +176,10 @@ function closeDeclutterTab() {
 }
 
 function openModal(confirmModal, warningModal) {
-    if (selectedSenders.length > 0) {
+    if (Object.keys(selectedSenders).length > 0) {
         console.log("Showing confirm modal");
+        confirmModal.querySelector("#emailsNum").textContent = Object.values(selectedSenders).reduce((a, b) => a + b, 0);
+        confirmModal.querySelector("#sendersNum").textContent = Object.keys(selectedSenders).length;
         confirmModal.style.display = "block";
     } else {
         console.log("Showing warning modal");
