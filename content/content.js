@@ -34,7 +34,8 @@ async function insertDeclutterBody() {
     });
 
     // Add no senders modal popup functionality
-    loadModalPopup("#noSenderModal");
+    const noSendersModal = await loadModalPopup('content/ui/modal_popups/no_sender.html');
+    decutterBody.appendChild(noSendersModal);
     const openNoSenderModal = () => { document.querySelector("#noSenderModal").style.display = "block"; }
     decutterBody.querySelector("#unsubscribe-button").onclick = openNoSenderModal;;
     decutterBody.querySelector("#delete-button").onclick = openNoSenderModal;;
@@ -114,23 +115,21 @@ function loadCSS(cssUrl, styleId) {
     }
 }
 
-function loadModalPopup(modalId) {
-    // Loads the modal popup and returns a function to open it.
+async function loadModalPopup(htmlUrl) {
+    const modal = await loadHTMLFragment(htmlUrl, 'content/ui/modal_popups/modal_popup.css', 'modal-style');
+    const closeModalButton = modal.querySelector(".close-modal");
 
-    setTimeout(() => {
-        const modal = document.querySelector(modalId);
-        const closeModalButton = modal.querySelector(".close-modal");
-
-        // Add close functionality
-        closeModalButton.onclick = function () {
+    // Add close functionality
+    closeModalButton.onclick = function () {
+        modal.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == modal) {
             modal.style.display = "none";
         }
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    }, 2000);
+    }
+
+    return modal
 }
 
 // Actions

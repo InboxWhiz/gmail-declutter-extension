@@ -12,12 +12,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "content/ui/declutter_icon.html",
-        "content/ui/declutter_icon.css",
-        "content/ui/declutter_body.html",
-        "content/ui/declutter_body.css",
-        "content/ui/sender_line.html",
-        "content/ui/sender_line.css",
+        "content/ui/*",
         "content/assets/declutter-icon.png"
       ],
       "matches": [
