@@ -39,6 +39,8 @@ async function insertDeclutterBody() {
     decutterBody.appendChild(noSendersModal);
 
     const deleteModal = await loadModalPopup('content/ui/modal_popups/confirm_delete.html');
+    const showEmailsButton = deleteModal.querySelector(".show-emails");
+    showEmailsButton.onclick = () => searchEmailSenders(Object.keys(selectedSenders));
     decutterBody.appendChild(deleteModal);
 
     // Add unsubscribe and delete button functionality
@@ -69,7 +71,7 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
 
     // Add onClick to email link button
     senderEmailElement.addEventListener("click", () => {
-        searchEmailSender(senderEmail);
+        searchEmailSenders([senderEmail]);
     });
 
     // Add functionality to checkbox
@@ -197,12 +199,15 @@ function reloadSenders() {
     document.querySelector("#senders").innerHTML = "";
 }
 
-function searchEmailSender(email) {
+function searchEmailSenders(emails) {
+    // Concatenate emails
+    const email = emails.join(" OR ");
+
     // Get the search input element
     const searchInput = document.querySelector("input[name='q']");
 
     // Set the search input value to the email address
-    searchInput.value = `from:${email}`;
+    searchInput.value = `from:(${email})`;
 
     // Submit the search form
     document.querySelector("button[aria-label='Search mail']").click();
