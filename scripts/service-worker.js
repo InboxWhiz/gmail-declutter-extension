@@ -1,11 +1,11 @@
-chrome.runtime.onInstalled.addListener(() => {
-    console.log("Extension installed, loading email senders...");
-    chrome.identity.getAuthToken({ interactive: true }, (token) => {
-        if (token) {
-            fetchAllUnreadSenders(token);
-        }
-    });
-});
+// chrome.runtime.onInstalled.addListener(() => {
+//     console.log("Extension installed, loading email senders...");
+//     chrome.identity.getAuthToken({ interactive: true }, (token) => {
+//         if (token) {
+//             fetchAllUnreadSenders(token);
+//         }
+//     });
+// });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "fetchSenders") {

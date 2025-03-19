@@ -34,12 +34,16 @@ async function insertDeclutterBody() {
         closeDeclutterTab();
     });
 
-    // Add no senders modal popup functionality
+    // Add modal popups
     const noSendersModal = await loadModalPopup('content/ui/modal_popups/no_sender.html');
     decutterBody.appendChild(noSendersModal);
-    const openNoSenderModal = () => { document.querySelector("#noSenderModal").style.display = "block"; }
-    decutterBody.querySelector("#unsubscribe-button").onclick = openNoSenderModal;;
-    decutterBody.querySelector("#delete-button").onclick = openNoSenderModal;;
+
+    const deleteModal = await loadModalPopup('content/ui/modal_popups/confirm_delete.html');
+    decutterBody.appendChild(deleteModal);
+
+    // Add unsubscribe and delete button functionality
+    decutterBody.querySelector("#unsubscribe-button").onclick = () => openModal(noSendersModal, noSendersModal);
+    decutterBody.querySelector("#delete-button").onclick = () => openModal(deleteModal, noSendersModal);
 
     // Add reload button functionality
     decutterBody.querySelector("#reload-button").addEventListener("click", () => {
@@ -166,6 +170,16 @@ function closeDeclutterTab() {
 
     // Hide Declutter tab content
     document.querySelector("#declutter-body").style.display = "none";
+}
+
+function openModal(confirmModal, warningModal) {
+    if (selectedSenders.length > 0) {
+        console.log("Showing confirm modal");
+        confirmModal.style.display = "block";
+    } else {
+        console.log("Showing warning modal");
+        warningModal.style.display = "block";
+    }
 }
 
 function reloadSenders() {
