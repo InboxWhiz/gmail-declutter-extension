@@ -200,6 +200,7 @@ function reloadSenders() {
 
     // Clear existing senders
     document.querySelector("#senders").innerHTML = "";
+    selectedSenders = {};
 }
 
 function searchEmailSenders(emails) {
@@ -230,6 +231,9 @@ function trashSenders() {
                 // Show success popup
                 document.querySelector("#deletePendingModal").style.display = "none";
                 document.querySelector("#deleteSuccessModal").style.display = "block";
+
+                // Reload senders
+                reloadSenders();
             }
         }
     );
