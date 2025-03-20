@@ -1,6 +1,6 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "fetchSenders") {
-        fetchAllUnreadSenders();
+        fetchAllSenders();
     }
 });
 
@@ -30,7 +30,7 @@ async function getOAuthToken(interactive = true) {
     });
 }
 
-async function fetchAllUnreadSenders() {
+async function fetchAllSenders() {
     let token = await getOAuthToken();
     let senders = {};
     let nextPageToken = null;
@@ -38,12 +38,12 @@ async function fetchAllUnreadSenders() {
 
     try {
         do {
-            let url = "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=500&q=is:unread";
+            let url = "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=500";
             if (nextPageToken) {
                 url += `&pageToken=${nextPageToken}`;
             }
 
-            // Fetch unread emails for the page
+            // Fetch emails for the page
             let response = await fetch(url, {
                 method: "GET",
                 headers: {
