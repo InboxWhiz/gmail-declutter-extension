@@ -1,23 +1,37 @@
-// chrome.runtime.onInstalled.addListener(() => {
-//     console.log("Extension installed, loading email senders...");
-//     chrome.identity.getAuthToken({ interactive: true }, (token) => {
-//         if (token) {
-//             fetchAllUnreadSenders(token);
-//         }
-//     });
-// });
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "fetchSenders") {
-        chrome.identity.getAuthToken({ interactive: true }, (token) => {
-            if (token) {
-                fetchAllUnreadSenders(token);
-            }
-        });
+        fetchAllUnreadSenders();
     }
 });
 
-async function fetchAllUnreadSenders(token) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "trashSenders" && Array.isArray(request.senders)) {
+        trashMultipleSenders(request.senders)
+            .then(() => {
+                sendResponse({ status: "success" });
+            })
+            .catch((err) => {
+                sendResponse({ status: "error", error: err.message });
+            });
+
+        return true; // This keeps the message channel open
+    }
+});
+
+async function getOAuthToken(interactive = true) {
+    return new Promise((resolve, reject) => {
+        chrome.identity.getAuthToken({ interactive }, token => {
+            if (chrome.runtime.lastError || !token) {
+                reject(chrome.runtime.lastError);
+                return;
+            }
+            resolve(token);
+        });
+    });
+}
+
+async function fetchAllUnreadSenders() {
+    let token = await getOAuthToken();
     let senders = {};
     let nextPageToken = null;
     let totalFetched = 0;
@@ -108,6 +122,44 @@ async function fetchAllUnreadSenders(token) {
     } catch (error) {
         console.error("Error fetching unread emails:", error);
     }
+}
+
+async function trashMultipleSenders(senders) {
+    const token = await getOAuthToken();
+    for (const sender of senders) {
+        await trashSender(token, sender);
+    }
+}
+
+async function trashSender(token, senderEmail) {
+    const headers = {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    // Step 1: Search for messages
+    const searchUrl = `https://www.googleapis.com/gmail/v1/users/me/messages?q=from:${encodeURIComponent(senderEmail)}&maxResults=500`;
+    const searchRes = await fetch(searchUrl, { headers });
+    const searchData = await searchRes.json();
+
+    if (!searchData.messages || searchData.messages.length === 0) {
+        console.log('No messages found.');
+        return;
+    } else {
+        console.log(`Found ${searchData.messages.length} messages from ${senderEmail}`);
+    }
+
+    const messageIds = searchData.messages.map(msg => msg.id);
+
+    // // Step 2: Move each message to Trash
+    // for (const id of messageIds) {
+    //     await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}/trash`, {
+    //         method: 'POST',
+    //         headers
+    //     });
+    // }
+
+    // console.log(`Deleted ${messageIds.length} emails from ${senderEmail}`);
 }
 
 function parseSender(sender) {
