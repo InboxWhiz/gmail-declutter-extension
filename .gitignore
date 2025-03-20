@@ -1,0 +1,5 @@
+# Linting tools
+package-lock.json
+node_modules/
+.stylelintrc.json
+.htmlhintrc

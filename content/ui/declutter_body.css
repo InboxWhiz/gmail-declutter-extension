@@ -1,137 +1,137 @@
 #declutter-body {
-    display: none;
-    position: relative;
-    background-color: white;
-    border-radius: 16px;
-    margin-left: 16px;
-    font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+  display: none;
+  position: relative;
+  background-color: white;
+  border-radius: 16px;
+  margin-left: 16px;
+  font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 }
 
 .declutter-body-header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .declutter-body-title {
-    font-size: 1rem;
-    padding-left: 20px;
+  font-size: 1rem;
+  padding-left: 20px;
 }
 
 .close-button {
-    background-image: url(https://www.gstatic.com/images/icons/material/system_gm/1x/close_black_20dp.png);
-    background-color: white;
-    background-repeat: no-repeat;
-    background-position: center;
-    border-radius: 20px;
-    border: none;
-    height: 40px;
-    width: 40px;
-    margin: 6px;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
+  background-image: url("https://www.gstatic.com/images/icons/material/system_gm/1x/close_black_20dp.png");
+  background-color: white;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 20px;
+  border: none;
+  height: 40px;
+  width: 40px;
+  margin: 6px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .close-button:hover {
-    background-color: #E7E7E7;
+  background-color: #e7e7e7;
 }
 
 .button-bar {
-    padding: 0px 20px;
-    min-width: 300px;
-    display: flex;
-    justify-content: space-between;
+  padding: 0 20px;
+  min-width: 300px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .sender-actions button {
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    height: 32px;
-    margin: 4px;
-    padding: 0 16px;
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  height: 32px;
+  margin: 4px;
+  padding: 0 16px;
+  box-shadow: 0 3px 5px rgba(0 0 0 / 20%);
 }
 
 .button-bar button i {
-    margin-right: 4px;
+  margin-right: 4px;
 }
 
 #unsubscribe-button {
-    background-color: #233B86;
-    color: white;
+  background-color: #233b86;
+  color: white;
 }
 
 #unsubscribe-button:hover {
-    background-color: #1A4C9B;
+  background-color: #1a4c9b;
 }
 
 #delete-button {
-    background-color: #BB1826;
-    color: white;
+  background-color: #bb1826;
+  color: white;
 }
 
 #delete-button:hover {
-    background-color: #C21807;
+  background-color: #c21807;
 }
 
 #reload-button {
-    border: none;
-    background-color: white;
-    box-shadow: none;
-    cursor: pointer;
+  border: none;
+  background-color: white;
+  box-shadow: none;
+  cursor: pointer;
 }
 
 #reload-button i {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .loading-message {
-    padding-left: 20px;
+  padding-left: 20px;
 }
 
 #senders {
-    padding: 10px;
-    overflow-y: scroll;
-    height: 80%;
+  padding: 10px;
+  overflow-y: scroll;
+  height: 80%;
 }
 
 .modal {
-    display: none;
-    position: absolute;
-    z-index: 50;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 16px;
-    background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background-color: rgba(0 0 0 / 40%);
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 50% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 70%;
-    border-radius: 7px;
-    text-align: center;
+  background-color: #fefefe;
+  margin: 50% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 70%;
+  border-radius: 7px;
+  text-align: center;
 }
 
 .close-modal {
-    color: #F4F4F4;
-    background-color: #323232;
-    text-align: center;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    padding: 1px 0;
-    margin-top: 40px;
-    width: 100%;
+  color: #f4f4f4;
+  background-color: #323232;
+  text-align: center;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  padding: 1px 0;
+  margin-top: 40px;
+  width: 100%;
 }
 
 .close-modal:hover {
-    background-color: #555;
-    cursor: pointer;
+  background-color: #555;
+  cursor: pointer;
 }

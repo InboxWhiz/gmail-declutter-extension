@@ -1,0 +1,54 @@
+{
+  "name": "gmail-declutter",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "prettier": "^3.5.3",
+    "stylelint": "^16.16.0",
+    "stylelint-config-standard": "^37.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:js": "eslint . --fix",
+    "lint:css": "stylelint **/*.css --fix",
+    "lint:html": "htmlhint **/*.html",
+    "lint:prettier": "prettier --write .",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:prettier"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": 2021
+    },
+    "env": {
+      "browser": true,
+      "webextensions": true,
+      "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "no-console": "off",
+      "semi": [
+        "error",
+        "always"
+      ],
+      "camelcase": [
+        "error"
+      ]
+    }
+  },
+  "stylelint": {
+    "extends": "stylelint-config-standard"
+  },
+  "htmlhint": {
+    "tagname-lowercase": true,
+    "attr-lowercase": true,
+    "attr-value-double-quotes": true,
+    "id-class-value": "dash",
+    "doctype-first": true,
+    "tag-pair": true,
+    "spec-char-escape": true,
+    "id-unique": true,
+    "src-not-empty": true
+  }
+}
