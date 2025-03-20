@@ -95,7 +95,6 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
         } else {
             delete selectedSenders[senderEmail];
         }
-        console.log(selectedSenders);
         console.log("Selected senders: " + Object.keys(selectedSenders).length);
         console.log("Total emails: " + Object.values(selectedSenders).reduce((a, b) => a + b, 0));
     }

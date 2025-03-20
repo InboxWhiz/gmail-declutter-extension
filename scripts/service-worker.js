@@ -151,15 +151,15 @@ async function trashSender(token, senderEmail) {
 
     const messageIds = searchData.messages.map(msg => msg.id);
 
-    // // Step 2: Move each message to Trash
-    // for (const id of messageIds) {
-    //     await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}/trash`, {
-    //         method: 'POST',
-    //         headers
-    //     });
-    // }
+    // Step 2: Move each message to Trash
+    for (const id of messageIds) {
+        await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}/trash`, {
+            method: 'POST',
+            headers
+        });
+    }
 
-    // console.log(`Deleted ${messageIds.length} emails from ${senderEmail}`);
+    console.log(`Deleted ${messageIds.length} emails from ${senderEmail}`);
 }
 
 function parseSender(sender) {
