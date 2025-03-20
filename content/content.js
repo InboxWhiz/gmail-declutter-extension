@@ -50,10 +50,19 @@ async function insertModalPopups(body) {
     body.appendChild(deletePendingModal);
     body.appendChild(deleteSuccessModal);
 
+    // Add click-off functionality
+    body.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
     // Add functionality to delete confirmation modal
     deleteConfirmModal.querySelector(".show-emails").onclick = () => searchEmailSenders(Object.keys(selectedSenders));
     deleteConfirmModal.querySelector(".delete-emails").onclick = trashSenders;
- 
+
     // Add unsubscribe and delete button functionality
     body.querySelector("#unsubscribe-button").onclick = () => openModal(noSendersModal, noSendersModal);
     body.querySelector("#delete-button").onclick = () => openModal(deleteConfirmModal, noSendersModal);
@@ -146,12 +155,6 @@ async function loadModalPopup(htmlUrl) {
     // Add close functionality
     if (closeModalButton) {
         closeModalButton.onclick = () => modal.style.display = "none";
-    }
-
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
     }
 
     return modal
