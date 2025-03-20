@@ -1,14 +1,13 @@
 var declutterTabOpen = false;
+var selectedSenders = {};
 
 // Functions to build UI
 
 async function insertDeclutterButton() {
     const button = await loadHTMLFragment('content/ui/declutter_icon.html', 'content/ui/declutter_icon.css', 'declutter-button-style');
 
-    // On click, open the Declutter tab
-    button.addEventListener("click", () => {
-        declutterTabOpen ? closeDeclutterTab() : openDeclutterTab();
-    });
+    // On click, open or close the Declutter tab
+    button.onclick = () => { declutterTabOpen ? closeDeclutterTab() : openDeclutterTab(); };
 
     // Append to Gmail
     const supportIcon = Array.from(document.querySelectorAll("*")).find(el => el.getAttribute("data-tooltip") === "Support");
@@ -28,25 +27,46 @@ async function insertDeclutterBody() {
         document.head.appendChild(fontAwesome);
     }
 
-    // Add onClick to close button
-    decutterBody.querySelector(".close-button").addEventListener("click", () => {
-        closeDeclutterTab();
-    });
+    // Add modal popups
+    await insertModalPopups(decutterBody);
 
-    // Add no senders modal popup functionality
-    loadModalPopup("#noSenderModal");
-    const openNoSenderModal = () => { document.querySelector("#noSenderModal").style.display = "block"; }
-    decutterBody.querySelector("#unsubscribe-button").onclick = openNoSenderModal;;
-    decutterBody.querySelector("#delete-button").onclick = openNoSenderModal;;
-
-    // Add reload button functionality
-    decutterBody.querySelector("#reload-button").addEventListener("click", () => {
-        reloadSenders();
-    });
+    // Add close and reload button functionality
+    decutterBody.querySelector(".close-button").onclick = closeDeclutterTab;
+    decutterBody.querySelector("#reload-button").onclick = reloadSenders;
 
     // Append to Gmail
     const tabParent = document.querySelector(".aUx");
     tabParent.prepend(decutterBody);
+}
+
+async function insertModalPopups(body) {
+    // Add modal popups
+    const noSendersModal = await loadModalPopup('content/ui/modal_popups/no_sender.html');
+    const deleteConfirmModal = await loadModalPopup('content/ui/modal_popups/delete_confirm.html');
+    const deletePendingModal = await loadModalPopup('content/ui/modal_popups/delete_pending.html');
+    const deleteSuccessModal = await loadModalPopup('content/ui/modal_popups/delete_success.html');
+    body.appendChild(noSendersModal);
+    body.appendChild(deleteConfirmModal);
+    body.appendChild(deletePendingModal);
+    body.appendChild(deleteSuccessModal);
+
+    // Add click-off functionality
+    body.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // Add functionality to delete confirmation modal
+    deleteConfirmModal.querySelector(".show-emails").onclick = () => searchEmailSenders(Object.keys(selectedSenders));
+    deleteConfirmModal.querySelector(".delete-emails").onclick = trashSenders;
+
+    // Add unsubscribe and delete button functionality
+    body.querySelector("#unsubscribe-button").onclick = () => openModal(noSendersModal, noSendersModal);
+    body.querySelector("#delete-button").onclick = () => openModal(deleteConfirmModal, noSendersModal);
+
 }
 
 async function createSenderLine(senderName, senderEmail, emailCountNum) {
@@ -62,9 +82,22 @@ async function createSenderLine(senderName, senderEmail, emailCountNum) {
     emailCountElement.textContent = emailCountNum;
 
     // Add onClick to email link button
-    senderEmailElement.addEventListener("click", () => {
-        searchEmailSender(senderEmail);
-    });
+    senderEmailElement.onclick = () => searchEmailSenders([senderEmail]);
+
+    // Add functionality to checkbox
+    senderLine.querySelector("input[type='checkbox']").addEventListener("change", updateCheckbox);
+
+    function updateCheckbox() {
+        senderLine.classList.toggle("selected");
+
+        if (this.checked) {
+            selectedSenders[senderEmail] = emailCountNum;
+        } else {
+            delete selectedSenders[senderEmail];
+        }
+        console.log("Selected senders: " + Object.keys(selectedSenders).length);
+        console.log("Total emails: " + Object.values(selectedSenders).reduce((a, b) => a + b, 0));
+    }
 
     return senderLine;
 }
@@ -114,23 +147,16 @@ function loadCSS(cssUrl, styleId) {
     }
 }
 
-function loadModalPopup(modalId) {
-    // Loads the modal popup and returns a function to open it.
+async function loadModalPopup(htmlUrl) {
+    const modal = await loadHTMLFragment(htmlUrl, 'content/ui/modal_popups/modal_popup.css', 'modal-style');
+    const closeModalButton = modal.querySelector(".close-modal");
 
-    setTimeout(() => {
-        const modal = document.querySelector(modalId);
-        const closeModalButton = modal.querySelector(".close-modal");
+    // Add close functionality
+    if (closeModalButton) {
+        closeModalButton.onclick = () => modal.style.display = "none";
+    }
 
-        // Add close functionality
-        closeModalButton.onclick = function () {
-            modal.style.display = "none";
-        }
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    }, 2000);
+    return modal
 }
 
 // Actions
@@ -155,6 +181,16 @@ function closeDeclutterTab() {
     document.querySelector("#declutter-body").style.display = "none";
 }
 
+function openModal(confirmModal, warningModal) {
+    if (Object.keys(selectedSenders).length > 0) {
+        confirmModal.querySelector("#emailsNum").textContent = Object.values(selectedSenders).reduce((a, b) => a + b, 0);
+        confirmModal.querySelector("#sendersNum").textContent = Object.keys(selectedSenders).length;
+        confirmModal.style.display = "block";
+    } else {
+        warningModal.style.display = "block";
+    }
+}
+
 function reloadSenders() {
     chrome.runtime.sendMessage({ action: "fetchSenders" });
 
@@ -163,18 +199,45 @@ function reloadSenders() {
 
     // Clear existing senders
     document.querySelector("#senders").innerHTML = "";
+    selectedSenders = {};
 }
 
-function searchEmailSender(email) {
+function searchEmailSenders(emails) {
+    // Concatenate emails
+    const email = emails.join(" OR ");
+
     // Get the search input element
     const searchInput = document.querySelector("input[name='q']");
 
     // Set the search input value to the email address
-    searchInput.value = `from:${email}`;
+    searchInput.value = `from:(${email})`;
 
     // Submit the search form
     document.querySelector("button[aria-label='Search mail']").click();
 }
+
+function trashSenders() {
+    // Show pending popup
+    document.querySelector("#deleteConfirmModal").style.display = "none";
+    document.querySelector("#deletePendingModal").style.display = "block";
+
+    // Send message to background script
+    chrome.runtime.sendMessage({ action: "trashSenders", senders: Object.keys(selectedSenders) },
+        (response) => {
+            if (chrome.runtime.lastError) {
+                console.error("Message error:", chrome.runtime.lastError.message);
+            } else {
+                // Show success popup
+                document.querySelector("#deletePendingModal").style.display = "none";
+                document.querySelector("#deleteSuccessModal").style.display = "block";
+
+                // Reload senders
+                reloadSenders();
+            }
+        }
+    );
+}
+
 
 
 // Update senders if the senders list changes

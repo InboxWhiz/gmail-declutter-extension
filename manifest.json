@@ -12,12 +12,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "content/ui/declutter_icon.html",
-        "content/ui/declutter_icon.css",
-        "content/ui/declutter_body.html",
-        "content/ui/declutter_body.css",
-        "content/ui/sender_line.html",
-        "content/ui/sender_line.css",
+        "content/ui/*",
         "content/assets/declutter-icon.png"
       ],
       "matches": [
@@ -43,7 +38,7 @@
   "oauth2": {
     "client_id": "396720193118-fggljh2amq0jlgq4v861vqn6rb88q9dt.apps.googleusercontent.com",
     "scopes": [
-      "https://www.googleapis.com/auth/gmail.readonly"
+      "https://www.googleapis.com/auth/gmail.modify"
     ]
   }
 }
