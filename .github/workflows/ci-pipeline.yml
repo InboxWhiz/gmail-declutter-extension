@@ -1,5 +1,4 @@
----
-name: lint
+name: Lint and Test
 
 on:
   push:
@@ -10,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  lint:
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -25,3 +24,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_CHECKOV: false
           VALIDATE_JAVASCRIPT_STANDARD: false
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Run Jest tests
+        run: |
+          npm test
