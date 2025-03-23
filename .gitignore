@@ -3,3 +3,6 @@ package-lock.json
 node_modules/
 .stylelintrc.json
 .htmlhintrc
+
+# Ignore the Puppeteer test for now
+test/index.test.js
