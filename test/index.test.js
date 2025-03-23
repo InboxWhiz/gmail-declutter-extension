@@ -1,13 +1,13 @@
-const puppeteer = require("puppeteer");
-const path = require("path");
+import { launch } from "puppeteer";
+import { resolve } from "path";
 
-const EXTENSION_PATH = path.resolve(__dirname, "../extension");
+const EXTENSION_PATH = resolve(__dirname, "../extension"); // eslint-disable-line no-undef
 const EXTENSION_ID = "ohanekenlbhghgfgfkciikfdchgljkma";
 
 let browser;
 
 beforeEach(async () => {
-  browser = await puppeteer.launch({
+  browser = await launch({
     headless: false,
     args: [
       `--disable-extensions-except=${EXTENSION_PATH}`,
@@ -23,7 +23,9 @@ afterEach(async () => {
 
 test("hello world test", async () => {
   const page = await browser.newPage();
-  await page.goto(`chrome-extension://${EXTENSION_ID}/content/ui/declutter_body.html`);
+  await page.goto(
+    `chrome-extension://${EXTENSION_ID}/content/ui/declutter_body.html`,
+  );
 
   const buttonBar = await page.$(".button-bar");
   const children = await buttonBar.$$("button");
