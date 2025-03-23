@@ -23,7 +23,7 @@
     }
   ],
   "background": {
-    "service_worker": "scripts/service-worker.js",
+    "service_worker": "background/main.js",
     "type": "module"
   },
   "permissions": ["identity", "storage"],
