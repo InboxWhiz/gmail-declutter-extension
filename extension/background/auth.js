@@ -3,7 +3,7 @@ export async function getOAuthToken(interactive = true) {
     chrome.identity.getAuthToken({ interactive }, (token) => {
       if (chrome.runtime.lastError || !token) {
         reject(
-          chrome.runtime.lastError || { message: "No OAuth token received." }
+          chrome.runtime.lastError || { message: "No OAuth token received." },
         );
         return;
       }

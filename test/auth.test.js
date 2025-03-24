@@ -1,23 +1,14 @@
 import { getOAuthToken } from "../extension/background/auth.js";
 
 describe("getOAuthToken", () => {
-  let originalChrome;
-
   beforeEach(() => {
-    // Save original chrome so we can restore it later
-    originalChrome = global.chrome;
-
-    // Create a mock chrome object
+    //eslint-disable-next-line no-undef
     global.chrome = {
       identity: {
         getAuthToken: jest.fn(),
       },
       runtime: {},
     };
-  });
-
-  afterEach(() => {
-    global.chrome = originalChrome;
   });
 
   test("resolves token when chrome.identity.getAuthToken succeeds", async () => {
@@ -46,8 +37,8 @@ describe("getOAuthToken", () => {
     });
 
     await expect(getOAuthToken()).rejects.toEqual({
-        message: "No OAuth token received.",
-      });
+      message: "No OAuth token received.",
+    });
   });
 
   test("passes correct interactive value to getAuthToken", async () => {
