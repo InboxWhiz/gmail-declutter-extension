@@ -1,4 +1,4 @@
-export function parseSender([raw, count]) {
+export function parseSender(raw) {
   try {
     let name, email;
     if (raw.includes("<")) {
@@ -8,10 +8,13 @@ export function parseSender([raw, count]) {
       name = raw.split("@")[0].trim();
       email = raw;
     }
-    return [email, name, count];
+    if (name.startsWith('"') && name.endsWith('"')) {
+      name = name.slice(1, -1);
+    }
+    return [email, name];
   } catch (e) {
     console.error("Error parsing sender:", raw, e);
-    return [raw, raw, count];
+    return [raw, "Unknown Sender"];
   }
 }
 
