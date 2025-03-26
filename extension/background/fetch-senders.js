@@ -120,14 +120,9 @@ function updateSenderCounts(sendersList, allSenders) {
 
 function storeSenders(senders) {
   // Parse and sort senders by email count
-  const parsedSenders = {};
-  for (const email of Object.keys(senders)) {
-    const name = Array.from(senders[email].name).sort(
-      (a, b) => a.length - b.length
-    )[0]; // Shortest name
-    const count = senders[email].count;
-    parsedSenders[email] = { name, count };
-  }
+  const parsedSenders = Object.entries(senders)
+    .map(([email, { name, count }]) => [email, Array.from(senders[email].name).sort((a, b) => a.length - b.length)[0], count]) // Shortest name
+    .sort((a, b) => b[2] - a[2]); // Sort by count in descending order
 
   // Store in local storage
   chrome.storage.local.set({ senders: parsedSenders });

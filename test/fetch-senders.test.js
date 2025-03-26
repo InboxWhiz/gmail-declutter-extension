@@ -118,10 +118,10 @@ describe("fetchAllSenders", () => {
     // Assert
     expect(fetch).toHaveBeenCalledTimes(4);
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
-      senders: {
-        "sender1@example.com": { name: "sender1", count: 1 },
-        "sender2@example.com": { name: "sender2", count: 1 },
-      },
+      senders: [
+        ["sender1@example.com", "sender1", 1],
+        ["sender2@example.com", "sender2", 1],
+      ],
     });
   });
 
@@ -279,7 +279,7 @@ describe("updateSenderCounts", () => {
 });
 
 describe("storeSenders", () => {
-  test("calls chrome.storage.local.set with parsed senders", () => {
+  test("calls chrome.storage.local.set with parsed and sorted senders", () => {
     // Act
     storeSenders({
       "alice@example.com": { count: 3, name: new Set(["alice"]) },
@@ -288,26 +288,29 @@ describe("storeSenders", () => {
 
     // Assert
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
-      senders: {
-        "alice@example.com": { name: "alice", count: 3 },
-        "bob@example.com": { name: "bob", count: 5 },
-      },
+      senders: [
+        ["bob@example.com", "bob", 5],
+        ["alice@example.com", "alice", 3],
+      ],
     });
   });
 
   test("uses shortest sender name", () => {
     // Act
     storeSenders({
-      "alice@example.com": { count: 3, name: new Set(["Alice - Newsletter", "alice"]) },
+      "alice@example.com": {
+        count: 3,
+        name: new Set(["Alice - Newsletter", "alice"]),
+      },
       "bob@example.com": { count: 5, name: new Set(["bob"]) },
     });
 
     // Assert
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
-      senders: {
-        "alice@example.com": { name: "alice", count: 3 },
-        "bob@example.com": { name: "bob", count: 5 },
-      },
+      senders: [
+        ["bob@example.com", "bob", 5],
+        ["alice@example.com", "alice", 3],
+      ],
     });
   });
 });

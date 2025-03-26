@@ -13,7 +13,6 @@ export function parseSender(raw) {
     }
     return [email, name];
   } catch (e) {
-    console.error("Error parsing sender:", raw, e);
     return [null, "Unknown Sender"];
   }
 }
