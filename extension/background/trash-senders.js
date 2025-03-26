@@ -1,10 +1,16 @@
 import { getOAuthToken } from "./auth.js";
 
-export async function trashMultipleSenders(senders) {
-  const token = await getOAuthToken();
+export async function trashMultipleSenders(
+  senders,
+  trashSenderFunc = trashSender,
+  getOAuthTokenFunc = getOAuthToken,
+) {
+  let totalEmailsTrashed = 0;
+  const token = await getOAuthTokenFunc();
   for (const sender of senders) {
-    await trashSender(token, sender);
+    totalEmailsTrashed += await trashSenderFunc(token, sender);
   }
+  return totalEmailsTrashed;
 }
 
 async function trashSender(token, senderEmail) {
@@ -20,7 +26,7 @@ async function trashSender(token, senderEmail) {
 
   if (!searchData.messages || searchData.messages.length === 0) {
     console.log("No messages found.");
-    return;
+    return 0; // To indicate no emails were found;
   } else {
     console.log(
       `Found ${searchData.messages.length} messages from ${senderEmail}`,
@@ -32,7 +38,7 @@ async function trashSender(token, senderEmail) {
   // Step 2: Move each message to Trash
   for (const id of messageIds) {
     await fetch(
-      `https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}/trash`,
+      `https://www.googleapis.com/gmail/v1/users/me/messages/${id}/trash`,
       {
         method: "POST",
         headers,
@@ -41,4 +47,7 @@ async function trashSender(token, senderEmail) {
   }
 
   console.log(`Deleted ${messageIds.length} emails from ${senderEmail}`);
+  return messageIds.length; // Return the number of emails trashed
 }
+
+export const exportForTest = { trashSender };
