@@ -1,3 +1,4 @@
+// eslint-disable-file no-redeclare
 /* global global */
 
 import {
@@ -301,17 +302,17 @@ describe("storeSenders", () => {
     // Act
     storeSenders({
       "alice@example.com": {
-        count: 3,
+        count: 4,
         name: new Set(["Alice - Newsletter", "alice"]),
       },
-      "bob@example.com": { count: 5, name: new Set(["bob"]) },
+      "bob@example.com": { count: 8, name: new Set(["bob"]) },
     });
 
     // Assert
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
       senders: [
-        ["bob@example.com", "bob", 5],
-        ["alice@example.com", "alice", 3],
+        ["bob@example.com", "bob", 8],
+        ["alice@example.com", "alice", 4],
       ],
     });
   });

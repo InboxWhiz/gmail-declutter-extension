@@ -1,4 +1,6 @@
+// eslint-disable-file no-redeclare
 /* global global */
+
 import {
   trashMultipleSenders,
   exportForTest,

@@ -1,4 +1,6 @@
+// eslint-disable-file no-redeclare
 /* global global */
+
 import { getOAuthToken } from "../extension/background/auth.js";
 
 describe("getOAuthToken", () => {
