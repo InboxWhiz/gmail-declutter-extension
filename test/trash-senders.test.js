@@ -1,6 +1,3 @@
-// eslint-disable-file no-redeclare
-/* global global */
-
 import {
   trashMultipleSenders,
   exportForTest,
@@ -10,7 +7,7 @@ const { trashSender } = exportForTest;
 // Mock dependencies
 const mockToken = "mock-token";
 const getOAuthToken = jest.fn().mockResolvedValue(mockToken);
-global.fetch = jest.fn();
+global.fetch = jest.fn(); // eslint-disable-line no-undef
 
 beforeEach(() => {
   jest.clearAllMocks();

@@ -1,6 +1,3 @@
-// eslint-disable-file no-redeclare
-/* global global */
-
 import {
   fetchAllSenders,
   exportForTest,
@@ -24,6 +21,7 @@ jest.mock("../extension/background/utils.js", () => {
     sleep: jest.fn(),
   };
 });
+// eslint-disable-next-line no-undef
 global.chrome = {
   storage: {
     local: {
@@ -31,7 +29,7 @@ global.chrome = {
     },
   },
 };
-global.fetch = jest.fn();
+global.fetch = jest.fn(); // eslint-disable-line no-undef
 
 describe("fetchAllSenders", () => {
   beforeEach(() => {
