@@ -14,9 +14,13 @@ import { parseSender, sleep } from "../extension/background/utils.js";
 
 // Mock dependencies
 jest.mock("../extension/background/auth.js");
-jest.mock("../extension/background/utils.js");
-
-// Mock `chrome.storage.local.set`
+jest.mock("../extension/background/utils.js", () => {
+  const originalModule = jest.requireActual("../extension/background/utils.js");
+  return {
+    ...originalModule,
+    sleep: jest.fn(),
+  };
+});
 global.chrome = {
   storage: {
     local: {
@@ -24,8 +28,6 @@ global.chrome = {
     },
   },
 };
-
-// Mock `fetch`
 global.fetch = jest.fn();
 
 describe("fetchAllSenders", () => {
@@ -74,11 +76,6 @@ describe("fetchAllSenders", () => {
 
   test("handles pagination and multiple fetch calls", async () => {
     // Arrange
-    parseSender.mockImplementation(([sender, count]) => [
-      sender,
-      sender.split("@")[0],
-      count,
-    ]);
 
     getOAuthToken.mockResolvedValue("mock-token");
 
@@ -121,10 +118,10 @@ describe("fetchAllSenders", () => {
     // Assert
     expect(fetch).toHaveBeenCalledTimes(4);
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
-      senders: [
-        ["sender1@example.com", "sender1", 1],
-        ["sender2@example.com", "sender2", 1],
-      ],
+      senders: {
+        "sender1@example.com": { name: "sender1", count: 1 },
+        "sender2@example.com": { name: "sender2", count: 1 },
+      },
     });
   });
 
@@ -209,14 +206,14 @@ describe("fetchMessageSenderSingle", () => {
     fetch.mockResolvedValueOnce({
       json: async () => ({
         payload: {
-          headers: [{ name: "From", value: "test@example.com" }],
+          headers: [{ name: "From", value: "Test <test@example.com>" }],
         },
       }),
     });
 
     const sender = await fetchMessageSenderSingle("mock-token", "123");
 
-    expect(sender).toBe("test@example.com");
+    expect(sender).toStrictEqual(["test@example.com", "Test"]);
   });
 
   test("returns 'Unknown Sender' when no From header is found", async () => {
@@ -230,7 +227,7 @@ describe("fetchMessageSenderSingle", () => {
 
     const sender = await fetchMessageSenderSingle("mock-token", "123");
 
-    expect(sender).toBe("Unknown Sender");
+    expect(sender).toStrictEqual([null, "Unknown Sender"]);
   });
 });
 
@@ -241,39 +238,76 @@ describe("updateSenderCounts", () => {
 
     // Act
     updateSenderCounts(
-      ["a@example.com", "b@example.com", "a@example.com"],
+      [
+        ["a@example.com", "Alice"],
+        ["b@example.com", "Bob"],
+        ["a@example.com", "Alice"],
+      ],
       senders
     );
 
     // Assert
     expect(senders).toEqual({
-      "a@example.com": 2,
-      "b@example.com": 1,
+      "a@example.com": { name: new Set(["Alice"]), count: 2 },
+      "b@example.com": { name: new Set(["Bob"]), count: 1 },
+    });
+  });
+
+  test("correctly increments sender counts with the same sender having multiple names", () => {
+    // Arrange
+    const senders = {};
+
+    // Act
+    updateSenderCounts(
+      [
+        ["a@example.com", "Alice"],
+        ["b@example.com", "Bob"],
+        ["a@example.com", "Alice - Newsletter"],
+      ],
+      senders
+    );
+
+    // Assert
+    expect(senders).toEqual({
+      "a@example.com": {
+        name: new Set(["Alice", "Alice - Newsletter"]),
+        count: 2,
+      },
+      "b@example.com": { name: new Set(["Bob"]), count: 1 },
     });
   });
 });
 
 describe("storeSenders", () => {
   test("calls chrome.storage.local.set with parsed senders", () => {
-    // Arrange
-    parseSender.mockImplementation(([sender, count]) => [
-      sender,
-      sender.split("@")[0],
-      count,
-    ]);
-
     // Act
     storeSenders({
-      "alice@example.com": 3,
-      "bob@example.com": 5,
+      "alice@example.com": { count: 3, name: new Set(["alice"]) },
+      "bob@example.com": { count: 5, name: new Set(["bob"]) },
     });
 
     // Assert
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
-      senders: [
-        ["bob@example.com", "bob", 5],
-        ["alice@example.com", "alice", 3],
-      ],
+      senders: {
+        "alice@example.com": { name: "alice", count: 3 },
+        "bob@example.com": { name: "bob", count: 5 },
+      },
+    });
+  });
+
+  test("uses shortest sender name", () => {
+    // Act
+    storeSenders({
+      "alice@example.com": { count: 3, name: new Set(["Alice - Newsletter", "alice"]) },
+      "bob@example.com": { count: 5, name: new Set(["bob"]) },
+    });
+
+    // Assert
+    expect(chrome.storage.local.set).toHaveBeenCalledWith({
+      senders: {
+        "alice@example.com": { name: "alice", count: 3 },
+        "bob@example.com": { name: "bob", count: 5 },
+      },
     });
   });
 });

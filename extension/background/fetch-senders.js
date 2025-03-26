@@ -18,6 +18,9 @@ export async function fetchAllSenders() {
       allMessageIds.push(...messageIds);
       nextPageToken = nextPage;
     } while (nextPageToken);
+    console.log(
+      `Fetched ${allMessageIds.length} email IDs. Getting senders...`
+    );
 
     // Process messages in batches of 40
     for (let i = 0; i < allMessageIds.length; i += 40) {
@@ -98,20 +101,33 @@ async function fetchMessageSenderSingle(token, messageId) {
   const sender = msgData.payload?.headers?.find(
     (header) => header.name === "From"
   )?.value;
-  return sender || "Unknown Sender";
+  return parseSender(sender);
 }
 
 function updateSenderCounts(sendersList, allSenders) {
   sendersList.forEach((sender) => {
-    allSenders[sender] = (allSenders[sender] || 0) + 1;
+    if (allSenders[sender[0]]) {
+      allSenders[sender[0]].count += 1;
+      allSenders[sender[0]]["name"].add(sender[1]);
+    } else {
+      allSenders[sender[0]] = {
+        count: 1,
+        name: new Set([sender[1]]),
+      };
+    }
   });
 }
 
 function storeSenders(senders) {
   // Parse and sort senders by email count
-  const parsedSenders = Object.entries(senders)
-    .map(([sender, count]) => parseSender([sender, count]))
-    .sort((a, b) => b[2] - a[2]);
+  const parsedSenders = {};
+  for (const email of Object.keys(senders)) {
+    const name = Array.from(senders[email].name).sort(
+      (a, b) => a.length - b.length
+    )[0]; // Shortest name
+    const count = senders[email].count;
+    parsedSenders[email] = { name, count };
+  }
 
   // Store in local storage
   chrome.storage.local.set({ senders: parsedSenders });
