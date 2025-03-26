@@ -13,13 +13,13 @@ export async function fetchAllSenders() {
     do {
       const { messageIds, nextPage } = await fetchMessageIds(
         authToken,
-        nextPageToken
+        nextPageToken,
       );
       allMessageIds.push(...messageIds);
       nextPageToken = nextPage;
     } while (nextPageToken);
     console.log(
-      `Fetched ${allMessageIds.length} email IDs. Getting senders...`
+      `Fetched ${allMessageIds.length} email IDs. Getting senders...`,
     );
 
     // Process messages in batches of 40
@@ -30,7 +30,7 @@ export async function fetchAllSenders() {
     }
 
     console.log(
-      `Fetched ${allMessageIds.length} emails. Found ${Object.keys(senders).length} unique senders.`
+      `Fetched ${allMessageIds.length} emails. Found ${Object.keys(senders).length} unique senders.`,
     );
 
     storeSenders(senders);
@@ -72,7 +72,7 @@ async function fetchMessageIds(token, pageToken) {
 
 async function fetchMessageSendersBatch(token, messageIds) {
   return Promise.all(
-    messageIds.map((id) => fetchMessageSenderSingle(token, id))
+    messageIds.map((id) => fetchMessageSenderSingle(token, id)),
   );
 }
 
@@ -86,7 +86,7 @@ async function fetchMessageSenderSingle(token, messageId) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    }
+    },
   );
 
   // Handle rate limiting
@@ -99,7 +99,7 @@ async function fetchMessageSenderSingle(token, messageId) {
   // Extract sender from response
   const msgData = await response.json();
   const sender = msgData.payload?.headers?.find(
-    (header) => header.name === "From"
+    (header) => header.name === "From",
   )?.value;
   return parseSender(sender);
 }
@@ -121,7 +121,11 @@ function updateSenderCounts(sendersList, allSenders) {
 function storeSenders(senders) {
   // Parse and sort senders by email count
   const parsedSenders = Object.entries(senders)
-    .map(([email, { name, count }]) => [email, Array.from(senders[email].name).sort((a, b) => a.length - b.length)[0], count]) // Shortest name
+    .map(([email, { name, count }]) => [
+      email,
+      Array.from(name).sort((a, b) => a.length - b.length)[0],
+      count,
+    ]) // Shortest name
     .sort((a, b) => b[2] - a[2]); // Sort by count in descending order
 
   // Store in local storage

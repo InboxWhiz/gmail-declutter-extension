@@ -1,3 +1,4 @@
+/* global global */
 import {
   trashMultipleSenders,
   exportForTest,
@@ -26,7 +27,7 @@ describe("trashMultipleSenders", () => {
     const result = await trashMultipleSenders(
       senders,
       mockTrashSender,
-      getOAuthToken
+      getOAuthToken,
     );
 
     // Assert
@@ -35,11 +36,11 @@ describe("trashMultipleSenders", () => {
     expect(mockTrashSender).toHaveBeenCalledTimes(2);
     expect(mockTrashSender).toHaveBeenCalledWith(
       mockToken,
-      "test1@example.com"
+      "test1@example.com",
     );
     expect(mockTrashSender).toHaveBeenCalledWith(
       mockToken,
-      "test2@example.com"
+      "test2@example.com",
     );
   });
 });
@@ -66,7 +67,7 @@ describe("trashSender", () => {
           Authorization: `Bearer ${mockToken}`,
           "Content-Type": "application/json",
         },
-      })
+      }),
     );
 
     // Assert: Check that trash request is correct for each message
@@ -78,7 +79,7 @@ describe("trashSender", () => {
           Authorization: `Bearer ${mockToken}`,
           "Content-Type": "application/json",
         },
-      })
+      }),
     );
     expect(fetch).toHaveBeenCalledWith(
       `https://www.googleapis.com/gmail/v1/users/me/messages/456/trash`,
@@ -88,7 +89,7 @@ describe("trashSender", () => {
           Authorization: `Bearer ${mockToken}`,
           "Content-Type": "application/json",
         },
-      })
+      }),
     );
 
     // Assert: Check that the output matches expectation
@@ -102,7 +103,7 @@ describe("trashSender", () => {
 
     // Act & Assert: Expect rejection to be handled
     await expect(trashSender(mockToken, senderEmail)).rejects.toThrow(
-      "Network error"
+      "Network error",
     );
   });
 });

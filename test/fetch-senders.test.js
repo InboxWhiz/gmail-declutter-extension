@@ -1,3 +1,5 @@
+/* global global */
+
 import {
   fetchAllSenders,
   exportForTest,
@@ -10,7 +12,7 @@ const {
 } = exportForTest;
 
 import { getOAuthToken } from "../extension/background/auth.js";
-import { parseSender, sleep } from "../extension/background/utils.js";
+import { sleep } from "../extension/background/utils.js";
 
 // Mock dependencies
 jest.mock("../extension/background/auth.js");
@@ -243,7 +245,7 @@ describe("updateSenderCounts", () => {
         ["b@example.com", "Bob"],
         ["a@example.com", "Alice"],
       ],
-      senders
+      senders,
     );
 
     // Assert
@@ -264,7 +266,7 @@ describe("updateSenderCounts", () => {
         ["b@example.com", "Bob"],
         ["a@example.com", "Alice - Newsletter"],
       ],
-      senders
+      senders,
     );
 
     // Assert

@@ -1,8 +1,8 @@
+/* global global */
 import { getOAuthToken } from "../extension/background/auth.js";
 
 describe("getOAuthToken", () => {
   beforeEach(() => {
-    //eslint-disable-next-line no-undef
     global.chrome = {
       identity: {
         getAuthToken: jest.fn(),

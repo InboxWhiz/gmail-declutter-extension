@@ -3,7 +3,7 @@ import { getOAuthToken } from "./auth.js";
 export async function trashMultipleSenders(
   senders,
   trashSenderFunc = trashSender,
-  getOAuthTokenFunc = getOAuthToken
+  getOAuthTokenFunc = getOAuthToken,
 ) {
   let totalEmailsTrashed = 0;
   const token = await getOAuthTokenFunc();
@@ -29,7 +29,7 @@ async function trashSender(token, senderEmail) {
     return 0; // To indicate no emails were found;
   } else {
     console.log(
-      `Found ${searchData.messages.length} messages from ${senderEmail}`
+      `Found ${searchData.messages.length} messages from ${senderEmail}`,
     );
   }
 
@@ -42,7 +42,7 @@ async function trashSender(token, senderEmail) {
       {
         method: "POST",
         headers,
-      }
+      },
     );
   }
 
