@@ -1,5 +1,6 @@
 // import { useState } from 'react'
 
+import { ActionButton } from './components/actionButton.tsx'
 import { SenderLine } from './components/senderLine.tsx'
 
 function App() {
@@ -13,15 +14,8 @@ function App() {
 
         <div className="button-bar">
           <div className="sender-actions">
-            <button id="unsubscribe-button">
-              <i className="fa-solid fa-ban"></i>
-              Unsubscribe
-            </button>
-
-            <button id="delete-button">
-              <i className="fa-solid fa-trash"></i>
-              Delete
-            </button>
+            <ActionButton id="unsubscribe-button" />
+            <ActionButton id="delete-button" />
           </div>
 
           <button id="reload-button">
