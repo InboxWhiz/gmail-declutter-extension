@@ -8,6 +8,7 @@ import './App.css'
 import { ModalPopup } from './components/modalPopup.tsx'
 
 function App() {
+
   return (
     <>
       <div id="declutter-body">
@@ -38,10 +39,10 @@ function App() {
           <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={44} />
         </div>
       </div>
-      <ModalPopup type="no-sender" />
-      <ModalPopup action="delete" type="confirm" />
-      <ModalPopup action="delete" type="pending" />
-      <ModalPopup action="delete" type="success" />
+      {/* <ModalPopup type="no-sender" /> */}
+      <ModalPopup action="delete" type="confirm" extras={{"emailsNum": 0, "sendersNum": 0}}/>
+      {/* <ModalPopup action="delete" type="pending" /> */}
+      {/* <ModalPopup action="delete" type="success" /> */}
     </>
   )
 }

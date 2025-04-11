@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
 import './modalPopup.css'
 
-interface ModalBodyProps {
+interface DeleteConfirmProps {
     close: () => void
+    emailsNum: number
+    sendersNum: number
 }
 
-const DeleteConfirm = ({ close }: ModalBodyProps) => {
+const DeleteConfirm = ({ close, emailsNum, sendersNum }: DeleteConfirmProps) => {
     return (
         <>
             <p>
-                Are you sure you want to
-                <b>delete <span id="emails-num"></span> emails</b> from
-                <b><span id="senders-num"></span></b> senders?
+                Are you sure you want to <b>delete {emailsNum} emails</b> from <b>{sendersNum}</b> senders?
             </p>
             <p className="note">Note: This will not block or unsubscribe.</p>
 
@@ -43,7 +43,7 @@ const DeleteSuccess = () => {
     )
 }
 
-const NoSender = ({ close }: ModalBodyProps) => {
+const NoSender = ({ close }: { close: () => void }) => {
     return (
         <>
             <p>Oops!</p>
@@ -60,9 +60,10 @@ const NoSender = ({ close }: ModalBodyProps) => {
 interface ModalPopupProps {
     action?: string
     type: string
+    extras?: { emailsNum: number, sendersNum: number }
 }
 
-export const ModalPopup = ({ action, type }: ModalPopupProps) => {
+export const ModalPopup = ({ action, type, extras }: ModalPopupProps) => {
     // action: delete, unsubscribe
     // type: confirm, pending, success, error, no-sender
 
@@ -78,7 +79,11 @@ export const ModalPopup = ({ action, type }: ModalPopupProps) => {
     const getChild = (): React.ReactNode => {
         switch (true) {
             case action === "delete" && type === "confirm":
-                return <DeleteConfirm close={() => setVisible(false)} />;
+                return <DeleteConfirm
+                    close={() => setVisible(false)}
+                    emailsNum={extras!.emailsNum}
+                    sendersNum={extras!.sendersNum}
+                />;
             case action === "delete" && type === "pending":
                 return <DeletePending />;
             case action === "delete" && type === "success":
