@@ -9,7 +9,7 @@ interface SenderLineProps {
 }
 
 export const SenderLine = ({ senderName, senderEmail, senderCount }: SenderLineProps) => {
-    const [isSelected, setIsSelected] = useState(false);
+    const [isSelected, setIsSelected] = useState<boolean>(false);
 
     return (
         <div className={isSelected ? "sender-line selected" : "sender-line"}>

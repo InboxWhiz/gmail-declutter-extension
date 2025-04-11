@@ -69,7 +69,7 @@ export const ModalPopup = ({ action, type, extras }: ModalPopupProps) => {
 
     const id: string = action ? `${action}-${type}-modal` : `${type}-modal`
 
-    const [visible, setVisible] = useState(false);
+    const [visible, setVisible] = useState<boolean>(false);
     const handleBackgroundClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) {
             setVisible(false);
