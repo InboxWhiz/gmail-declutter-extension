@@ -1,17 +1,21 @@
 import './modalPopup.css'
 import { useModal } from '../contexts/modalContext'
 import { useSelectedSenders } from '../contexts/selectedSendersContext'
-import { searchEmailSenders } from '../utils/actions'
+import { searchEmailSenders, trashSenders } from '../utils/actions'
 
 interface DeleteConfirmProps {
-    close: () => void
     emailsNum: number
     sendersNum: number
 }
 
-const DeleteConfirm = ({ close, emailsNum, sendersNum }: DeleteConfirmProps) => {
+const DeleteConfirm = ({ emailsNum, sendersNum }: DeleteConfirmProps) => {
     const { selectedSenders } = useSelectedSenders();
+    const { setModal } = useModal();
     const showEmails = () => { searchEmailSenders(Object.keys(selectedSenders)) }
+    const deleteEmails = () => {
+        setModal({ action: "delete", type: "pending" });
+        trashSenders(Object.keys(selectedSenders))
+    }
 
     return (
         <>
@@ -21,7 +25,7 @@ const DeleteConfirm = ({ close, emailsNum, sendersNum }: DeleteConfirmProps) => 
             <p className="note">Note: This will not block or unsubscribe.</p>
 
             <button className="secondary" onClick={showEmails}>Show all emails</button>
-            <button className="primary delete-emails" onClick={close}>Confirm</button>
+            <button className="primary" onClick={deleteEmails}>Confirm</button>
         </>
     )
 }
@@ -79,7 +83,6 @@ export const ModalPopup = () => {
         switch (true) {
             case action === "delete" && type === "confirm":
                 return <DeleteConfirm
-                    close={() => setModal(null)}
                     emailsNum={extras!.emailsNum}
                     sendersNum={extras!.sendersNum}
                 />;
