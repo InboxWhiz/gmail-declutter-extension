@@ -5,6 +5,7 @@ import { SenderLine } from './components/senderLine.tsx'
 import { ReloadButton } from './components/reloadButton.tsx'
 import { CloseButton } from './components/closeButton.tsx'
 import './App.css'
+import { ModalPopup } from './components/modalPopup.tsx'
 
 function App() {
   return (
@@ -32,6 +33,10 @@ function App() {
           <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={44} />
         </div>
       </div>
+      <ModalPopup type="no-sender" />
+      <ModalPopup type="delete-confirm" />
+      <ModalPopup type="delete-pending" />
+      <ModalPopup type="delete-success" />
     </>
   )
 }
