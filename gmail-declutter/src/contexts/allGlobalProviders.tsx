@@ -1,12 +1,15 @@
 import { ModalProvider } from "./modalContext";
 import { SelectedSendersProvider } from "./selectedSendersContext";
+import { SendersProvider } from "./sendersContext";
 
 export const AllGlobalProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <SelectedSendersProvider>
-            <ModalProvider>
-                {children}
-            </ModalProvider>
+            <SendersProvider>
+                <ModalProvider>
+                    {children}
+                </ModalProvider>
+            </SendersProvider>
         </SelectedSendersProvider>
     );
 };
