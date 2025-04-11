@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { searchEmailSenders } from '../utils/actions'
 import './senderLine.css'
+import { useSelectedSenders } from '../contexts/selectedSendersContext';
 
 interface SenderLineProps {
     senderName: string;
@@ -10,6 +11,21 @@ interface SenderLineProps {
 
 export const SenderLine = ({ senderName, senderEmail, senderCount }: SenderLineProps) => {
     const [isSelected, setIsSelected] = useState<boolean>(false);
+    const { setSelectedSenders } = useSelectedSenders();
+
+    const selectLine = () => {
+        setIsSelected(!isSelected);
+
+        setSelectedSenders(prev => {
+            const newSelected = { ...prev };
+            if (!isSelected) {
+                newSelected[senderEmail] = senderCount;
+            } else {
+                delete newSelected[senderEmail];
+            }
+            return newSelected;
+        });
+    };
 
     return (
         <div className={isSelected ? "sender-line selected" : "sender-line"}>
@@ -17,7 +33,7 @@ export const SenderLine = ({ senderName, senderEmail, senderCount }: SenderLineP
                 <div>
                     <input
                         type="checkbox"
-                        onClick={() => setIsSelected(!isSelected)}
+                        onClick={selectLine}
                     />
                 </div>
                 <div className="sender-details">

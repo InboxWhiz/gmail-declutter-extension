@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
 import './modalPopup.css'
+import { useModal } from '../contexts/modalContext'
 
 interface DeleteConfirmProps {
     close: () => void
@@ -57,22 +57,16 @@ const NoSender = ({ close }: { close: () => void }) => {
 }
 
 
-interface ModalPopupProps {
-    action?: string
-    type: string
-    extras?: { emailsNum: number, sendersNum: number }
-}
+export const ModalPopup = () => {
+    const { modal, setModal } = useModal();
+    if (!modal) return null;
 
-export const ModalPopup = ({ action, type, extras }: ModalPopupProps) => {
-    // action: delete, unsubscribe
-    // type: confirm, pending, success, error, no-sender
-
+    const { action, type, extras } = modal;
     const id: string = action ? `${action}-${type}-modal` : `${type}-modal`
 
-    const [visible, setVisible] = useState<boolean>(false);
     const handleBackgroundClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) {
-            setVisible(false);
+            setModal(null);
         }
     };
 
@@ -80,7 +74,7 @@ export const ModalPopup = ({ action, type, extras }: ModalPopupProps) => {
         switch (true) {
             case action === "delete" && type === "confirm":
                 return <DeleteConfirm
-                    close={() => setVisible(false)}
+                    close={() => setModal(null)}
                     emailsNum={extras!.emailsNum}
                     sendersNum={extras!.sendersNum}
                 />;
@@ -89,7 +83,7 @@ export const ModalPopup = ({ action, type, extras }: ModalPopupProps) => {
             case action === "delete" && type === "success":
                 return <DeleteSuccess />;
             case type === "no-sender":
-                return <NoSender close={() => setVisible(false)} />;
+                return <NoSender close={() => setModal(null)} />;
             default:
                 return <></>;
         }
@@ -99,7 +93,7 @@ export const ModalPopup = ({ action, type, extras }: ModalPopupProps) => {
         <div
             id={id}
             className="modal"
-            style={{ display: visible ? "block" : "none" }}
+            style={{ display: "block"}}
             onClick={handleBackgroundClick}
         >
             <div className="modal-content">
