@@ -31,12 +31,17 @@ function App() {
           <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={42} />
           <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={43} />
           <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={44} />
+          <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={45} />
+          <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={46} />
+          <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={44} />
+          <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={44} />
+          <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={44} />
         </div>
       </div>
       <ModalPopup type="no-sender" />
-      <ModalPopup type="delete-confirm" />
-      <ModalPopup type="delete-pending" />
-      <ModalPopup type="delete-success" />
+      <ModalPopup action="delete" type="confirm" />
+      <ModalPopup action="delete" type="pending" />
+      <ModalPopup action="delete" type="success" />
     </>
   )
 }

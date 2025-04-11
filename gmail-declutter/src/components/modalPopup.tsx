@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './modalPopup.css'
 
-const DeleteConfirm = () => {
+interface ModalBodyProps {
+    close: () => void
+}
+
+const DeleteConfirm = ({ close }: ModalBodyProps) => {
     return (
         <>
             <p>
@@ -12,7 +16,7 @@ const DeleteConfirm = () => {
             <p className="note">Note: This will not block or unsubscribe.</p>
 
             <button className="secondary show-emails">Show all emails</button>
-            <button className="primary delete-emails close-modal">Confirm</button>
+            <button className="primary delete-emails" onClick={() => close()}>Confirm</button>
         </>
     )
 }
@@ -39,7 +43,7 @@ const DeleteSuccess = () => {
     )
 }
 
-const noSender = () => {
+const NoSender = ({ close }: ModalBodyProps) => {
     return (
         <>
             <p>Oops!</p>
@@ -47,7 +51,7 @@ const noSender = () => {
 
             <div style={{ "height": "20px" }}></div>
 
-            <button className="primary close-modal">Go back</button>
+            <button className="primary" onClick={() => close()}>Go back</button>
         </>
     )
 }
@@ -56,8 +60,6 @@ const noSender = () => {
 interface ModalPopupProps {
     action?: string
     type: string
-    children?: React.ReactNode
-
 }
 
 export const ModalPopup = ({ action, type }: ModalPopupProps) => {
@@ -65,24 +67,38 @@ export const ModalPopup = ({ action, type }: ModalPopupProps) => {
     // type: confirm, pending, success, error, no-sender
 
     const id: string = action ? `${action}-${type}-modal` : `${type}-modal`
-    let child: React.ReactNode;
-    if (action === "delete" && type === "confirm") {
-        child = <DeleteConfirm />
-    } else if (action === "delete" && type === "pending") {
-        child = <DeletePending />
-    } else if (action === "delete" && type === "success") {
-        child = <DeleteSuccess />
-    } else if (type === "no-sender") {
-        child = noSender()
-    } else {
-        child = <></>
-    }
 
+    const [visible, setVisible] = useState(false);
+    const handleBackgroundClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (event.target === event.currentTarget) {
+            setVisible(false);
+        }
+    };
+
+    const getChild = (): React.ReactNode => {
+        switch (true) {
+            case action === "delete" && type === "confirm":
+                return <DeleteConfirm close={() => setVisible(false)} />;
+            case action === "delete" && type === "pending":
+                return <DeletePending />;
+            case action === "delete" && type === "success":
+                return <DeleteSuccess />;
+            case type === "no-sender":
+                return <NoSender close={() => setVisible(false)} />;
+            default:
+                return <></>;
+        }
+    };
 
     return (
-        <div id={id} className="modal">
+        <div
+            id={id}
+            className="modal"
+            style={{ display: visible ? "block" : "none" }}
+            onClick={handleBackgroundClick}
+        >
             <div className="modal-content">
-                {child}
+                {getChild()}
             </div>
         </div>
     )
