@@ -14,7 +14,7 @@
 }
 
 .button-bar {
-    padding: 10px 20px;
+    padding: 10px 20px 0;
     min-width: 300px;
     display: flex;
     justify-content: space-between;
