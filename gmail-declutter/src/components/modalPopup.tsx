@@ -12,9 +12,10 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: DeleteConfirmProps) => {
     const { selectedSenders } = useSelectedSenders();
     const { setModal } = useModal();
     const showEmails = () => { searchEmailSenders(Object.keys(selectedSenders)) }
-    const deleteEmails = () => {
+    const deleteEmails = async () => {
         setModal({ action: "delete", type: "pending" });
-        trashSenders(Object.keys(selectedSenders))
+        await trashSenders(Object.keys(selectedSenders))
+        setModal({ action: "delete", type: "success" });
     }
 
     return (
@@ -52,7 +53,8 @@ const DeleteSuccess = () => {
     )
 }
 
-const NoSender = ({ close }: { close: () => void }) => {
+const NoSender = () => {
+    const { setModal } = useModal();
     return (
         <>
             <p>Oops!</p>
@@ -60,7 +62,7 @@ const NoSender = ({ close }: { close: () => void }) => {
 
             <div style={{ "height": "20px" }}></div>
 
-            <button className="primary" onClick={() => close()}>Go back</button>
+            <button className="primary" onClick={() => setModal(null)}>Go back</button>
         </>
     )
 }
@@ -91,7 +93,7 @@ export const ModalPopup = () => {
             case action === "delete" && type === "success":
                 return <DeleteSuccess />;
             case type === "no-sender":
-                return <NoSender close={() => setModal(null)} />;
+                return <NoSender />;
             default:
                 return <></>;
         }

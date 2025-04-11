@@ -2,6 +2,8 @@ import { Sender } from "../types/types";
 
 export function searchEmailSenders(emails: string[]): void {
   console.log("Searching for emails: ", emails);
+  // TODO: Implement search emails functionality
+
   // // Concatenate emails
   // const email = emails.join(" OR ");
 
@@ -15,9 +17,37 @@ export function searchEmailSenders(emails: string[]): void {
   // (document.querySelector("button[aria-label='Search mail']") as HTMLButtonElement)!.click();
 }
 
-export function trashSenders(emails: string[]): void {
+export function trashSenders(emails: string[]): Promise<void> {
   console.log("Trashing senders: ", emails);
+
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(console.log("Trashed senders successfully"));
+    }, 1000);
+  });
+
   // TODO: Implement delete emails functionality
+
+  // // Show pending popup
+  // document.querySelector("#delete-confirm-modal").style.display = "none";
+  // document.querySelector("#delete-pending-modal").style.display = "block";
+
+  // // Send message to background script
+  // chrome.runtime.sendMessage(
+  //   { action: "trashSenders", senders: Object.keys(selectedSenders) },
+  //   () => {
+  //     if (chrome.runtime.lastError) {
+  //       console.error("Message error:", chrome.runtime.lastError.message);
+  //     } else {
+  //       // Show success popup
+  //       document.querySelector("#delete-pending-modal").style.display = "none";
+  //       document.querySelector("#delete-success-modal").style.display = "block";
+
+  //       // Reload senders
+  //       reloadSenders();
+  //     }
+  //   },
+  // );
 }
 
 export async function getAllSenders(): Promise<Sender[]> {
