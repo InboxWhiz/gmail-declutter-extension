@@ -1,0 +1,37 @@
+body {
+    padding: 0;
+    margin: 0;
+    background-color: grey;
+}
+
+#declutter-body {
+    /* display: none; */
+    position: relative;
+    background-color: white;
+    border-radius: 16px;
+    margin-left: 16px;
+    font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+}
+
+.declutter-body-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.declutter-body-title {
+    font-size: 1rem;
+    padding-left: 20px;
+}
+
+.button-bar {
+    padding: 0 20px;
+    min-width: 300px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#senders {
+    padding: 10px;
+    overflow-y: scroll;
+    height: 80%;
+}

@@ -3,6 +3,8 @@
 import { ActionButton } from './components/actionButton.tsx'
 import { SenderLine } from './components/senderLine.tsx'
 import { ReloadButton } from './components/reloadButton.tsx'
+import { CloseButton } from './components/closeButton.tsx'
+import './App.css'
 
 function App() {
   return (
@@ -10,7 +12,7 @@ function App() {
       <div id="declutter-body">
         <div className="declutter-body-header">
           <p className="declutter-body-title">Declutter</p>
-          <button className="close-button" aria-label="Close"></button>
+          <CloseButton />
         </div>
 
         <div className="button-bar">
@@ -22,7 +24,7 @@ function App() {
           <ReloadButton />
         </div>
 
-        <p className="loading-message">Loading messages...</p>
+        {/* <p className="loading-message">Loading messages...</p> */}
 
         <div id="senders">
           <SenderLine senderName="Sender name" senderEmail="email@email.com" senderCount={42} />
