@@ -1,0 +1,15 @@
+.reload-button {
+    border: none;
+    background-color: white;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.reload-button .i {
+    font-size: 18px;
+}
+
+.reload-button:hover {
+    transform: scale(1.2);
+    transition: transform 0.2s ease-in-out;
+}

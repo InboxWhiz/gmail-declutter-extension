@@ -2,6 +2,7 @@
 
 import { ActionButton } from './components/actionButton.tsx'
 import { SenderLine } from './components/senderLine.tsx'
+import { ReloadButton } from './components/reloadButton.tsx'
 
 function App() {
   return (
@@ -18,9 +19,7 @@ function App() {
             <ActionButton id="delete-button" />
           </div>
 
-          <button id="reload-button">
-            <i className="fa-solid fa-rotate"></i>
-          </button>
+          <ReloadButton />
         </div>
 
         <p className="loading-message">Loading messages...</p>
