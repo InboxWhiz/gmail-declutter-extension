@@ -10,7 +10,8 @@
     "128": "images/icon-128.png"
   },
   "permissions": [
-    "sidePanel"
+    "sidePanel",
+    "storage"
   ],
   "action": {
     "default_icon": "images/icon-32.png"
