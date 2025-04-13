@@ -2,11 +2,12 @@ import { getOAuthToken } from "./auth";
 
 export async function trashMultipleSenders(
   senders: string[],
+  trashSenderFunc = trashSender,
 ) {
   let totalEmailsTrashed: number = 0;
   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
   for (const sender of senders) {
-    totalEmailsTrashed += await trashSender(token, sender);
+    totalEmailsTrashed += await trashSenderFunc(token, sender);
   }
   return totalEmailsTrashed;
 }

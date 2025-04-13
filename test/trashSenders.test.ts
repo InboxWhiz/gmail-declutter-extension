@@ -1,16 +1,19 @@
 import {
   trashMultipleSenders,
   exportForTest,
-} from "../extension/background/trash-senders.js";
+} from "../src/utils/trashSenders";
 const { trashSender } = exportForTest;
 
+import { getOAuthToken } from "../src/utils/auth";
+
 // Mock dependencies
-const mockToken = "mock-token";
-const getOAuthToken = jest.fn().mockResolvedValue(mockToken);
-global.fetch = jest.fn(); // eslint-disable-line no-undef
+jest.mock("../src/utils/auth");
+const mockToken = "mock-token" as chrome.identity.GetAuthTokenResult;
+global.fetch = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
+  (getOAuthToken as jest.Mock).mockResolvedValue("mock-token");
 });
 
 describe("trashMultipleSenders", () => {
@@ -23,11 +26,7 @@ describe("trashMultipleSenders", () => {
       .mockResolvedValueOnce(5);
 
     // Act
-    const result = await trashMultipleSenders(
-      senders,
-      mockTrashSender,
-      getOAuthToken,
-    );
+    const result = await trashMultipleSenders(senders, mockTrashSender);
 
     // Assert
     expect(result).toBe(8);
@@ -51,7 +50,8 @@ describe("trashSender", () => {
     const mockResponse = {
       messages: [{ id: "123" }, { id: "456" }],
     };
-    fetch.mockResolvedValueOnce({
+    (getOAuthToken as jest.Mock).mockResolvedValue(mockToken);
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: () => Promise.resolve(mockResponse),
     });
 
@@ -98,7 +98,7 @@ describe("trashSender", () => {
   test("handles error when fetch fails", async () => {
     // Arrange
     const senderEmail = "test@example.com";
-    fetch.mockRejectedValueOnce(new Error("Network error"));
+    (fetch as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
 
     // Act & Assert: Expect rejection to be handled
     await expect(trashSender(mockToken, senderEmail)).rejects.toThrow(
