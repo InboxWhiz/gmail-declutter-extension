@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Gmail Declutter - Vite",
+  "name": "Gmail Declutter",
   "version": "1.0.0",
-  "description": "Declutter your Gmail in seconds — unsubscribe and remove bulk emails effortlessly.",
+  "description": "Declutter your Gmail in seconds - unsubscribe and remove bulk emails effortlessly.",
   "icons": {
     "16": "images/icon-16.png",
     "32": "images/icon-32.png",
@@ -34,7 +34,7 @@
     }
   ],
   "oauth2": {
-    "client_id": "396720193118-15n5b7vqhid0ttcgbt5jr8qkgo2mvgq7.apps.googleusercontent.com",
+    "client_id": "396720193118-fggljh2amq0jlgq4v861vqn6rb88q9dt.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/gmail.modify"
     ]
