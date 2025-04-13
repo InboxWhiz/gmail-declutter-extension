@@ -1,4 +1,4 @@
-import { parseSender } from "../extension/background/utils.js";
+import { parseSender } from "../src/utils/utils";
 
 describe("parseSender", () => {
   test("extracts name and email", () => {
