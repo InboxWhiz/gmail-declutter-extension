@@ -1,9 +1,9 @@
-import { getOAuthToken } from "../extension/background/auth.js";
+import { getOAuthToken } from "../src/utils/auth";
 
 describe("getOAuthToken", () => {
   beforeEach(() => {
-    // eslint-disable-next-line no-undef
-    global.chrome = {
+     
+    (global as any).chrome = {
       identity: {
         getAuthToken: jest.fn(),
       },
@@ -12,7 +12,7 @@ describe("getOAuthToken", () => {
   });
 
   test("resolves token when chrome.identity.getAuthToken succeeds", async () => {
-    chrome.identity.getAuthToken.mockImplementation((options, callback) => {
+    (chrome.identity.getAuthToken as jest.Mock).mockImplementation((options, callback) => {
       callback("mock-token");
     });
 
@@ -21,7 +21,7 @@ describe("getOAuthToken", () => {
   });
 
   test("rejects when chrome.runtime.lastError exists", async () => {
-    chrome.identity.getAuthToken.mockImplementation((options, callback) => {
+    (chrome.identity.getAuthToken as jest.Mock).mockImplementation((options, callback) => {
       chrome.runtime.lastError = { message: "Permission denied" };
       callback(null);
     });
@@ -32,7 +32,7 @@ describe("getOAuthToken", () => {
   });
 
   test("rejects when no token is returned (null)", async () => {
-    chrome.identity.getAuthToken.mockImplementation((options, callback) => {
+    (chrome.identity.getAuthToken as jest.Mock).mockImplementation((options, callback) => {
       callback(null);
     });
 
@@ -42,7 +42,7 @@ describe("getOAuthToken", () => {
   });
 
   test("passes correct interactive value to getAuthToken", async () => {
-    chrome.identity.getAuthToken.mockImplementation((options, callback) => {
+    (chrome.identity.getAuthToken as jest.Mock).mockImplementation((options, callback) => {
       expect(options).toEqual({ interactive: false });
       callback("mock-token");
     });
