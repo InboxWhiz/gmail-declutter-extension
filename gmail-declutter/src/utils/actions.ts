@@ -37,8 +37,9 @@ export function deleteSenders(emails: string[]): Promise<void> {
 
 }
 
-export async function getAllSenders(): Promise<Sender[]> {
-  // Retrieves all senders from local storage, or fetches them if not available
+export async function getAllSenders(fetchNew: boolean = false): Promise<Sender[]> {
+  // Retrieves all senders from local storage, or fetches them if not available.
+  // fetchNew: boolean - whether to fetch new senders from the server
 
   // // Set mock data
   // await chrome.storage.local.set({
@@ -48,6 +49,10 @@ export async function getAllSenders(): Promise<Sender[]> {
   //     Math.floor(Math.random() * 100) + 1,
   //   ]))
   // });
+
+  if (fetchNew) {
+    await fetchAllSenders();
+  }
 
   return new Promise((resolve, reject) => {
     chrome.storage.local.get(['senders'], async (result) => {
@@ -67,9 +72,11 @@ export async function getAllSenders(): Promise<Sender[]> {
         );
         resolve(realSenders);
       } else {
-        await fetchAllSenders();
-        await getAllSenders(); // Retry after fetching
-        resolve([]); // No senders saved
+        if (!fetchNew) { // Retry with fetching new senders if not found
+          await getAllSenders(fetchNew = true);
+        } else { // Already fetched - no senders found
+          resolve([]);
+        }
       }
     });
   });

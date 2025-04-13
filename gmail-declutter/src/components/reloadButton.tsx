@@ -7,7 +7,7 @@ export const ReloadButton = () => {
     const { reloadSenders } = useSenders();
 
     return (
-        <button className="reload-button" aria-label="Reload" onClick={reloadSenders}>
+        <button className="reload-button" aria-label="Reload" onClick={() => reloadSenders(true)}>
             <FontAwesomeIcon icon={faRotate} className="i" />
         </button>
     )

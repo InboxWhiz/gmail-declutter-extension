@@ -5,7 +5,7 @@ import { getAllSenders } from '../utils/actions';
 interface SendersContextType {
     senders: Sender[];
     loading: boolean;
-    reloadSenders: () => void;
+    reloadSenders: (fetchNew?: boolean) => void;
 }
 
 const SendersContext = createContext<SendersContextType | undefined>(undefined);
@@ -14,9 +14,9 @@ export const SendersProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [senders, setSenders] = useState<Sender[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
-    const reloadSenders = useCallback(async () => {
+    const reloadSenders = useCallback(async (fetchNew=false) => {
         setLoading(true);
-        const data = await getAllSenders();
+        const data = await getAllSenders(fetchNew);
         setSenders(data);
         setLoading(false);
     }, []);
