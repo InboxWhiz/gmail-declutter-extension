@@ -11,7 +11,8 @@
   },
   "permissions": [
     "sidePanel",
-    "storage"
+    "storage",
+    "identity"
   ],
   "action": {
     "default_icon": "images/icon-32.png"
@@ -22,5 +23,9 @@
   "background": {
     "service_worker": "background.js",
     "type": "module"
+  },
+  "oauth2": {
+    "client_id": "396720193118-15n5b7vqhid0ttcgbt5jr8qkgo2mvgq7.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/gmail.modify"]
   }
 }

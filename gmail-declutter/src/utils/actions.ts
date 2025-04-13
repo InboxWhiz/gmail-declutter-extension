@@ -1,4 +1,5 @@
 import { Sender } from "../types/types";
+import { fetchAllSenders } from "./fetchSenders";
 
 export function searchEmailSenders(emails: string[]): void {
   console.log("Searching for emails: ", emails);
@@ -51,19 +52,19 @@ export function trashSenders(emails: string[]): Promise<void> {
 }
 
 export async function getAllSenders(): Promise<Sender[]> {
-  // TODO: Implement a call to the background script to get all senders into storage
+  // Retrieve all senders from local storage, or fetch them if not available
 
-  // Set mock data
-  await chrome.storage.local.set({
-    senders: Array.from({ length: 10 }, (_, i) => ([
-      `email${i + 1}@email.com`,
-      `Sender ${i + 1}`,
-      Math.floor(Math.random() * 100) + 1,
-    ]))
-  });
+  // // Set mock data
+  // await chrome.storage.local.set({
+  //   senders: Array.from({ length: 10 }, (_, i) => ([
+  //     `email${i + 1}@email.com`,
+  //     `Sender ${i + 1}`,
+  //     Math.floor(Math.random() * 100) + 1,
+  //   ]))
+  // });
 
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get(['senders'], (result) => {
+    chrome.storage.local.get(['senders'], async (result) => {
       if (chrome.runtime.lastError) {
         reject(chrome.runtime.lastError);
         return;
@@ -80,6 +81,8 @@ export async function getAllSenders(): Promise<Sender[]> {
         );
         resolve(realSenders);
       } else {
+        await fetchAllSenders();
+        await getAllSenders(); // Retry after fetching
         resolve([]); // No senders saved
       }
     });
