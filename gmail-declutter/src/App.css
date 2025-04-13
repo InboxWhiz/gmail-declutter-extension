@@ -1,6 +1,9 @@
 #declutter-body {
     background-color: white;
     font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    height: 97vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .declutter-body-header {
@@ -22,6 +25,7 @@
 
 #senders {
     padding: 10px;
-    overflow-y: scroll;
-    height: 80%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-grow: 1;
 }
