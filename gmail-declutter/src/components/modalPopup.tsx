@@ -1,6 +1,7 @@
 import './modalPopup.css'
 import { useModal } from '../contexts/modalContext'
 import { useSelectedSenders } from '../contexts/selectedSendersContext'
+import { useSenders } from '../contexts/sendersContext';
 import { searchEmailSenders, deleteSenders } from '../utils/actions'
 
 interface DeleteConfirmProps {
@@ -10,12 +11,19 @@ interface DeleteConfirmProps {
 
 const DeleteConfirm = ({ emailsNum, sendersNum }: DeleteConfirmProps) => {
     const { selectedSenders } = useSelectedSenders();
+    const { reloadSenders } = useSenders();
     const { setModal } = useModal();
+
     const showEmails = () => { searchEmailSenders(Object.keys(selectedSenders)) }
     const deleteEmails = async () => {
         setModal({ action: "delete", type: "pending" });
         await deleteSenders(Object.keys(selectedSenders))
         setModal({ action: "delete", type: "success" });
+
+        // Wait 1 sec then reload senders
+        setTimeout(() => {
+            reloadSenders();
+        }, 1000);
     }
 
     return (

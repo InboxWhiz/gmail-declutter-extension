@@ -19,7 +19,6 @@ export function searchEmailSenders(emails: string[]): void {
   });
 }
 
-
 export function deleteSenders(emails: string[]): Promise<void> {
   // Moves the senders to trash using Gmail API
 
@@ -31,6 +30,19 @@ export function deleteSenders(emails: string[]): Promise<void> {
 
   return new Promise((resolve) => {
     trashMultipleSenders(emails).then(() => {
+
+      // Remove senders from local storage
+      chrome.storage.local.get(['senders'], (result) => {
+        if (result.senders) {
+          const updatedSenders = result.senders.filter(
+            (sender: [string, string, number]) => !emails.includes(sender[0])
+          );
+          chrome.storage.local.set({ senders: updatedSenders }, () => {
+            console.log("Updated senders in local storage.");
+          });
+        }
+      });
+
       resolve(console.log("Trashed senders successfully"));
     });
   });
