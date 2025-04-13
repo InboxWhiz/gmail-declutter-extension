@@ -1,7 +1,7 @@
 import {
   fetchAllSenders,
   exportForTest,
-} from "../extension/background/fetch-senders.js";
+} from "../src/utils/fetchSenders";
 const {
   fetchMessageIds,
   fetchMessageSenderSingle,
@@ -9,27 +9,27 @@ const {
   storeSenders,
 } = exportForTest;
 
-import { getOAuthToken } from "../extension/background/auth.js";
-import { sleep } from "../extension/background/utils.js";
+import { getOAuthToken } from "../src/utils/auth";
+import { sleep } from "../src/utils/utils";
 
 // Mock dependencies
-jest.mock("../extension/background/auth.js");
-jest.mock("../extension/background/utils.js", () => {
-  const originalModule = jest.requireActual("../extension/background/utils.js");
+jest.mock("../src/utils/auth");
+jest.mock("../src/utils/utils", () => {
+  const originalModule = jest.requireActual("../src/utils/utils");
   return {
     ...originalModule,
     sleep: jest.fn(),
   };
 });
-// eslint-disable-next-line no-undef
-global.chrome = {
+ 
+(global as any).chrome = {
   storage: {
     local: {
       set: jest.fn(),
     },
   },
 };
-global.fetch = jest.fn(); // eslint-disable-line no-undef
+global.fetch = jest.fn();
 
 describe("fetchAllSenders", () => {
   beforeEach(() => {
@@ -38,9 +38,9 @@ describe("fetchAllSenders", () => {
 
   test("calls getOAuthToken and fetches message IDs", async () => {
     // Arrange
-    getOAuthToken.mockResolvedValue("mock-token");
+    (getOAuthToken as jest.Mock).mockResolvedValue("mock-token");
 
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       status: 200,
       json: async () => ({
         messages: [{ id: "123" }, { id: "456" }],
@@ -48,7 +48,7 @@ describe("fetchAllSenders", () => {
       }),
     });
 
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       status: 200,
       json: async () => ({
         payload: {
@@ -57,7 +57,7 @@ describe("fetchAllSenders", () => {
       }),
     });
 
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       status: 200,
       json: async () => ({
         payload: {
@@ -78,10 +78,10 @@ describe("fetchAllSenders", () => {
   test("handles pagination and multiple fetch calls", async () => {
     // Arrange
 
-    getOAuthToken.mockResolvedValue("mock-token");
+    (getOAuthToken as jest.Mock).mockResolvedValue("mock-token");
 
     // First response with a nextPageToken
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         messages: [{ id: "123" }],
         nextPageToken: "next-page",
@@ -89,7 +89,7 @@ describe("fetchAllSenders", () => {
     });
 
     // Second response with no nextPageToken
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         messages: [{ id: "456" }],
         nextPageToken: null,
@@ -97,7 +97,7 @@ describe("fetchAllSenders", () => {
     });
 
     // Metadata request
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         payload: {
           headers: [{ name: "From", value: "sender1@example.com" }],
@@ -105,7 +105,7 @@ describe("fetchAllSenders", () => {
       }),
     });
 
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         payload: {
           headers: [{ name: "From", value: "sender2@example.com" }],
@@ -128,12 +128,12 @@ describe("fetchAllSenders", () => {
 
   test("handles rate limiting (429 Too Many Requests)", async () => {
     // Arrange
-    getOAuthToken.mockResolvedValue("mock-token");
+    (getOAuthToken as jest.Mock).mockResolvedValue("mock-token");
 
     // First response: rate limit hit
-    fetch.mockResolvedValueOnce({ status: 429 });
+    (fetch as jest.Mock).mockResolvedValueOnce({ status: 429 });
     // Second response: successful message fetch
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         messages: [{ id: "123" }],
         nextPageToken: null,
@@ -141,7 +141,7 @@ describe("fetchAllSenders", () => {
     });
 
     // Metadata request
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         payload: {
           headers: [{ name: "From", value: "sender@example.com" }],
@@ -164,14 +164,14 @@ describe("fetchMessageIds", () => {
   });
 
   test("fetches email IDs and handles pagination", async () => {
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         messages: [{ id: "abc123" }, { id: "xyz456" }],
         nextPageToken: "next-page-token",
       }),
     });
 
-    const result = await fetchMessageIds("mock-token", null);
+    const result = await fetchMessageIds(("mock-token" as chrome.identity.GetAuthTokenResult), null);
 
     expect(result).toEqual({
       messageIds: ["abc123", "xyz456"],
@@ -181,8 +181,8 @@ describe("fetchMessageIds", () => {
 
   test("handles rate limiting (429 Too Many Requests)", async () => {
     // Arrange
-    fetch.mockResolvedValueOnce({ status: 429 });
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({ status: 429 });
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         messages: [{ id: "abc123" }, { id: "xyz456" }],
         nextPageToken: "next-page-token",
@@ -190,11 +190,11 @@ describe("fetchMessageIds", () => {
     });
 
     // Act
-    const result = await fetchMessageIds("mock-token", null);
+    const result = await fetchMessageIds(("mock-token" as chrome.identity.GetAuthTokenResult), null);
 
     // Assert
     expect(sleep).toHaveBeenCalledWith(1000);
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect((fetch as jest.Mock)).toHaveBeenCalledTimes(2);
     expect(result).toEqual({
       messageIds: ["abc123", "xyz456"],
       nextPage: "next-page-token",
@@ -204,7 +204,7 @@ describe("fetchMessageIds", () => {
 
 describe("fetchMessageSenderSingle", () => {
   test("fetches sender metadata correctly", async () => {
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         payload: {
           headers: [{ name: "From", value: "Test <test@example.com>" }],
@@ -212,13 +212,13 @@ describe("fetchMessageSenderSingle", () => {
       }),
     });
 
-    const sender = await fetchMessageSenderSingle("mock-token", "123");
+    const sender = await fetchMessageSenderSingle(("mock-token" as chrome.identity.GetAuthTokenResult), "123");
 
     expect(sender).toStrictEqual(["test@example.com", "Test"]);
   });
 
   test("returns 'Unknown Sender' when no From header is found", async () => {
-    fetch.mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         payload: {
           headers: [],
@@ -226,7 +226,7 @@ describe("fetchMessageSenderSingle", () => {
       }),
     });
 
-    const sender = await fetchMessageSenderSingle("mock-token", "123");
+    const sender = await fetchMessageSenderSingle(("mock-token" as chrome.identity.GetAuthTokenResult), "123");
 
     expect(sender).toStrictEqual([null, "Unknown Sender"]);
   });

@@ -2,12 +2,11 @@ import { getOAuthToken } from "./auth";
 import { parseSender, sleep } from "./utils";
 
 export async function fetchAllSenders(): Promise<void> {
-  await getOAuthToken();
   const authToken = await getOAuthToken();
   const senders = {};
 
   let nextPageToken = null;
-  let allMessageIds = [];
+  const allMessageIds = [];
 
   try {
     // Fetch all message IDs
