@@ -12,7 +12,9 @@
   "permissions": [
     "sidePanel",
     "storage",
-    "identity"
+    "identity",
+    "tabs",
+    "activeTab"
   ],
   "action": {
     "default_icon": "images/icon-32.png"
@@ -24,8 +26,21 @@
     "service_worker": "background.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "type": "module"
+    }
+  ],
   "oauth2": {
     "client_id": "396720193118-15n5b7vqhid0ttcgbt5jr8qkgo2mvgq7.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/gmail.modify"]
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.modify"
+    ]
   }
 }

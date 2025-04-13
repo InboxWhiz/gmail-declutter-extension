@@ -3,21 +3,22 @@ import { fetchAllSenders } from "./fetchSenders";
 import { trashMultipleSenders } from "./trashSenders";
 
 export function searchEmailSenders(emails: string[]): void {
+  // Searches for emails in the Gmail tab
+
   console.log("Searching for emails: ", emails);
-  // TODO: Implement search emails functionality
 
-  // // Concatenate emails
-  // const email = emails.join(" OR ");
-
-  // // Get the search input element
-  // const searchInput: HTMLInputElement = document.querySelector("input[name='q']")!;
-
-  // // Set the search input value to the email address
-  // searchInput.value = `from:(${email})`;
-
-  // // Submit the search form
-  // (document.querySelector("button[aria-label='Search mail']") as HTMLButtonElement)!.click();
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]?.id) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        type: "SEARCH_EMAIL_SENDERS",
+        emails: emails,
+      });
+    } else {
+      console.error("No active tab found.");
+    }
+  });
 }
+
 
 export function deleteSenders(emails: string[]): Promise<void> {
   // Moves the senders to trash using Gmail API
