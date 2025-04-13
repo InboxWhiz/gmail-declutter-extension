@@ -19,12 +19,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Lint Code Base
         uses: super-linter/super-linter/slim@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_CHECKOV: false
           VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_TYPESCRIPT_STANDARD: false
+          VALIDATE_JSON: false
+          LINTER_RULES_PATH: .
+          JAVASCRIPT_ES_CONFIG_FILE: eslint.config.js
+          TYPESCRIPT_ES_CONFIG_FILE: eslint.config.js
 
   test:
     name: test
