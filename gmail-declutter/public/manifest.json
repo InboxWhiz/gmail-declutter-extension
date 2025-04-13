@@ -13,14 +13,10 @@
     "sidePanel",
     "storage",
     "identity",
-    "tabs",
-    "activeTab"
+    "tabs"
   ],
   "action": {
-    "default_icon": "images/icon-32.png"
-  },
-  "side_panel": {
-    "default_path": "index.html"
+    "default_state": "disabled"
   },
   "background": {
     "service_worker": "background.js",
