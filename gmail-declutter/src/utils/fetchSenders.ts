@@ -66,7 +66,7 @@ async function fetchMessageIds(token: chrome.identity.GetAuthTokenResult, pageTo
   // Parse response
   const data = await response.json();
   return {
-    messageIds: data.messages?.map((m: { id: any; }) => m.id) || [],
+    messageIds: data.messages?.map((m: gapi.client.gmail.Message) => m.id) || [],
     nextPage: data.nextPageToken || null,
   };
 }

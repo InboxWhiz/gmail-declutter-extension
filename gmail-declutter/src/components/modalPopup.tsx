@@ -1,7 +1,7 @@
 import './modalPopup.css'
 import { useModal } from '../contexts/modalContext'
 import { useSelectedSenders } from '../contexts/selectedSendersContext'
-import { searchEmailSenders, trashSenders } from '../utils/actions'
+import { searchEmailSenders, deleteSenders } from '../utils/actions'
 
 interface DeleteConfirmProps {
     emailsNum: number
@@ -14,7 +14,7 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: DeleteConfirmProps) => {
     const showEmails = () => { searchEmailSenders(Object.keys(selectedSenders)) }
     const deleteEmails = async () => {
         setModal({ action: "delete", type: "pending" });
-        await trashSenders(Object.keys(selectedSenders))
+        await deleteSenders(Object.keys(selectedSenders))
         setModal({ action: "delete", type: "success" });
     }
 

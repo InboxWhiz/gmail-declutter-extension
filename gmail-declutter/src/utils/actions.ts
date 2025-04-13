@@ -1,5 +1,6 @@
 import { Sender } from "../types/types";
 import { fetchAllSenders } from "./fetchSenders";
+import { trashMultipleSenders } from "./trashSenders";
 
 export function searchEmailSenders(emails: string[]): void {
   console.log("Searching for emails: ", emails);
@@ -18,41 +19,25 @@ export function searchEmailSenders(emails: string[]): void {
   // (document.querySelector("button[aria-label='Search mail']") as HTMLButtonElement)!.click();
 }
 
-export function trashSenders(emails: string[]): Promise<void> {
-  console.log("Trashing senders: ", emails);
+export function deleteSenders(emails: string[]): Promise<void> {
+  // Moves the senders to trash using Gmail API
 
-  return new Promise(resolve => {
-    setTimeout(() => {
+  // return new Promise(resolve => {
+  //   setTimeout(() => {
+  //     resolve(console.log("Trashed senders successfully"));
+  //   }, 1000);
+  // });
+
+  return new Promise((resolve) => {
+    trashMultipleSenders(emails).then(() => {
       resolve(console.log("Trashed senders successfully"));
-    }, 1000);
+    });
   });
 
-  // TODO: Implement delete emails functionality
-
-  // // Show pending popup
-  // document.querySelector("#delete-confirm-modal").style.display = "none";
-  // document.querySelector("#delete-pending-modal").style.display = "block";
-
-  // // Send message to background script
-  // chrome.runtime.sendMessage(
-  //   { action: "trashSenders", senders: Object.keys(selectedSenders) },
-  //   () => {
-  //     if (chrome.runtime.lastError) {
-  //       console.error("Message error:", chrome.runtime.lastError.message);
-  //     } else {
-  //       // Show success popup
-  //       document.querySelector("#delete-pending-modal").style.display = "none";
-  //       document.querySelector("#delete-success-modal").style.display = "block";
-
-  //       // Reload senders
-  //       reloadSenders();
-  //     }
-  //   },
-  // );
 }
 
 export async function getAllSenders(): Promise<Sender[]> {
-  // Retrieve all senders from local storage, or fetch them if not available
+  // Retrieves all senders from local storage, or fetches them if not available
 
   // // Set mock data
   // await chrome.storage.local.set({
