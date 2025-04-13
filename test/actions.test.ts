@@ -76,7 +76,7 @@ describe("deleteSenders", () => {
 
         // Setup chrome.storage.local.set mock
         (chrome.storage.local.set as jest.Mock).mockImplementation(
-            (data: any, callback: Function) => {
+            (data: any, callback) => {
                 callback();
             }
         );

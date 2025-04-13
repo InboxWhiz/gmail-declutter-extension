@@ -13,7 +13,7 @@ export function parseSender(raw: string | null): [string | null, string] {
       name = name.slice(1, -1);
     }
     return [email, name];
-  } catch (e) {
+  } catch {
     return [null, "Unknown Sender"];
   }
 }

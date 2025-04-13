@@ -16,7 +16,7 @@ describe("parseSender", () => {
     expect(result).toEqual(["john@example.com", "John Doe"]);
   });
 
-  test("extracts name and email when error", () => {
+  test("extracts name and email when invalid", () => {
     const result = parseSender(null); // invalid sender
     expect(result).toEqual([null, "Unknown Sender"]);
   });

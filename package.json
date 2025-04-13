@@ -6,9 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest",
+    "lint:js": "eslint . --fix",
+    "lint:css": "stylelint **/*.css --fix",
+    "lint:html": "htmlhint **/*.html",
+    "lint:prettier": "prettier --write .",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:prettier"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
