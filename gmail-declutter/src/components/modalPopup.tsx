@@ -10,14 +10,26 @@ interface DeleteConfirmProps {
 }
 
 const DeleteConfirm = ({ emailsNum, sendersNum }: DeleteConfirmProps) => {
-    const { selectedSenders } = useSelectedSenders();
+    const { selectedSenders, setSelectedSenders } = useSelectedSenders();
     const { reloadSenders } = useSenders();
     const { setModal } = useModal();
 
     const showEmails = () => { searchEmailSenders(Object.keys(selectedSenders)) }
     const deleteEmails = async () => {
+        // Set modal to pending state
         setModal({ action: "delete", type: "pending" });
+
+        // Delete senders and remove them from selectedSenders
         await deleteSenders(Object.keys(selectedSenders))
+        for (const senderEmail in selectedSenders) {
+            setSelectedSenders(prev => {
+                const newSelected = { ...prev };
+                delete newSelected[senderEmail];
+                return newSelected;
+            });
+        }
+        
+        // Set modal to success state
         setModal({ action: "delete", type: "success" });
 
         // Wait 1 sec then reload senders
