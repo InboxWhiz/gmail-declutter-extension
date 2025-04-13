@@ -1,0 +1,4 @@
+{
+  "threshold": 0.4,
+  "ignore": ["**/dist/**", "**/node_modules/**"]
+}

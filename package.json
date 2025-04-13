@@ -12,7 +12,7 @@
     "lint:css": "stylelint **/*.css --fix",
     "lint:html": "htmlhint **/*.html",
     "lint:prettier": "prettier --write .",
-    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:prettier"
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:prettier && jscpd ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -40,6 +40,7 @@
     "globals": "^15.15.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
+    "jscpd": "^4.0.5",
     "prettier": "3.5.3",
     "stylelint": "^16.18.0",
     "stylelint-config-standard": "^38.0.0",
