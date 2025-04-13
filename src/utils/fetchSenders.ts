@@ -39,7 +39,10 @@ export async function fetchAllSenders(): Promise<void> {
   }
 }
 
-async function fetchMessageIds(token: chrome.identity.GetAuthTokenResult, pageToken: string | null): Promise<{ messageIds: string[]; nextPage: string | null }> {
+async function fetchMessageIds(
+  token: chrome.identity.GetAuthTokenResult,
+  pageToken: string | null,
+): Promise<{ messageIds: string[]; nextPage: string | null }> {
   let url =
     "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=500";
   if (pageToken) {
@@ -65,18 +68,25 @@ async function fetchMessageIds(token: chrome.identity.GetAuthTokenResult, pageTo
   // Parse response
   const data = await response.json();
   return {
-    messageIds: data.messages?.map((m: gapi.client.gmail.Message) => m.id) || [],
+    messageIds:
+      data.messages?.map((m: gapi.client.gmail.Message) => m.id) || [],
     nextPage: data.nextPageToken || null,
   };
 }
 
-export async function fetchMessageSendersBatch(token: chrome.identity.GetAuthTokenResult, messageIds: string[]): Promise<any[]> {
+export async function fetchMessageSendersBatch(
+  token: chrome.identity.GetAuthTokenResult,
+  messageIds: string[],
+): Promise<any[]> {
   return Promise.all(
     messageIds.map((id) => fetchMessageSenderSingle(token, id)),
   );
 }
 
-async function fetchMessageSenderSingle(token: chrome.identity.GetAuthTokenResult, messageId: string): Promise<any> {
+async function fetchMessageSenderSingle(
+  token: chrome.identity.GetAuthTokenResult,
+  messageId: string,
+): Promise<any> {
   // Fetch message metadata
   const response = await fetch(
     `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=metadata&metadataHeaders=From`,
@@ -99,12 +109,15 @@ async function fetchMessageSenderSingle(token: chrome.identity.GetAuthTokenResul
   // Extract sender from response
   const msgData = await response.json();
   const sender = msgData.payload?.headers?.find(
-    (header: { name: string; }) => header.name === "From",
+    (header: { name: string }) => header.name === "From",
   )?.value;
   return parseSender(sender);
 }
 
-function updateSenderCounts(sendersList: any[], allSenders: { [x: string]: { count: number; name: Set<any>; }; }): void {
+function updateSenderCounts(
+  sendersList: any[],
+  allSenders: { [x: string]: { count: number; name: Set<any> } },
+): void {
   sendersList.forEach((sender) => {
     if (allSenders[sender[0]]) {
       allSenders[sender[0]].count += 1;
@@ -118,7 +131,9 @@ function updateSenderCounts(sendersList: any[], allSenders: { [x: string]: { cou
   });
 }
 
-function storeSenders(senders: { [s: string]: { name: Set<string>; count: number } }) {
+function storeSenders(senders: {
+  [s: string]: { name: Set<string>; count: number };
+}) {
   // Parse and sort senders by email count
   const parsedSenders = Object.entries(senders)
     .map(([email, { name, count }]) => [

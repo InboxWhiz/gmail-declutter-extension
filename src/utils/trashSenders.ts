@@ -12,7 +12,10 @@ export async function trashMultipleSenders(
   return totalEmailsTrashed;
 }
 
-async function trashSender(token: chrome.identity.GetAuthTokenResult, senderEmail: string) {
+async function trashSender(
+  token: chrome.identity.GetAuthTokenResult,
+  senderEmail: string,
+) {
   const headers = {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
@@ -32,7 +35,9 @@ async function trashSender(token: chrome.identity.GetAuthTokenResult, senderEmai
     );
   }
 
-  const messageIds = searchData.messages.map((msg: gapi.client.gmail.Message) => msg.id);
+  const messageIds = searchData.messages.map(
+    (msg: gapi.client.gmail.Message) => msg.id,
+  );
 
   // Step 2: Move each message to Trash
   for (const id of messageIds) {

@@ -9,12 +9,7 @@
     "48": "images/icon-48.png",
     "128": "images/icon-128.png"
   },
-  "permissions": [
-    "sidePanel",
-    "storage",
-    "identity",
-    "tabs"
-  ],
+  "permissions": ["sidePanel", "storage", "identity", "tabs"],
   "action": {
     "default_state": "disabled"
   },
@@ -24,19 +19,13 @@
   },
   "content_scripts": [
     {
-      "js": [
-        "content.js"
-      ],
-      "matches": [
-        "https://mail.google.com/*"
-      ],
+      "js": ["content.js"],
+      "matches": ["https://mail.google.com/*"],
       "type": "module"
     }
   ],
   "oauth2": {
     "client_id": "396720193118-fggljh2amq0jlgq4v861vqn6rb88q9dt.apps.googleusercontent.com",
-    "scopes": [
-      "https://www.googleapis.com/auth/gmail.modify"
-    ]
+    "scopes": ["https://www.googleapis.com/auth/gmail.modify"]
   }
 }

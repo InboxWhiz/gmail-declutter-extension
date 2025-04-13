@@ -30,12 +30,11 @@ export function deleteSenders(emails: string[]): Promise<void> {
 
   return new Promise((resolve) => {
     trashMultipleSenders(emails).then(() => {
-
       // Remove senders from local storage
-      chrome.storage.local.get(['senders'], (result) => {
+      chrome.storage.local.get(["senders"], (result) => {
         if (result.senders) {
           const updatedSenders = result.senders.filter(
-            (sender: [string, string, number]) => !emails.includes(sender[0])
+            (sender: [string, string, number]) => !emails.includes(sender[0]),
           );
           chrome.storage.local.set({ senders: updatedSenders }, () => {
             console.log("Updated senders in local storage.");
@@ -46,10 +45,11 @@ export function deleteSenders(emails: string[]): Promise<void> {
       resolve(console.log("Trashed senders successfully"));
     });
   });
-
 }
 
-export async function getAllSenders(fetchNew: boolean = false): Promise<Sender[]> {
+export async function getAllSenders(
+  fetchNew: boolean = false,
+): Promise<Sender[]> {
   // Retrieves all senders from local storage, or fetches them if not available.
   // fetchNew: boolean - whether to fetch new senders from the server
 
@@ -67,7 +67,7 @@ export async function getAllSenders(fetchNew: boolean = false): Promise<Sender[]
   }
 
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get(['senders'], async (result) => {
+    chrome.storage.local.get(["senders"], async (result) => {
       if (chrome.runtime.lastError) {
         reject(chrome.runtime.lastError);
         return;
@@ -80,13 +80,15 @@ export async function getAllSenders(fetchNew: boolean = false): Promise<Sender[]
             email: sender[0],
             name: sender[1],
             count: sender[2],
-          })
+          }),
         );
         resolve(realSenders);
       } else {
-        if (!fetchNew) { // Retry with fetching new senders if not found
-          await getAllSenders(fetchNew = true);
-        } else { // Already fetched - no senders found
+        if (!fetchNew) {
+          // Retry with fetching new senders if not found
+          await getAllSenders((fetchNew = true));
+        } else {
+          // Already fetched - no senders found
           resolve([]);
         }
       }

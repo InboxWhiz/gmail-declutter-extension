@@ -1,19 +1,19 @@
 .close-button {
-    background-image: url("https://www.gstatic.com/images/icons/material/system_gm/1x/close_black_20dp.png");
-    background-color: white;
-    background-repeat: no-repeat;
-    background-position: center;
-    border-radius: 20px;
-    border: none;
-    height: 40px;
-    width: 40px;
-    margin: 6px;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
+  background-image: url("https://www.gstatic.com/images/icons/material/system_gm/1x/close_black_20dp.png");
+  background-color: white;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 20px;
+  border: none;
+  height: 40px;
+  width: 40px;
+  margin: 6px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .close-button:hover {
-    background-color: #e7e7e7;
+  background-color: #e7e7e7;
 }

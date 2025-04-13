@@ -1,7 +1,4 @@
-import {
-  trashMultipleSenders,
-  exportForTest,
-} from "../src/utils/trashSenders";
+import { trashMultipleSenders, exportForTest } from "../src/utils/trashSenders";
 const { trashSender } = exportForTest;
 
 import { getOAuthToken } from "../src/utils/auth";

@@ -1,7 +1,4 @@
-import {
-  fetchAllSenders,
-  exportForTest,
-} from "../src/utils/fetchSenders";
+import { fetchAllSenders, exportForTest } from "../src/utils/fetchSenders";
 const {
   fetchMessageIds,
   fetchMessageSenderSingle,
@@ -21,7 +18,7 @@ jest.mock("../src/utils/utils", () => {
     sleep: jest.fn(),
   };
 });
- 
+
 (global as any).chrome = {
   storage: {
     local: {
@@ -171,7 +168,10 @@ describe("fetchMessageIds", () => {
       }),
     });
 
-    const result = await fetchMessageIds(("mock-token" as chrome.identity.GetAuthTokenResult), null);
+    const result = await fetchMessageIds(
+      "mock-token" as chrome.identity.GetAuthTokenResult,
+      null,
+    );
 
     expect(result).toEqual({
       messageIds: ["abc123", "xyz456"],
@@ -190,11 +190,14 @@ describe("fetchMessageIds", () => {
     });
 
     // Act
-    const result = await fetchMessageIds(("mock-token" as chrome.identity.GetAuthTokenResult), null);
+    const result = await fetchMessageIds(
+      "mock-token" as chrome.identity.GetAuthTokenResult,
+      null,
+    );
 
     // Assert
     expect(sleep).toHaveBeenCalledWith(1000);
-    expect((fetch as jest.Mock)).toHaveBeenCalledTimes(2);
+    expect(fetch as jest.Mock).toHaveBeenCalledTimes(2);
     expect(result).toEqual({
       messageIds: ["abc123", "xyz456"],
       nextPage: "next-page-token",
@@ -212,7 +215,10 @@ describe("fetchMessageSenderSingle", () => {
       }),
     });
 
-    const sender = await fetchMessageSenderSingle(("mock-token" as chrome.identity.GetAuthTokenResult), "123");
+    const sender = await fetchMessageSenderSingle(
+      "mock-token" as chrome.identity.GetAuthTokenResult,
+      "123",
+    );
 
     expect(sender).toStrictEqual(["test@example.com", "Test"]);
   });
@@ -226,7 +232,10 @@ describe("fetchMessageSenderSingle", () => {
       }),
     });
 
-    const sender = await fetchMessageSenderSingle(("mock-token" as chrome.identity.GetAuthTokenResult), "123");
+    const sender = await fetchMessageSenderSingle(
+      "mock-token" as chrome.identity.GetAuthTokenResult,
+      "123",
+    );
 
     expect(sender).toStrictEqual([null, "Unknown Sender"]);
   });

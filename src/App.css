@@ -1,31 +1,30 @@
 #declutter-body {
-    background-color: white;
-    font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
-    height: 97vh;
-    display: flex;
-    flex-direction: column;
+  background-color: white;
+  font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+  height: 97vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .declutter-body-header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .declutter-body-title {
-    font-size: 1rem;
-    padding-left: 20px;
+  font-size: 1rem;
+  padding-left: 20px;
 }
 
 .button-bar {
-    padding: 10px 20px 0;
-    min-width: 300px;
-    display: flex;
-    justify-content: space-between;
+  padding: 10px 20px 0;
+  min-width: 300px;
+  display: flex;
+  justify-content: space-between;
 }
 
 #senders {
-    padding: 10px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex-grow: 1;
+  padding: 10px;
+  overflow: hidden auto;
+  flex-grow: 1;
 }
