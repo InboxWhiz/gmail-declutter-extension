@@ -4,6 +4,7 @@ import { useSelectedSenders } from "../contexts/selectedSendersContext";
 import { useSenders } from "../contexts/sendersContext";
 import { searchEmailSenders, deleteSenders } from "../utils/actions";
 import { ToggleSwitch } from "./toggleSwitch";
+import { useState } from "react";
 
 interface ConfirmProps {
   emailsNum: number;
@@ -15,9 +16,12 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const { reloadSenders } = useSenders();
   const { setModal } = useModal();
 
+  const [deleteEmails, setDeleteEmails] = useState(true);
+
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
   };
+
   const unsubscribeSenders = async () => {
     // Set modal to pending state
     setModal({ action: "unsubscribe", type: "pending" });
@@ -48,8 +52,8 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
       </p>
 
       <div className='delete-option'>
-        <ToggleSwitch />
-        <div style={{"width": "10px"}}></div>
+        <ToggleSwitch defaultChecked={true} onChange={setDeleteEmails} />
+        <div style={{ "width": "10px" }}></div>
         <p className="note">Delete <b>{emailsNum} email(s)</b> from selected senders</p>
       </div>
 
@@ -71,6 +75,7 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
   };
+
   const deleteEmails = async () => {
     // Set modal to pending state
     setModal({ action: "delete", type: "pending" });
@@ -115,7 +120,7 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
 const DeletePending = () => {
   return (
     <>
-      <p>Deleting...</p>
+      <p>Deleting emails...</p>
       <div style={{ height: "5px" }}></div>
       <div className="loader"></div>
     </>
