@@ -3,13 +3,67 @@ import { useModal } from "../contexts/modalContext";
 import { useSelectedSenders } from "../contexts/selectedSendersContext";
 import { useSenders } from "../contexts/sendersContext";
 import { searchEmailSenders, deleteSenders } from "../utils/actions";
+import { ToggleSwitch } from "./toggleSwitch";
 
-interface DeleteConfirmProps {
+interface ConfirmProps {
   emailsNum: number;
   sendersNum: number;
 }
 
-const DeleteConfirm = ({ emailsNum, sendersNum }: DeleteConfirmProps) => {
+const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
+  const { selectedSenders } = useSelectedSenders();
+  const { reloadSenders } = useSenders();
+  const { setModal } = useModal();
+
+  const showEmails = () => {
+    searchEmailSenders(Object.keys(selectedSenders));
+  };
+  const unsubscribeSenders = async () => {
+    // Set modal to pending state
+    setModal({ action: "unsubscribe", type: "pending" });
+
+    // // Delete senders and remove them from selectedSenders
+    // await deleteSenders(Object.keys(selectedSenders));
+    // for (const senderEmail in selectedSenders) {
+    //   setSelectedSenders((prev) => {
+    //     const newSelected = { ...prev };
+    //     delete newSelected[senderEmail];
+    //     return newSelected;
+    //   });
+    // }
+
+    // Set modal to success state
+    setModal({ action: "unsubscribe", type: "success" });
+
+    // Wait 1 sec then reload senders
+    setTimeout(() => {
+      reloadSenders();
+    }, 1000);
+  };
+
+  return (
+    <>
+      <p>
+        Are you sure you want to <b>unsubscribe</b> from <b>{sendersNum}</b> selected sender(s)?
+      </p>
+
+      <div className='delete-option'>
+        <ToggleSwitch />
+        <div style={{"width": "10px"}}></div>
+        <p className="note">Delete <b>{emailsNum} email(s)</b> from selected senders</p>
+      </div>
+
+      <button className="secondary" onClick={showEmails}>
+        Show all emails
+      </button>
+      <button className="primary" onClick={unsubscribeSenders}>
+        Confirm
+      </button>
+    </>
+  );
+};
+
+const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const { selectedSenders, setSelectedSenders } = useSelectedSenders();
   const { reloadSenders } = useSenders();
   const { setModal } = useModal();
@@ -111,6 +165,13 @@ export const ModalPopup = () => {
 
   const getChild = (): React.ReactNode => {
     switch (true) {
+      case action === "unsubscribe" && type === "confirm":
+        return (
+          <UnsubscribeConfirm
+            emailsNum={extras!.emailsNum}
+            sendersNum={extras!.sendersNum}
+          />
+        );
       case action === "delete" && type === "confirm":
         return (
           <DeleteConfirm
