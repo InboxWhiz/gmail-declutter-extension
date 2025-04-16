@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { Sender } from "../types/types";
-import { getAllSenders } from "../utils/actions";
+import { useActions } from "./actionsContext";
 
 interface SendersContextType {
   senders: Sender[];
@@ -21,6 +21,7 @@ export const SendersProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [senders, setSenders] = useState<Sender[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const { getAllSenders } = useActions();
 
   const reloadSenders = useCallback(async (fetchNew = false) => {
     setLoading(true);

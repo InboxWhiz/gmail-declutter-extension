@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { searchEmailSenders } from "../utils/actions";
 import "./senderLine.css";
+import { useState } from "react";
 import { useSelectedSenders } from "../contexts/selectedSendersContext";
+import { useActions } from "../contexts/actionsContext";
 
 interface SenderLineProps {
   senderName: string;
@@ -16,6 +16,7 @@ export const SenderLine = ({
 }: SenderLineProps) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const { setSelectedSenders } = useSelectedSenders();
+  const { searchEmailSenders } = useActions();
 
   const selectLine = () => {
     setIsSelected(!isSelected);

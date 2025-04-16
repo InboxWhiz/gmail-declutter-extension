@@ -1,10 +1,10 @@
 import "./modalPopup.css";
+import { ToggleSwitch } from "./toggleSwitch";
+import { useState } from "react";
 import { useModal } from "../contexts/modalContext";
 import { useSelectedSenders } from "../contexts/selectedSendersContext";
 import { useSenders } from "../contexts/sendersContext";
-import { searchEmailSenders, deleteSenders } from "../utils/actions";
-import { ToggleSwitch } from "./toggleSwitch";
-import { useState } from "react";
+import { useActions } from "../contexts/actionsContext";
 
 interface ConfirmProps {
   emailsNum: number;
@@ -12,7 +12,8 @@ interface ConfirmProps {
 }
 
 const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
-  const { selectedSenders } = useSelectedSenders();
+  const { searchEmailSenders, getUnsubscribeLink } = useActions();
+  const { selectedSenders, setSelectedSenders } = useSelectedSenders();
   const { reloadSenders } = useSenders();
   const { setModal } = useModal();
 
@@ -68,6 +69,7 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
 };
 
 const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
+  const { searchEmailSenders, deleteSenders } = useActions();
   const { selectedSenders, setSelectedSenders } = useSelectedSenders();
   const { reloadSenders } = useSenders();
   const { setModal } = useModal();
