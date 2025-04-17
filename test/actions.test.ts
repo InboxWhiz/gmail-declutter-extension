@@ -1,4 +1,4 @@
-import { realActions } from "../src/actions/realActions";
+import { realActions } from "../src/utils/actions/realActions";
 export const actions = realActions;
 
 export const {

@@ -1,7 +1,7 @@
 // actions/realActions.ts
-import { Sender } from '../types/types';
-import { fetchAllSenders } from '../utils/fetchSenders';
-import { trashMultipleSenders } from '../utils/trashSenders';
+import { Sender } from '../../types/types';
+import { fetchAllSenders } from '../fetchSenders';
+import { trashMultipleSenders } from '../trashSenders';
 import { Actions } from './types';
 
 export const realActions: Actions = {

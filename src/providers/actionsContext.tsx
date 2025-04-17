@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
-import { Actions } from "../actions/types";
-import { realActions } from "../actions/realActions";
-import { mockActions } from "../actions/mockActions";
+import { Actions } from "../utils/actions/types";
+import { realActions } from "../utils/actions/realActions";
+import { mockActions } from "../utils/actions/mockActions";
 
 const useMock = true;
 const ActionsContext = useMock ? createContext<Actions>(mockActions) : createContext<Actions>(realActions);

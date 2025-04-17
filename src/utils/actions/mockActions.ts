@@ -1,5 +1,5 @@
 // actions/mockActions.ts
-import { Sender } from '../types/types';
+import { Sender } from '../../types/types';
 import { Actions } from './types';
 
 export const mockActions: Actions = {
