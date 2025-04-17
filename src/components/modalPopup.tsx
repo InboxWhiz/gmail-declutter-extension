@@ -1,10 +1,10 @@
 import "./modalPopup.css";
 import { ToggleSwitch } from "./toggleSwitch";
 import { useState } from "react";
-import { useModal } from "../contexts/modalContext";
-import { useSelectedSenders } from "../contexts/selectedSendersContext";
-import { useSenders } from "../contexts/sendersContext";
-import { useActions } from "../contexts/actionsContext";
+import { useModal } from "../providers/modalContext";
+import { useSelectedSenders } from "../providers/selectedSendersContext";
+import { useSenders } from "../providers/sendersContext";
+import { useActions } from "../providers/actionsContext";
 
 function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
   const { getUnsubscribeLink, deleteSenders } = useActions();

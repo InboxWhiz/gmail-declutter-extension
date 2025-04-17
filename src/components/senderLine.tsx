@@ -1,7 +1,7 @@
 import "./senderLine.css";
 import { useState } from "react";
-import { useSelectedSenders } from "../contexts/selectedSendersContext";
-import { useActions } from "../contexts/actionsContext";
+import { useSelectedSenders } from "../providers/selectedSendersContext";
+import { useActions } from "../providers/actionsContext";
 
 interface SenderLineProps {
   senderName: string;
