@@ -26,11 +26,12 @@ export const mockActions: Actions = {
         });
     },
 
-    async getUnsubscribeLink(): Promise<string> {
+    async getUnsubscribeLink(email: string): Promise<string> {
+        console.log(`[MOCK] Getting unsubscribe link for: ${email}`);
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                // resolve(`https://example.com/unsubscribe/${email}`);
-                reject("[MOCK] Unsubscribe link not found.");
+                resolve(`https://example.com/unsubscribe/${email}`);
+                // reject("[MOCK] Unsubscribe link not found.");
             }, 1000);
         });
     },

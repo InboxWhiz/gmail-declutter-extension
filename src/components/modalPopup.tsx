@@ -6,44 +6,84 @@ import { useSelectedSenders } from "../contexts/selectedSendersContext";
 import { useSenders } from "../contexts/sendersContext";
 import { useActions } from "../contexts/actionsContext";
 
+function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
+  const { getUnsubscribeLink, deleteSenders } = useActions();
+  const { setModal } = useModal();
+  const { reloadSenders } = useSenders();
+  const { setSelectedSenders } = useSelectedSenders();
+
+  // Kick off the flow
+  const startUnsubscribeFlow = () => {
+    processNext(selectedSenders, 0);
+  };
+
+  // End the flow
+  const endUnsubscribeFlow = async () => {
+    // Delete senders if needed
+    if (deleteEmails) {
+      setModal({ action: "delete", type: "pending" });
+      await deleteSenders(Object.keys(selectedSenders));
+    }
+
+    // Deselect all senders
+    for (const senderEmail in selectedSenders) {
+      setSelectedSenders((prev) => {
+        const newSelected = { ...prev };
+        delete newSelected[senderEmail];
+        return newSelected;
+      });
+    }
+
+    // Show success modal and refresh senders
+    setModal({ action: "unsubscribe", type: "success" });
+    reloadSenders();
+  };
+
+  // Process one sender at `i`
+  const processNext = async (senders: string[], i: number) => {
+    // all done → final cleanup
+    if (i >= senders.length) {
+      endUnsubscribeFlow();
+      return;
+    }
+
+    const email = senders[i];
+    try {
+      setModal({ action: "unsubscribe", type: "pending", subtype: "finding-link" });
+      const link = await getUnsubscribeLink(email);
+
+      if (link) {
+        window.open(link, "_blank");
+        setModal({
+          action: "unsubscribe",
+          type: "continue",
+          extras: { email, link, onContinue: () => { processNext(senders, i + 1); } },
+        });
+      } else {
+        throw new Error("No link");
+      }
+    } catch {
+      setModal({ action: "unsubscribe", type: "error" });
+    }
+  };
+
+  return { startUnsubscribeFlow: startUnsubscribeFlow };
+}
+
+
 interface ConfirmProps {
   emailsNum: number;
   sendersNum: number;
 }
 
 const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
-  const { searchEmailSenders, getUnsubscribeLink } = useActions();
-  const { selectedSenders, setSelectedSenders } = useSelectedSenders();
-  const { reloadSenders } = useSenders();
-  const { setModal } = useModal();
-
   const [deleteEmails, setDeleteEmails] = useState(true);
+  const { searchEmailSenders } = useActions();
+  const { selectedSenders } = useSelectedSenders();
+  const { startUnsubscribeFlow } = useUnsubscribeFlow(Object.keys(selectedSenders), deleteEmails);
 
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
-  };
-
-  const unsubscribeSenders = async () => {
-    // Set modal to pending state
-    setModal({ action: "unsubscribe", type: "pending" });
-
-    // // Delete senders and remove them from selectedSenders
-    // await deleteSenders(Object.keys(selectedSenders));
-    // for (const senderEmail in selectedSenders) {
-    //   setSelectedSenders((prev) => {
-    //     const newSelected = { ...prev };
-    //     delete newSelected[senderEmail];
-    //     return newSelected;
-    //   });
-    // }
-
-    // Set modal to success state
-    setModal({ action: "unsubscribe", type: "success" });
-
-    // Wait 1 sec then reload senders
-    setTimeout(() => {
-      reloadSenders();
-    }, 1000);
   };
 
   return (
@@ -61,8 +101,68 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
       <button className="secondary" onClick={showEmails}>
         Show all emails
       </button>
-      <button className="primary" onClick={unsubscribeSenders}>
+      <button className="primary" onClick={startUnsubscribeFlow}>
         Confirm
+      </button>
+    </>
+  );
+};
+
+const UnsubscribePending = ({ subtype }: { subtype: string }) => {
+  const message = subtype === "finding-link" ? "Finding unsubscribe links..." : "Blocking sender...";
+  return (
+    <>
+      <p>{message}</p>
+      <div style={{ height: "5px" }}></div>
+      <div className="loader"></div>
+    </>
+  );
+};
+
+const UnsubscribeContinue = ({ email, link, onContinue }: { email: string, link: string, onContinue: () => void }) => {
+  const reopenLink = () => { window.open(link, "_blank"); }
+  return (
+    <>
+      <p>Unsubscribe link for <b>{email}</b> found.</p>
+      <p className="note">Make sure to follow any instructions on the unsubscribe page to complete the process.</p>
+      <button className="secondary" onClick={reopenLink}>Reopen Link</button>
+      <button className="primary" onClick={onContinue}>Continue</button>
+    </>
+  );
+};
+
+const UnsubscribeSuccess = () => {
+  return (
+    <>
+      <p>✅ Success!</p>
+      <p>You have been unsubscribed from selected senders.</p>
+      <p className="note">
+        Note: You may need to reload your browser to see changes.
+      </p>
+    </>
+  );
+};
+
+const UnsubscribeError = () => {
+  const { blockSender } = useActions();
+  const { setModal } = useModal();
+  const { selectedSenders } = useSelectedSenders();
+
+  const handleBlockSender = async () => {
+    setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
+    await blockSender(Object.keys(selectedSenders)[0]);
+    setModal({ action: "unsubscribe", type: "success" });
+  };
+
+  return (
+    <>
+      <p>Unable to find unsubscribe link.</p>
+      <p>Block sender instead?</p>
+      <button className="secondary">
+        Cancel
+      </button>
+      <button className="primary" onClick={handleBlockSender}>
+        Block
       </button>
     </>
   );
@@ -161,7 +261,7 @@ export const ModalPopup = () => {
   const { modal, setModal } = useModal();
   if (!modal) return null;
 
-  const { action, type, extras } = modal;
+  const { action, type, subtype, extras } = modal;
   const id: string = action ? `${action}-${type}-modal` : `${type}-modal`;
 
   const handleBackgroundClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -179,6 +279,16 @@ export const ModalPopup = () => {
             sendersNum={extras!.sendersNum}
           />
         );
+      case action === "unsubscribe" && type === "pending":
+        return <UnsubscribePending subtype={subtype!} />;
+      case action === "unsubscribe" && type === "success":
+        return <UnsubscribeSuccess />;
+      case action === "unsubscribe" && type === "error":
+        return <UnsubscribeError />;
+      case action === "unsubscribe" && type === "continue":
+        return <UnsubscribeContinue email={extras!.email} link={extras!.link} onContinue={extras!.onContinue} />;
+      case action === "unsubscribe" && type === "success":
+        return <UnsubscribeSuccess />;
       case action === "delete" && type === "confirm":
         return (
           <DeleteConfirm
