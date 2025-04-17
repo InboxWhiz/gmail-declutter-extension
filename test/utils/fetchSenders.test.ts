@@ -1,4 +1,4 @@
-import { fetchAllSenders, exportForTest } from "../src/utils/fetchSenders";
+import { fetchAllSenders, exportForTest } from "../../src/utils/fetchSenders";
 const {
   fetchMessageIds,
   fetchMessageSenderSingle,
@@ -6,8 +6,8 @@ const {
   storeSenders,
 } = exportForTest;
 
-import { getOAuthToken } from "../src/utils/auth";
-import { sleep } from "../src/utils/utils";
+import { getOAuthToken } from "../../src/utils/auth";
+import { sleep } from "../../src/utils/utils";
 
 // Mock dependencies
 jest.mock("../src/utils/auth");

@@ -1,4 +1,4 @@
-import { getOAuthToken } from "../src/utils/auth";
+import { getOAuthToken } from "../../src/utils/auth";
 
 describe("getOAuthToken", () => {
   beforeEach(() => {

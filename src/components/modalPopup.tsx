@@ -281,8 +281,6 @@ export const ModalPopup = () => {
         );
       case action === "unsubscribe" && type === "pending":
         return <UnsubscribePending subtype={subtype!} />;
-      case action === "unsubscribe" && type === "success":
-        return <UnsubscribeSuccess />;
       case action === "unsubscribe" && type === "error":
         return <UnsubscribeError />;
       case action === "unsubscribe" && type === "continue":

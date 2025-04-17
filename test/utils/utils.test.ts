@@ -1,4 +1,4 @@
-import { parseSender } from "../src/utils/utils";
+import { parseSender } from "../../src/utils/utils";
 
 describe("parseSender", () => {
   test("extracts name and email", () => {

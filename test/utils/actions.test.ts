@@ -1,4 +1,4 @@
-import { realActions } from "../src/utils/actions/realActions";
+import { realActions } from "../../src/utils/actions/realActions";
 export const actions = realActions;
 
 export const {
@@ -7,10 +7,10 @@ export const {
   getAllSenders,
 } = actions;
 
-import { Sender } from "../src/types/types";
+import { Sender } from "../../src/types/types";
 
-import { trashMultipleSenders } from "../src/utils/trashSenders";
-import { fetchAllSenders } from "../src/utils/fetchSenders";
+import { trashMultipleSenders } from "../../src/utils/trashSenders";
+import { fetchAllSenders } from "../../src/utils/fetchSenders";
 
 // Create mocks for dependent functions
 jest.mock("../src/utils/trashSenders", () => ({
