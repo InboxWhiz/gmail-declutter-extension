@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { selectAliceBob } from "./helpers";
 
 test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
   let logs: string[] = [];
@@ -14,7 +15,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     page,
   }) => {
     // select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "unsubscribe");
 
     const modal = page.locator("#unsubscribe-confirm-modal");
     await expect(modal).toBeVisible();
@@ -32,7 +33,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     page,
   }) => {
     // select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "unsubscribe");
 
     // click "Show all emails" button
     await page.getByRole("button", { name: "Show all emails" }).click();
@@ -71,7 +72,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
   test("3.3b - Unsubscribe Flow Wizard", async ({ page }) => {
     // select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "unsubscribe");
 
     // click "Confirm" button
     const [newTab1] = await Promise.all([
@@ -242,18 +243,3 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     expect(logs).toContain("[MOCK] Blocked alice@email.com successfully");
   });
 });
-
-const selectAliceBob = async (page) => {
-  // Helper function to select Alice and Bob senders
-  await page
-    .locator("div")
-    .filter({ hasText: /^Alicealice@email\.com32$/ })
-    .getByRole("checkbox")
-    .check();
-  await page
-    .locator("div")
-    .filter({ hasText: /^Bobbob@email\.com78$/ })
-    .getByRole("checkbox")
-    .check();
-  await page.click("#unsubscribe-button");
-};

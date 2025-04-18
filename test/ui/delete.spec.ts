@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { selectAliceBob } from "./helpers";
 
 test.describe("UI tests for Epic 2 - Delete Functionality", () => {
   let logs: string[] = [];
@@ -14,7 +15,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
     page,
   }) => {
     // Select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "delete");
 
     const modal = page.locator("#delete-confirm-modal");
     await expect(modal).toBeVisible();
@@ -30,7 +31,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
     page,
   }) => {
     // select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "delete");
 
     // click "Show all emails" button
     await page.getByRole("button", { name: "Show all emails" }).click();
@@ -47,7 +48,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
 
   test("2.3 - clicking “Confirm” triggers deletion", async ({ page }) => {
     // Select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "delete");
 
     // Confirm deletion
     await page.getByRole("button", { name: "Confirm" }).click();
@@ -62,18 +63,3 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
     );
   });
 });
-
-const selectAliceBob = async (page) => {
-  // Helper function to select Alice and Bob senders
-  await page
-    .locator("div")
-    .filter({ hasText: /^Alicealice@email\.com32$/ })
-    .getByRole("checkbox")
-    .check();
-  await page
-    .locator("div")
-    .filter({ hasText: /^Bobbob@email\.com78$/ })
-    .getByRole("checkbox")
-    .check();
-  await page.click("#delete-button");
-};
