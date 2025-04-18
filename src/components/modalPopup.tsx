@@ -149,7 +149,7 @@ const UnsubscribeContinue = ({
 }) => {
   const { blockSender } = useActions();
   const { setModal } = useModal();
-  const [toBlock] = useState<boolean>(false);
+  const [toBlock, setToBlock] = useState<boolean>(false);
 
   const reopenLink = () => {
     window.open(link, "_blank");
@@ -172,7 +172,10 @@ const UnsubscribeContinue = ({
       </p>
 
       <div className="toggle-option">
-        <ToggleSwitch defaultChecked={false} onChange={() => {}} />
+        <ToggleSwitch
+          defaultChecked={false}
+          onChange={(checked) => setToBlock(checked)}
+        />
         <div style={{ width: "10px" }}></div>
         <p className="note">Also block sender</p>
       </div>

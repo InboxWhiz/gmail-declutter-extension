@@ -16,7 +16,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     page,
   }) => {
     // select two senders
-    selectAliceBob();
+    await selectAliceBob(page);
 
     const modal = page.locator("#unsubscribe-confirm-modal");
     await expect(modal).toBeVisible();
@@ -34,7 +34,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     page,
   }) => {
     // select two senders
-    selectAliceBob();
+    await selectAliceBob(page);
 
     // click "Show all emails" button
     await page.getByRole("button", { name: "Show all emails" }).click();
@@ -73,7 +73,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
   test("3.3b - Unsubscribe Flow Wizard", async ({ page }) => {
     // select two senders
-    selectAliceBob();
+    await selectAliceBob(page);
 
     // click "Confirm" button
     const [newTab1] = await Promise.all([
@@ -116,6 +116,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // Emails were deleted (by default)
     expect(logs).toContain("[MOCK] Trashed senders successfully");
+
+    // Blocking action was not called (by default)
+    expect(logs).not.toContain("[MOCK] Blocked alice@email.com successfully");
   });
 
   test("3.4 - lack of unsubscribe link flows into block-sender prompt", async ({
@@ -236,19 +239,17 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
   });
 });
 
-function selectAliceBob() {
+const selectAliceBob = async (page) => {
   // Helper function to select Alice and Bob senders
-  return async (page) => {
-    await page
-      .locator("div")
-      .filter({ hasText: /^Alicealice@email\.com32$/ })
-      .getByRole("checkbox")
-      .check();
-    await page
-      .locator("div")
-      .filter({ hasText: /^Bobbob@email\.com78$/ })
-      .getByRole("checkbox")
-      .check();
-    await page.click("#unsubscribe-button");
-  };
-}
+  await page
+    .locator("div")
+    .filter({ hasText: /^Alicealice@email\.com32$/ })
+    .getByRole("checkbox")
+    .check();
+  await page
+    .locator("div")
+    .filter({ hasText: /^Bobbob@email\.com78$/ })
+    .getByRole("checkbox")
+    .check();
+  await page.click("#unsubscribe-button");
+};
