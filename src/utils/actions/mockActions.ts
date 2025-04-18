@@ -43,22 +43,24 @@ export const mockActions: Actions = {
     },
 
     async getUnsubscribeLink(email: string): Promise<string> {
+        // Simulates retrieving an unsubscribe link for the given email.
+        // For the purposes of this mock, it will return a link for most emails,
+        // but will reject for carol@email.com and dave@email.com.
         console.log(`[MOCK] Getting unsubscribe link for: ${email}`);
         return new Promise((resolve, reject) => {
             setTimeout(() => {
+                if (email === 'carol@email.com' || email === 'dave@email.com') {
+                    reject(console.log("[MOCK] Unsubscribe link not found."));
+                }
                 resolve(`https://example.com/unsubscribe/${email}`);
-                // reject("[MOCK] Unsubscribe link not found.");
             }, 1000);
         });
     },
 
-    async blockSender(): Promise<void> {
-        // Blocks the sender using the Gmail API.
-        // TODO: Implement the actual logic to block the sender.
-
+    async blockSender(email: string): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(console.log("[MOCK] Blocked sender successfully"));
+                resolve(console.log(`[MOCK] Blocked ${email} successfully`));
             }, 1000);
         });
     },
