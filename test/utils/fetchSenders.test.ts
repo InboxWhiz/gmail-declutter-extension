@@ -10,9 +10,9 @@ import { getOAuthToken } from "../../src/utils/auth";
 import { sleep } from "../../src/utils/utils";
 
 // Mock dependencies
-jest.mock("../src/utils/auth");
-jest.mock("../src/utils/utils", () => {
-  const originalModule = jest.requireActual("../src/utils/utils");
+jest.mock("../../src/utils/auth");
+jest.mock("../../src/utils/utils", () => {
+  const originalModule = jest.requireActual("../../src/utils/utils");
   return {
     ...originalModule,
     sleep: jest.fn(),

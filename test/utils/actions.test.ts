@@ -13,10 +13,10 @@ import { trashMultipleSenders } from "../../src/utils/trashSenders";
 import { fetchAllSenders } from "../../src/utils/fetchSenders";
 
 // Create mocks for dependent functions
-jest.mock("../src/utils/trashSenders", () => ({
+jest.mock("../../src/utils/trashSenders", () => ({
   trashMultipleSenders: jest.fn(() => Promise.resolve()),
 }));
-jest.mock("../src/utils/fetchSenders", () => ({
+jest.mock("../../src/utils/fetchSenders", () => ({
   fetchAllSenders: jest.fn(() => Promise.resolve()),
 }));
 
