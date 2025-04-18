@@ -7,9 +7,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await page.goto("/");
 
     logs = []; // reset logs before each test
-    page.on("console", (msg) => {
-      logs.push(msg.text());
-    });
+    page.on("console", (msg) => logs.push(msg.text()));
   });
 
   test("3.1 - shows modal with correct email & sender count & buttons", async ({

@@ -21,7 +21,7 @@ test.describe("UI tests for Epic 1 - Sender Management", () => {
     expect(senderItems.length).toBe(20);
 
     // Verify that the sender counts are sorted in descending order
-    var max = Number.MAX_SAFE_INTEGER;
+    let max = Number.MAX_SAFE_INTEGER;
     for (const sender of senderItems) {
       const senderCountElement = await sender.$(".email-count");
       const countText: string =
