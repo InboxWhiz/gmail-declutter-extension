@@ -1,10 +1,13 @@
-import { trashMultipleSenders, exportForTest } from "../src/utils/trashSenders";
+import {
+  trashMultipleSenders,
+  exportForTest,
+} from "../../src/utils/trashSenders";
 const { trashSender } = exportForTest;
 
-import { getOAuthToken } from "../src/utils/auth";
+import { getOAuthToken } from "../../src/utils/auth";
 
 // Mock dependencies
-jest.mock("../src/utils/auth");
+jest.mock("../../src/utils/auth");
 const mockToken = "mock-token" as chrome.identity.GetAuthTokenResult;
 global.fetch = jest.fn();
 

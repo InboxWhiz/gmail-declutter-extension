@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 type SelectedSendersType = Record<string, number>;
 
 interface SelectedSendersContextType {
   selectedSenders: SelectedSendersType;
   setSelectedSenders: React.Dispatch<React.SetStateAction<SelectedSendersType>>;
+  clearSelectedSenders: () => void;
 }
 
 const SelectedSendersContext = createContext<
@@ -28,9 +29,13 @@ export const SelectedSendersProvider: React.FC<{
     {},
   );
 
+  const clearSelectedSenders = useCallback(() => {
+    setSelectedSenders({});
+  }, []);
+
   return (
     <SelectedSendersContext.Provider
-      value={{ selectedSenders, setSelectedSenders }}
+      value={{ selectedSenders, setSelectedSenders, clearSelectedSenders }}
     >
       {children}
     </SelectedSendersContext.Provider>

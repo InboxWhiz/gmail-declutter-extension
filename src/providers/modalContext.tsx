@@ -2,8 +2,9 @@ import React, { createContext, useContext, useState } from "react";
 
 type ModalState = null | {
   action?: "delete" | "unsubscribe";
-  type: "confirm" | "pending" | "success" | "error" | "no-sender";
-  extras?: Record<string, any>;
+  type: "confirm" | "pending" | "continue" | "success" | "error" | "no-sender";
+  subtype?: "finding-link" | "blocking";
+  extras?: any;
 };
 
 interface ModalContextType {

@@ -1,5 +1,5 @@
 import { SenderLine } from "./senderLine";
-import { useSenders } from "../contexts/sendersContext";
+import { useSenders } from "../providers/sendersContext";
 
 export const SendersContainer = () => {
   const { senders, loading } = useSenders();

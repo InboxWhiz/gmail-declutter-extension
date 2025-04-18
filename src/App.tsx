@@ -6,7 +6,7 @@ import { ReloadButton } from "./components/reloadButton.tsx";
 // import { CloseButton } from './components/closeButton.tsx'
 import { ModalPopup } from "./components/modalPopup.tsx";
 import { SendersContainer } from "./components/sendersContainer.tsx";
-import { AllGlobalProviders } from "./contexts/allGlobalProviders.tsx";
+import { AllGlobalProviders } from "./providers/allGlobalProviders.tsx";
 
 function App() {
   return (

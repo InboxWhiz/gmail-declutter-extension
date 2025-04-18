@@ -2,8 +2,8 @@ import "./actionButton.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBan, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { useSelectedSenders } from "../contexts/selectedSendersContext";
-import { useModal } from "../contexts/modalContext";
+import { useSelectedSenders } from "../providers/selectedSendersContext";
+import { useModal } from "../providers/modalContext";
 
 export const ActionButton = ({ id }: { id: string }) => {
   const text: string = id == "unsubscribe-button" ? "Unsubscribe" : "Delete";

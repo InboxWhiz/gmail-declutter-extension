@@ -1,18 +1,18 @@
-import {
-  searchEmailSenders,
-  deleteSenders,
-  getAllSenders,
-} from "../src/utils/actions";
-import { Sender } from "../src/types/types";
+import { realActions } from "../../src/utils/actions/realActions";
+export const actions = realActions;
 
-import { trashMultipleSenders } from "../src/utils/trashSenders";
-import { fetchAllSenders } from "../src/utils/fetchSenders";
+export const { searchEmailSenders, deleteSenders, getAllSenders } = actions;
+
+import { Sender } from "../../src/types/types";
+
+import { trashMultipleSenders } from "../../src/utils/trashSenders";
+import { fetchAllSenders } from "../../src/utils/fetchSenders";
 
 // Create mocks for dependent functions
-jest.mock("../src/utils/trashSenders", () => ({
+jest.mock("../../src/utils/trashSenders", () => ({
   trashMultipleSenders: jest.fn(() => Promise.resolve()),
 }));
-jest.mock("../src/utils/fetchSenders", () => ({
+jest.mock("../../src/utils/fetchSenders", () => ({
   fetchAllSenders: jest.fn(() => Promise.resolve()),
 }));
 
