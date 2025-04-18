@@ -47,13 +47,7 @@ As a user, I want to be able to delete emails from multiple senders at once and 
 
   - **Acceptance Criteria:**
     - Clicking "Confirm" deletes all the emails from the selected senders.
-
-- **User Story 2.4:**  
-  **As a user**, I want a confirmation message after deleting the emails to ensure the deletion was successful.
-
-  - **Acceptance Criteria:**
     - After deleting the emails, a confirmation message is displayed notifying the user that the emails were successfully deleted.
-    - The confirmation message includes the number of emails deleted and a button to close the message.
 
 ---
 
