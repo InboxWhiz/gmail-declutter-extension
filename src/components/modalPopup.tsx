@@ -91,7 +91,7 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
         Are you sure you want to <b>unsubscribe</b> from <b>{sendersNum}</b> selected sender(s)?
       </p>
 
-      <div className='delete-option'>
+      <div className='toggle-option'>
         <ToggleSwitch defaultChecked={true} onChange={setDeleteEmails} />
         <div style={{ "width": "10px" }}></div>
         <p className="note">Delete <b>{emailsNum} email(s)</b> from selected senders</p>
@@ -119,13 +119,31 @@ const UnsubscribePending = ({ subtype }: { subtype: string }) => {
 };
 
 const UnsubscribeContinue = ({ email, link, onContinue }: { email: string, link: string, onContinue: () => void }) => {
+  const { blockSender } = useActions();
+  const { setModal } = useModal();
+  const toBlock = useState(false);
+
   const reopenLink = () => { window.open(link, "_blank"); }
+  const continueToNext = async () => {
+    if (toBlock) {
+      setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
+      await blockSender(email);
+    }
+    onContinue();
+  };
   return (
     <>
       <p>Unsubscribe link for <b>{email}</b> found.</p>
       <p className="note">Make sure to follow any instructions on the unsubscribe page to complete the process.</p>
+
+      <div className='toggle-option'>
+        <ToggleSwitch defaultChecked={false} onChange={() => { }} />
+        <div style={{ "width": "10px" }}></div>
+        <p className="note">Also block sender</p>
+      </div>
+
       <button className="secondary" onClick={reopenLink}>Reopen Link</button>
-      <button className="primary" onClick={onContinue}>Continue</button>
+      <button className="primary" onClick={continueToNext}>Continue</button>
     </>
   );
 };

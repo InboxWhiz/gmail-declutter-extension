@@ -176,4 +176,27 @@ test.describe('UI tests for Epic 3 - Unsubscribe Flow', () => {
     expect(logs).not.toContain("[MOCK] Trashed senders successfully");
 
   });
+
+  test('3.6 - senders can be blocked even when link is found', async ({ page }) => {
+    // select a sender
+    await page.locator('div').filter({ hasText: /^Alicealice@email\.com32$/ }).getByRole('checkbox').check();
+    await page.click('#unsubscribe-button');
+    page.getByRole('button', { name: 'Confirm' }).click();
+
+    // check that the toggle is not checked by default
+    const toggle = page.locator('.switch');
+    await expect(toggle).not.toBeChecked();
+
+    // toggle it on
+    await toggle.click();
+    await expect(toggle).toBeChecked();
+
+    // click "Continue" button
+    page.getByRole('button', { name: 'Continue' }).click();
+    await expect(page.locator('#unsubscribe-success-modal')).toBeVisible();
+
+    // check that block action was called
+    expect(logs).toContain("[MOCK] Blocked alice@email.com successfully");
+
+  });
 });
