@@ -1,11 +1,7 @@
 import { realActions } from "../../src/utils/actions/realActions";
 export const actions = realActions;
 
-export const {
-  searchEmailSenders,
-  deleteSenders,
-  getAllSenders,
-} = actions;
+export const { searchEmailSenders, deleteSenders, getAllSenders } = actions;
 
 import { Sender } from "../../src/types/types";
 
@@ -71,7 +67,7 @@ describe("deleteSenders", () => {
   test("should trash senders and update local storage", async () => {
     const emails = ["test@example.com", "user@example.com"];
     // Spy on console.log to check outputs
-    const logSpy = jest.spyOn(console, "log").mockImplementation(() => { });
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
     // Setup chrome.storage.local.get:
     const initialSenders: [string, string, number][] = [

@@ -29,10 +29,18 @@ export const SenderLine = ({
   };
 
   return (
-    <div className={Boolean(selectedSenders[senderEmail]) ? "sender-line selected" : "sender-line"}>
+    <div
+      className={
+        selectedSenders[senderEmail] ? "sender-line selected" : "sender-line"
+      }
+    >
       <div className="begin">
         <div>
-          <input type="checkbox" onChange={selectLine} checked={Boolean(selectedSenders[senderEmail])} />
+          <input
+            type="checkbox"
+            onChange={selectLine}
+            checked={Boolean(selectedSenders[senderEmail])}
+          />
         </div>
         <div className="sender-details">
           <span className="sender-name">{senderName}</span>

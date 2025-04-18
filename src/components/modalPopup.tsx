@@ -44,7 +44,11 @@ function useUnsubscribeFlow(deleteEmails: boolean) {
 
     const email = senders[i];
     try {
-      setModal({ action: "unsubscribe", type: "pending", subtype: "finding-link" });
+      setModal({
+        action: "unsubscribe",
+        type: "pending",
+        subtype: "finding-link",
+      });
       const link = await getUnsubscribeLink(email);
 
       if (link) {
@@ -52,7 +56,13 @@ function useUnsubscribeFlow(deleteEmails: boolean) {
         setModal({
           action: "unsubscribe",
           type: "continue",
-          extras: { email, link, onContinue: () => { processNext(i + 1); } },
+          extras: {
+            email,
+            link,
+            onContinue: () => {
+              processNext(i + 1);
+            },
+          },
         });
       } else {
         throw new Error("No link");
@@ -61,14 +71,18 @@ function useUnsubscribeFlow(deleteEmails: boolean) {
       setModal({
         action: "unsubscribe",
         type: "error",
-        extras: { email, onContinue: () => { processNext(i + 1); } },
+        extras: {
+          email,
+          onContinue: () => {
+            processNext(i + 1);
+          },
+        },
       });
     }
   };
 
   return { startUnsubscribeFlow: startUnsubscribeFlow };
 }
-
 
 interface ConfirmProps {
   emailsNum: number;
@@ -88,13 +102,16 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   return (
     <>
       <p>
-        Are you sure you want to <b>unsubscribe</b> from <b>{sendersNum}</b> selected sender(s)?
+        Are you sure you want to <b>unsubscribe</b> from <b>{sendersNum}</b>{" "}
+        selected sender(s)?
       </p>
 
-      <div className='toggle-option'>
+      <div className="toggle-option">
         <ToggleSwitch defaultChecked={true} onChange={setDeleteEmails} />
-        <div style={{ "width": "10px" }}></div>
-        <p className="note">Delete <b>{emailsNum} email(s)</b> from selected senders</p>
+        <div style={{ width: "10px" }}></div>
+        <p className="note">
+          Delete <b>{emailsNum} email(s)</b> from selected senders
+        </p>
       </div>
 
       <button className="secondary" onClick={showEmails}>
@@ -108,7 +125,10 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
 };
 
 const UnsubscribePending = ({ subtype }: { subtype: string }) => {
-  const message = subtype === "finding-link" ? "Finding unsubscribe links..." : "Blocking sender...";
+  const message =
+    subtype === "finding-link"
+      ? "Finding unsubscribe links..."
+      : "Blocking sender...";
   return (
     <>
       <p>{message}</p>
@@ -118,12 +138,22 @@ const UnsubscribePending = ({ subtype }: { subtype: string }) => {
   );
 };
 
-const UnsubscribeContinue = ({ email, link, onContinue }: { email: string, link: string, onContinue: () => void }) => {
+const UnsubscribeContinue = ({
+  email,
+  link,
+  onContinue,
+}: {
+  email: string;
+  link: string;
+  onContinue: () => void;
+}) => {
   const { blockSender } = useActions();
   const { setModal } = useModal();
   const [toBlock] = useState<boolean>(false);
 
-  const reopenLink = () => { window.open(link, "_blank"); }
+  const reopenLink = () => {
+    window.open(link, "_blank");
+  };
   const continueToNext = async () => {
     if (toBlock) {
       setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
@@ -133,17 +163,26 @@ const UnsubscribeContinue = ({ email, link, onContinue }: { email: string, link:
   };
   return (
     <>
-      <p>Unsubscribe link for <b>{email}</b> found.</p>
-      <p className="note">Make sure to follow any instructions on the unsubscribe page to complete the process.</p>
+      <p>
+        Unsubscribe link for <b>{email}</b> found.
+      </p>
+      <p className="note">
+        Make sure to follow any instructions on the unsubscribe page to complete
+        the process.
+      </p>
 
-      <div className='toggle-option'>
-        <ToggleSwitch defaultChecked={false} onChange={() => { }} />
-        <div style={{ "width": "10px" }}></div>
+      <div className="toggle-option">
+        <ToggleSwitch defaultChecked={false} onChange={() => {}} />
+        <div style={{ width: "10px" }}></div>
         <p className="note">Also block sender</p>
       </div>
 
-      <button className="secondary" onClick={reopenLink}>Reopen Link</button>
-      <button className="primary" onClick={continueToNext}>Continue</button>
+      <button className="secondary" onClick={reopenLink}>
+        Reopen Link
+      </button>
+      <button className="primary" onClick={continueToNext}>
+        Continue
+      </button>
     </>
   );
 };
@@ -160,7 +199,13 @@ const UnsubscribeSuccess = () => {
   );
 };
 
-const UnsubscribeError = ({ email, onContinue }: { email: string, onContinue: () => void }) => {
+const UnsubscribeError = ({
+  email,
+  onContinue,
+}: {
+  email: string;
+  onContinue: () => void;
+}) => {
   const { blockSender } = useActions();
   const { setModal } = useModal();
 
@@ -172,7 +217,9 @@ const UnsubscribeError = ({ email, onContinue }: { email: string, onContinue: ()
 
   return (
     <>
-      <p>Unable to find unsubscribe link for <b>{email}</b>.</p>
+      <p>
+        Unable to find unsubscribe link for <b>{email}</b>.
+      </p>
       <p>Block sender instead?</p>
       <button className="secondary" onClick={onContinue}>
         Don't block
@@ -298,9 +345,20 @@ export const ModalPopup = () => {
       case action === "unsubscribe" && type === "pending":
         return <UnsubscribePending subtype={subtype!} />;
       case action === "unsubscribe" && type === "error":
-        return <UnsubscribeError email={extras!.email} onContinue={extras!.onContinue} />;
+        return (
+          <UnsubscribeError
+            email={extras!.email}
+            onContinue={extras!.onContinue}
+          />
+        );
       case action === "unsubscribe" && type === "continue":
-        return <UnsubscribeContinue email={extras!.email} link={extras!.link} onContinue={extras!.onContinue} />;
+        return (
+          <UnsubscribeContinue
+            email={extras!.email}
+            link={extras!.link}
+            onContinue={extras!.onContinue}
+          />
+        );
       case action === "unsubscribe" && type === "success":
         return <UnsubscribeSuccess />;
       case action === "delete" && type === "confirm":
