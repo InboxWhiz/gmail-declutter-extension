@@ -113,7 +113,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await expect(modal2).toBeVisible();
 
     // Emails were deleted (by default)
-    expect(logs).toContain("[MOCK] Trashed senders successfully: [alice@email.com, bob@email.com]");
+    expect(logs).toContain(
+      "[MOCK] Trashed senders successfully: [alice@email.com, bob@email.com]",
+    );
 
     // Blocking action was not called (by default)
     expect(logs).not.toContain("[MOCK] Blocked alice@email.com successfully");
@@ -146,7 +148,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     expect(logs).toContain("[MOCK] Blocked carol@email.com successfully");
 
     // check that the delete action was called
-    expect(logs).toContain("[MOCK] Trashed senders successfully: [carol@email.com]");
+    expect(logs).toContain(
+      "[MOCK] Trashed senders successfully: [carol@email.com]",
+    );
   });
 
   test("3.4a - multiple senders can be blocked in a row", async ({ page }) => {
@@ -177,7 +181,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     expect(logs).toContain("[MOCK] Blocked dave@email.com successfully");
 
     // check that the delete action was called
-    expect(logs).toContain("[MOCK] Trashed senders successfully: [carol@email.com, dave@email.com]");
+    expect(logs).toContain(
+      "[MOCK] Trashed senders successfully: [carol@email.com, dave@email.com]",
+    );
   });
 
   test("3.5 - delete-emails toggle defaults on and can be toggled off", async ({

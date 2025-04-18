@@ -40,7 +40,7 @@ test.describe("UI tests for Epic 1 - Sender Management", () => {
     await page.locator(".sender-email").first().click();
 
     // Verify that the Gmail search function is called
-    expect(logs).toContain("[MOCK] Searching for emails: [alice@email.com]");
+    expect(logs).toContain("[MOCK] Searching for emails: [grace@email.com]");
   });
 
   test("1.3a - shows 'No senders' modal when no senders are selected and unsubscribe button is clicked", async ({
