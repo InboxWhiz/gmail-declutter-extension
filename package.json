@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test:ui": "playwright test --headed",
+    "test:ui": "playwright test",
     "test": "jest",
     "lint:js": "eslint . --fix",
     "lint:css": "stylelint **/*.css --fix",
