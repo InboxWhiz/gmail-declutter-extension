@@ -6,15 +6,15 @@ import { useSelectedSenders } from "../providers/selectedSendersContext";
 import { useSenders } from "../providers/sendersContext";
 import { useActions } from "../providers/actionsContext";
 
-function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
+function useUnsubscribeFlow(deleteEmails: boolean) {
   const { getUnsubscribeLink, deleteSenders } = useActions();
   const { setModal } = useModal();
   const { reloadSenders } = useSenders();
-  const { setSelectedSenders } = useSelectedSenders();
+  const { selectedSenders, clearSelectedSenders } = useSelectedSenders();
 
   // Kick off the flow
   const startUnsubscribeFlow = () => {
-    processNext(selectedSenders, 0);
+    processNext(0);
   };
 
   // End the flow
@@ -26,13 +26,7 @@ function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
     }
 
     // Deselect all senders
-    for (const senderEmail in selectedSenders) {
-      setSelectedSenders((prev) => {
-        const newSelected = { ...prev };
-        delete newSelected[senderEmail];
-        return newSelected;
-      });
-    }
+    clearSelectedSenders();
 
     // Show success modal and refresh senders
     setModal({ action: "unsubscribe", type: "success" });
@@ -40,7 +34,9 @@ function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
   };
 
   // Process one sender at `i`
-  const processNext = async (senders: string[], i: number) => {
+  const processNext = async (i: number) => {
+    const senders = Object.keys(selectedSenders);
+
     if (i >= senders.length) {
       endUnsubscribeFlow();
       return;
@@ -56,7 +52,7 @@ function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
         setModal({
           action: "unsubscribe",
           type: "continue",
-          extras: { email, link, onContinue: () => { processNext(senders, i + 1); } },
+          extras: { email, link, onContinue: () => { processNext(i + 1); } },
         });
       } else {
         throw new Error("No link");
@@ -65,7 +61,7 @@ function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
       setModal({
         action: "unsubscribe",
         type: "error",
-        extras: { email, onContinue: () => { processNext(senders, i + 1); } },
+        extras: { email, onContinue: () => { processNext(i + 1); } },
       });
     }
   };
@@ -83,7 +79,7 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const [deleteEmails, setDeleteEmails] = useState(true);
   const { searchEmailSenders } = useActions();
   const { selectedSenders } = useSelectedSenders();
-  const { startUnsubscribeFlow } = useUnsubscribeFlow(Object.keys(selectedSenders), deleteEmails);
+  const { startUnsubscribeFlow } = useUnsubscribeFlow(deleteEmails);
 
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
@@ -160,8 +156,8 @@ const UnsubscribeError = ({ email, onContinue }: { email: string, onContinue: ()
     <>
       <p>Unable to find unsubscribe link for <b>{email}</b>.</p>
       <p>Block sender instead?</p>
-      <button className="secondary">
-        Cancel
+      <button className="secondary" onClick={onContinue}>
+        Don't block
       </button>
       <button className="primary" onClick={handleBlockSender}>
         Block

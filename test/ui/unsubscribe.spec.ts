@@ -117,8 +117,8 @@ test.describe('UI tests for Epic 3 - Unsubscribe Flow', () => {
     const modal = page.locator('#unsubscribe-error-modal');
     await expect(modal).toBeVisible();
 
-    // click "Block Sender" button
-    await page.getByRole('button', { name: 'Block' }).click();
+    // click "Block" button
+    await page.locator(".primary").click();
 
     // check that the success modal appears
     const successModal = page.locator('#unsubscribe-success-modal');
@@ -138,9 +138,9 @@ test.describe('UI tests for Epic 3 - Unsubscribe Flow', () => {
     await page.click('#unsubscribe-button');
     await page.getByRole('button', { name: 'Confirm' }).click();
 
-    // click "Block Sender" button twice
-    await page.getByRole('button', { name: 'Block' }).click();
-    await page.getByRole('button', { name: 'Block' }).click();
+    // click "Block" button twice
+    await page.locator(".primary").click();
+    await page.locator(".primary").click();
 
     // check that the success modal appears
     const successModal = page.locator('#unsubscribe-success-modal');

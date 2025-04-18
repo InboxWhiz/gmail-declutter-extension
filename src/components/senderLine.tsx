@@ -15,7 +15,7 @@ export const SenderLine = ({
   senderCount,
 }: SenderLineProps) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);
-  const { setSelectedSenders } = useSelectedSenders();
+  const { selectedSenders, setSelectedSenders } = useSelectedSenders();
   const { searchEmailSenders } = useActions();
 
   const selectLine = () => {
@@ -33,10 +33,10 @@ export const SenderLine = ({
   };
 
   return (
-    <div className={isSelected ? "sender-line selected" : "sender-line"}>
+    <div className={Boolean(selectedSenders[senderEmail]) ? "sender-line selected" : "sender-line"}>
       <div className="begin">
         <div>
-          <input type="checkbox" onClick={selectLine} />
+          <input type="checkbox" onChange={selectLine} checked={Boolean(selectedSenders[senderEmail])} />
         </div>
         <div className="sender-details">
           <span className="sender-name">{senderName}</span>
