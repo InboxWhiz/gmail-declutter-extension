@@ -6,10 +6,10 @@ export const mockActions: Actions = {
     console.log("[MOCK] Searching for emails:", emails);
   },
 
-  async deleteSenders() {
+  async deleteSenders(emails: string[]) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(console.log("[MOCK] Trashed senders successfully"));
+        resolve(console.log("[MOCK] Trashed senders successfully:", emails));
       }, 1000);
     });
   },

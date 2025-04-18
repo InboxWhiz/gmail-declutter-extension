@@ -15,6 +15,13 @@ As a user, I want to easily manage and view all email senders in my inbox so tha
   - **Acceptance Criteria:**
     - Clicking on a sender opens a Gmail view of all emails from that sender.
 
+- **User Story 1.3:**  
+  **As a user**, I want to see a “No senders” modal if I click Unsubscribe or Delete with no senders selected, so that I’m reminded to pick at least one sender before proceeding.
+
+  - **Acceptance Criteria:**
+    - Clicking “Unsubscribe” with zero senders selected displays a modal reading “No senders selected.”
+    - Clicking “Delete” with zero senders selected displays the same modal.
+
 ---
 
 ### **Epic 2: Delete Functionality**
@@ -40,13 +47,7 @@ As a user, I want to be able to delete emails from multiple senders at once and 
 
   - **Acceptance Criteria:**
     - Clicking "Confirm" deletes all the emails from the selected senders.
-
-- **User Story 2.4:**  
-  **As a user**, I want a confirmation message after deleting the emails to ensure the deletion was successful.
-
-  - **Acceptance Criteria:**
     - After deleting the emails, a confirmation message is displayed notifying the user that the emails were successfully deleted.
-    - The confirmation message includes the number of emails deleted and a button to close the message.
 
 ---
 

@@ -270,8 +270,8 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   return (
     <>
       <p>
-        Are you sure you want to <b>delete {emailsNum} emails</b> from{" "}
-        <b>{sendersNum}</b> senders?
+        Are you sure you want to <b>delete {emailsNum} email(s)</b> from{" "}
+        <b>{sendersNum}</b> sender(s)?
       </p>
       <p className="note">Note: This will not block or unsubscribe.</p>
 

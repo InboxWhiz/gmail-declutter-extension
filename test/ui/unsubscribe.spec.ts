@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { selectAliceBob } from "./helpers";
 
 test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
   let logs: string[] = [];
@@ -7,16 +8,14 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await page.goto("/");
 
     logs = []; // reset logs before each test
-    page.on("console", (msg) => {
-      logs.push(msg.text());
-    });
+    page.on("console", (msg) => logs.push(msg.text()));
   });
 
   test("3.1 - shows modal with correct email & sender count & buttons", async ({
     page,
   }) => {
     // select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "unsubscribe");
 
     const modal = page.locator("#unsubscribe-confirm-modal");
     await expect(modal).toBeVisible();
@@ -34,7 +33,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     page,
   }) => {
     // select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "unsubscribe");
 
     // click "Show all emails" button
     await page.getByRole("button", { name: "Show all emails" }).click();
@@ -73,7 +72,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
   test("3.3b - Unsubscribe Flow Wizard", async ({ page }) => {
     // select two senders
-    await selectAliceBob(page);
+    await selectAliceBob(page, "unsubscribe");
 
     // click "Confirm" button
     const [newTab1] = await Promise.all([
@@ -115,7 +114,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await expect(modal2).toBeVisible();
 
     // Emails were deleted (by default)
-    expect(logs).toContain("[MOCK] Trashed senders successfully");
+    expect(logs).toContain(
+      "[MOCK] Trashed senders successfully: [alice@email.com, bob@email.com]",
+    );
 
     // Blocking action was not called (by default)
     expect(logs).not.toContain("[MOCK] Blocked alice@email.com successfully");
@@ -148,7 +149,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     expect(logs).toContain("[MOCK] Blocked carol@email.com successfully");
 
     // check that the delete action was called
-    expect(logs).toContain("[MOCK] Trashed senders successfully");
+    expect(logs).toContain(
+      "[MOCK] Trashed senders successfully: [carol@email.com]",
+    );
   });
 
   test("3.4a - multiple senders can be blocked in a row", async ({ page }) => {
@@ -179,7 +182,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     expect(logs).toContain("[MOCK] Blocked dave@email.com successfully");
 
     // check that the delete action was called
-    expect(logs).toContain("[MOCK] Trashed senders successfully");
+    expect(logs).toContain(
+      "[MOCK] Trashed senders successfully: [carol@email.com, dave@email.com]",
+    );
   });
 
   test("3.5 - delete-emails toggle defaults on and can be toggled off", async ({
@@ -238,18 +243,3 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     expect(logs).toContain("[MOCK] Blocked alice@email.com successfully");
   });
 });
-
-const selectAliceBob = async (page) => {
-  // Helper function to select Alice and Bob senders
-  await page
-    .locator("div")
-    .filter({ hasText: /^Alicealice@email\.com32$/ })
-    .getByRole("checkbox")
-    .check();
-  await page
-    .locator("div")
-    .filter({ hasText: /^Bobbob@email\.com78$/ })
-    .getByRole("checkbox")
-    .check();
-  await page.click("#unsubscribe-button");
-};
