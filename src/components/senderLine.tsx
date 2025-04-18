@@ -1,5 +1,4 @@
 import "./senderLine.css";
-import { useState } from "react";
 import { useSelectedSenders } from "../providers/selectedSendersContext";
 import { useActions } from "../providers/actionsContext";
 
@@ -14,16 +13,13 @@ export const SenderLine = ({
   senderEmail,
   senderCount,
 }: SenderLineProps) => {
-  const [isSelected, setIsSelected] = useState<boolean>(false);
   const { selectedSenders, setSelectedSenders } = useSelectedSenders();
   const { searchEmailSenders } = useActions();
 
   const selectLine = () => {
-    setIsSelected(!isSelected);
-
     setSelectedSenders((prev) => {
       const newSelected = { ...prev };
-      if (!isSelected) {
+      if (!(senderEmail in newSelected)) {
         newSelected[senderEmail] = senderCount;
       } else {
         delete newSelected[senderEmail];

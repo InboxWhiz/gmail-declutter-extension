@@ -121,7 +121,7 @@ const UnsubscribePending = ({ subtype }: { subtype: string }) => {
 const UnsubscribeContinue = ({ email, link, onContinue }: { email: string, link: string, onContinue: () => void }) => {
   const { blockSender } = useActions();
   const { setModal } = useModal();
-  const toBlock = useState(false);
+  const [toBlock] = useState<boolean>(false);
 
   const reopenLink = () => { window.open(link, "_blank"); }
   const continueToNext = async () => {
