@@ -126,6 +126,32 @@ test.describe('UI tests for Epic 3 - Unsubscribe Flow', () => {
 
     // check that the blocking action was called
     expect(logs).toContain("[MOCK] Blocked carol@email.com successfully");
+
+    // check that the delete action was called
+    expect(logs).toContain("[MOCK] Trashed senders successfully");
+  });
+
+  test('3.4a - multiple senders can be blocked in a row', async ({ page }) => {
+    // select a sender
+    await page.locator('div').filter({ hasText: /^Carolcarol@email\.com15$/ }).getByRole('checkbox').check();
+    await page.locator('div').filter({ hasText: /^Davedave@email\.com56$/ }).getByRole('checkbox').check();
+    await page.click('#unsubscribe-button');
+    await page.getByRole('button', { name: 'Confirm' }).click();
+
+    // click "Block Sender" button twice
+    await page.getByRole('button', { name: 'Block' }).click();
+    await page.getByRole('button', { name: 'Block' }).click();
+
+    // check that the success modal appears
+    const successModal = page.locator('#unsubscribe-success-modal');
+    await expect(successModal).toBeVisible();
+
+    // check that both blocking actions were called
+    expect(logs).toContain("[MOCK] Blocked carol@email.com successfully");
+    expect(logs).toContain("[MOCK] Blocked dave@email.com successfully");
+
+    // check that the delete action was called
+    expect(logs).toContain("[MOCK] Trashed senders successfully");
   });
 
   test('3.5 - delete-emails toggle defaults on and can be toggled off', async ({ page }) => {

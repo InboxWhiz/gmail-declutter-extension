@@ -41,7 +41,6 @@ function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
 
   // Process one sender at `i`
   const processNext = async (senders: string[], i: number) => {
-    // all done → final cleanup
     if (i >= senders.length) {
       endUnsubscribeFlow();
       return;
@@ -63,7 +62,11 @@ function useUnsubscribeFlow(selectedSenders: string[], deleteEmails: boolean) {
         throw new Error("No link");
       }
     } catch {
-      setModal({ action: "unsubscribe", type: "error" });
+      setModal({
+        action: "unsubscribe",
+        type: "error",
+        extras: { email, onContinue: () => { processNext(senders, i + 1); } },
+      });
     }
   };
 
@@ -143,20 +146,19 @@ const UnsubscribeSuccess = () => {
   );
 };
 
-const UnsubscribeError = () => {
+const UnsubscribeError = ({ email, onContinue }: { email: string, onContinue: () => void }) => {
   const { blockSender } = useActions();
   const { setModal } = useModal();
-  const { selectedSenders } = useSelectedSenders();
 
   const handleBlockSender = async () => {
     setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
-    await blockSender(Object.keys(selectedSenders)[0]);
-    setModal({ action: "unsubscribe", type: "success" });
+    await blockSender(email);
+    onContinue(); // Continue to next sender after blocking
   };
 
   return (
     <>
-      <p>Unable to find unsubscribe link.</p>
+      <p>Unable to find unsubscribe link for <b>{email}</b>.</p>
       <p>Block sender instead?</p>
       <button className="secondary">
         Cancel
@@ -282,7 +284,7 @@ export const ModalPopup = () => {
       case action === "unsubscribe" && type === "pending":
         return <UnsubscribePending subtype={subtype!} />;
       case action === "unsubscribe" && type === "error":
-        return <UnsubscribeError />;
+        return <UnsubscribeError email={extras!.email} onContinue={extras!.onContinue} />;
       case action === "unsubscribe" && type === "continue":
         return <UnsubscribeContinue email={extras!.email} link={extras!.link} onContinue={extras!.onContinue} />;
       case action === "unsubscribe" && type === "success":
