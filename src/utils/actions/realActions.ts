@@ -1,5 +1,6 @@
 // actions/realActions.ts
 import { Sender } from "../../types/types";
+import { blockOneSender } from "../blockSenders";
 import { fetchAllSenders } from "../fetchSenders";
 import { trashMultipleSenders } from "../trashSenders";
 import { Actions } from "./types";
@@ -31,7 +32,7 @@ export const realActions: Actions = {
         chrome.storage.local.get(["senders"], (result) => {
           if (result.senders) {
             const updatedSenders = result.senders.filter(
-              (sender: [string, string, number]) => !emails.includes(sender[0]),
+              (sender: [string, string, number]) => !emails.includes(sender[0])
             );
             chrome.storage.local.set({ senders: updatedSenders }, () => {
               console.log("Updated senders in local storage.");
@@ -66,7 +67,7 @@ export const realActions: Actions = {
               email: sender[0],
               name: sender[1],
               count: sender[2],
-            }),
+            })
           );
           resolve(realSenders);
         } else {
@@ -95,12 +96,6 @@ export const realActions: Actions = {
 
   async blockSender(email: string): Promise<void> {
     // Blocks the sender using the Gmail API.
-    // TODO: Implement the actual logic to block the sender.
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(console.log("Blocked sender successfully", email));
-      }, 1000);
-    });
+    await blockOneSender(email);
   },
 };
