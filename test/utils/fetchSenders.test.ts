@@ -2,7 +2,7 @@ import { fetchAllSenders, exportForTest } from "../../src/utils/fetchSenders";
 const {
   fetchMessageIds,
   fetchMessageSenderSingle,
-  updateSenderCounts,
+  updateSenders,
   storeSenders,
 } = exportForTest;
 
@@ -117,8 +117,8 @@ describe("fetchAllSenders", () => {
     expect(fetch).toHaveBeenCalledTimes(4);
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
       senders: [
-        ["sender1@example.com", "sender1", 1],
-        ["sender2@example.com", "sender2", 1],
+        ["sender1@example.com", "sender1", 1, "123"],
+        ["sender2@example.com", "sender2", 1, "456"],
       ],
     });
   });
@@ -170,7 +170,7 @@ describe("fetchMessageIds", () => {
 
     const result = await fetchMessageIds(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      null,
+      null
     );
 
     expect(result).toEqual({
@@ -192,7 +192,7 @@ describe("fetchMessageIds", () => {
     // Act
     const result = await fetchMessageIds(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      null,
+      null
     );
 
     // Assert
@@ -217,10 +217,14 @@ describe("fetchMessageSenderSingle", () => {
 
     const sender = await fetchMessageSenderSingle(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      "123",
+      "123"
     );
 
-    expect(sender).toStrictEqual(["test@example.com", "Test"]);
+    expect(sender).toStrictEqual({
+      senderEmail: "test@example.com",
+      senderName: "Test",
+      messageId: "123",
+    });
   });
 
   test("returns 'Unknown Sender' when no From header is found", async () => {
@@ -234,32 +238,44 @@ describe("fetchMessageSenderSingle", () => {
 
     const sender = await fetchMessageSenderSingle(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      "123",
+      "123"
     );
 
-    expect(sender).toStrictEqual([null, "Unknown Sender"]);
+    expect(sender).toStrictEqual({
+      senderEmail: "null",
+      senderName: "Unknown Sender",
+      messageId: "123",
+    });
   });
 });
 
-describe("updateSenderCounts", () => {
-  test("correctly increments sender counts", () => {
+describe("updateSenders", () => {
+  test("correctly increments sender counts and sets first message ID", () => {
     // Arrange
     const senders = {};
 
     // Act
-    updateSenderCounts(
+    updateSenders(
       [
-        ["a@example.com", "Alice"],
-        ["b@example.com", "Bob"],
-        ["a@example.com", "Alice"],
+        { senderEmail: "a@example.com", senderName: "Alice", messageId: "1" },
+        { senderEmail: "b@example.com", senderName: "Bob", messageId: "2" },
+        { senderEmail: "a@example.com", senderName: "Alice", messageId: "3" },
       ],
-      senders,
+      senders
     );
 
     // Assert
     expect(senders).toEqual({
-      "a@example.com": { name: new Set(["Alice"]), count: 2 },
-      "b@example.com": { name: new Set(["Bob"]), count: 1 },
+      "a@example.com": {
+        name: new Set(["Alice"]),
+        count: 2,
+        latestMessageId: "1",
+      },
+      "b@example.com": {
+        name: new Set(["Bob"]),
+        count: 1,
+        latestMessageId: "2",
+      },
     });
   });
 
@@ -268,13 +284,17 @@ describe("updateSenderCounts", () => {
     const senders = {};
 
     // Act
-    updateSenderCounts(
+    updateSenders(
       [
-        ["a@example.com", "Alice"],
-        ["b@example.com", "Bob"],
-        ["a@example.com", "Alice - Newsletter"],
+        { senderEmail: "a@example.com", senderName: "Alice", messageId: "1" },
+        { senderEmail: "b@example.com", senderName: "Bob", messageId: "2" },
+        {
+          senderEmail: "a@example.com",
+          senderName: "Alice - Newsletter",
+          messageId: "3",
+        },
       ],
-      senders,
+      senders
     );
 
     // Assert
@@ -282,25 +302,42 @@ describe("updateSenderCounts", () => {
       "a@example.com": {
         name: new Set(["Alice", "Alice - Newsletter"]),
         count: 2,
+        latestMessageId: "1",
       },
-      "b@example.com": { name: new Set(["Bob"]), count: 1 },
+      "b@example.com": {
+        name: new Set(["Bob"]),
+        count: 1,
+        latestMessageId: "2",
+      },
     });
   });
 });
 
 describe("storeSenders", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("calls chrome.storage.local.set with parsed and sorted senders", () => {
     // Act
     storeSenders({
-      "alice@example.com": { count: 3, name: new Set(["alice"]) },
-      "bob@example.com": { count: 5, name: new Set(["bob"]) },
+      "alice@example.com": {
+        count: 3,
+        name: new Set(["alice"]),
+        latestMessageId: "1",
+      },
+      "bob@example.com": {
+        count: 5,
+        name: new Set(["bob"]),
+        latestMessageId: "2",
+      },
     });
 
     // Assert
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
       senders: [
-        ["bob@example.com", "bob", 5],
-        ["alice@example.com", "alice", 3],
+        ["bob@example.com", "bob", 5, "2"],
+        ["alice@example.com", "alice", 3, "1"],
       ],
     });
   });
@@ -311,15 +348,20 @@ describe("storeSenders", () => {
       "alice@example.com": {
         count: 4,
         name: new Set(["Alice - Newsletter", "alice"]),
+        latestMessageId: "1",
       },
-      "bob@example.com": { count: 8, name: new Set(["bob"]) },
+      "bob@example.com": {
+        count: 8,
+        name: new Set(["bob"]),
+        latestMessageId: "2",
+      },
     });
 
     // Assert
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
       senders: [
-        ["bob@example.com", "bob", 8],
-        ["alice@example.com", "alice", 4],
+        ["bob@example.com", "bob", 8, "2"],
+        ["alice@example.com", "alice", 4, "1"],
       ],
     });
   });

@@ -1,36 +1,51 @@
 import { getOAuthToken } from "./auth";
 import { parseSender, sleep } from "./utils";
 
+interface SenderData {
+  name: Set<string>;
+  count: number;
+  latestMessageId: string;
+}
+
+interface MessageData {
+  senderEmail: string;
+  senderName: string;
+  messageId: string;
+}
+
 export async function fetchAllSenders(): Promise<void> {
   const authToken = await getOAuthToken();
-  const senders = {};
+  const senders: { [key: string]: SenderData } = {};
 
   let nextPageToken = null;
-  const allMessageIds = [];
+  const allMessageIds: string[] = [];
 
   try {
     // Fetch all message IDs
     do {
       const { messageIds, nextPage } = await fetchMessageIds(
         authToken,
-        nextPageToken,
+        nextPageToken
       );
       allMessageIds.push(...messageIds);
       nextPageToken = nextPage;
     } while (nextPageToken);
     console.log(
-      `Fetched ${allMessageIds.length} email IDs. Getting senders...`,
+      `Fetched ${allMessageIds.length} email IDs. Getting senders...`
     );
 
     // Process messages in batches of 40
     for (let i = 0; i < allMessageIds.length; i += 40) {
       const batchIds = allMessageIds.slice(i, i + 40);
-      const batchSenders = await fetchMessageSendersBatch(authToken, batchIds);
-      updateSenderCounts(batchSenders, senders);
+      const batchSenders: MessageData[] = await fetchMessageSendersBatch(
+        authToken,
+        batchIds
+      );
+      updateSenders(batchSenders, senders);
     }
 
     console.log(
-      `Fetched ${allMessageIds.length} emails. Found ${Object.keys(senders).length} unique senders.`,
+      `Fetched ${allMessageIds.length} emails. Found ${Object.keys(senders).length} unique senders.`
     );
 
     storeSenders(senders);
@@ -41,7 +56,7 @@ export async function fetchAllSenders(): Promise<void> {
 
 async function fetchMessageIds(
   token: chrome.identity.GetAuthTokenResult,
-  pageToken: string | null,
+  pageToken: string | null
 ): Promise<{ messageIds: string[]; nextPage: string | null }> {
   let url =
     "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=500";
@@ -76,17 +91,17 @@ async function fetchMessageIds(
 
 export async function fetchMessageSendersBatch(
   token: chrome.identity.GetAuthTokenResult,
-  messageIds: string[],
-): Promise<any[]> {
+  messageIds: string[]
+): Promise<MessageData[]> {
   return Promise.all(
-    messageIds.map((id) => fetchMessageSenderSingle(token, id)),
+    messageIds.map((id) => fetchMessageSenderSingle(token, id))
   );
 }
 
 async function fetchMessageSenderSingle(
   token: chrome.identity.GetAuthTokenResult,
-  messageId: string,
-): Promise<any> {
+  messageId: string
+): Promise<MessageData> {
   // Fetch message metadata
   const response = await fetch(
     `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=metadata&metadataHeaders=From`,
@@ -96,7 +111,7 @@ async function fetchMessageSenderSingle(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    },
+    }
   );
 
   // Handle rate limiting
@@ -116,38 +131,42 @@ async function fetchMessageSenderSingle(
   // Extract sender from response
   const msgData = await response.json();
   const sender = msgData.payload?.headers?.find(
-    (header: { name: string }) => header.name === "From",
+    (header: { name: string }) => header.name === "From"
   )?.value;
-  return parseSender(sender);
+
+  // Parse the name and email from the sender
+  const [email, name] = parseSender(sender);
+
+  return { senderEmail: email, senderName: name, messageId };
 }
 
-function updateSenderCounts(
-  sendersList: any[],
-  allSenders: { [x: string]: { count: number; name: Set<any> } },
+function updateSenders(
+  messageList: MessageData[],
+  allSenders: { [x: string]: SenderData }
 ): void {
-  sendersList.forEach((sender) => {
-    if (allSenders[sender[0]]) {
-      allSenders[sender[0]].count += 1;
-      allSenders[sender[0]]["name"].add(sender[1]);
+  messageList.forEach((message) => {
+    if (allSenders[message.senderEmail]) {
+      allSenders[message.senderEmail].count += 1;
+      allSenders[message.senderEmail]["name"].add(message.senderName);
     } else {
-      allSenders[sender[0]] = {
+      allSenders[message.senderEmail] = {
         count: 1,
-        name: new Set([sender[1]]),
+        name: new Set([message.senderName]),
+        latestMessageId: message.messageId,
       };
     }
   });
 }
 
-function storeSenders(senders: {
-  [s: string]: { name: Set<string>; count: number };
-}) {
+function storeSenders(senders: { [s: string]: SenderData }) {
   // Parse and sort senders by email count
   const parsedSenders = Object.entries(senders)
-    .map(([email, { name, count }]) => [
+    .map(([email, { name, count, latestMessageId }]) => [
       email,
-      Array.from(name).sort((a, b) => a.length - b.length)[0],
+      Array.from(name).sort((a, b) => a.length - b.length)[0], // Shortest name
       count,
-    ]) // Shortest name
+      latestMessageId,
+    ])
     .sort((a, b) => Number(b[2]) - Number(a[2])); // Sort by count in descending order
 
   // Store in local storage
@@ -157,6 +176,6 @@ function storeSenders(senders: {
 export const exportForTest = {
   fetchMessageIds,
   fetchMessageSenderSingle,
-  updateSenderCounts,
+  updateSenders,
   storeSenders,
 };
