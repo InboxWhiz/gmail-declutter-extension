@@ -106,6 +106,13 @@ async function fetchMessageSenderSingle(
     return await fetchMessageSenderSingle(token, messageId); // Retry
   }
 
+  // Handle 403 error
+  if (response.status === 403) {
+    console.warn("Error. Pausing...");
+    await sleep(1000);
+    return await fetchMessageSenderSingle(token, messageId); // Retry
+  }
+
   // Extract sender from response
   const msgData = await response.json();
   const sender = msgData.payload?.headers?.find(
