@@ -18,6 +18,6 @@ describe("parseSender", () => {
 
   test("extracts name and email when invalid", () => {
     const result = parseSender(null); // invalid sender
-    expect(result).toEqual([null, "Unknown Sender"]);
+    expect(result).toEqual(["null", "Unknown Sender"]);
   });
 });

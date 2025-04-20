@@ -1,5 +1,5 @@
-export function parseSender(raw: string | null): [string | null, string] {
-  if (!raw) return [null, "Unknown Sender"];
+export function parseSender(raw: string | null): [string, string] {
+  if (!raw) return ["null", "Unknown Sender"];
   try {
     let name, email;
     if (raw.includes("<")) {
@@ -14,7 +14,7 @@ export function parseSender(raw: string | null): [string | null, string] {
     }
     return [email, name];
   } catch {
-    return [null, "Unknown Sender"];
+    return ["null", "Unknown Sender"];
   }
 }
 
