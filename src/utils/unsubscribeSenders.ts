@@ -1,0 +1,145 @@
+import { getOAuthToken } from "./auth";
+import { sleep } from "./utils";
+import { UnsubscribeData } from "../types/types";
+
+export async function getMultipleUnsubscribeData(
+  messageIds: string[]
+): Promise<UnsubscribeData[]> {
+  //   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
+  const token =
+    "ya29.a0AZYkNZgdxMXhZdZ12_R2BZ4DbPCbhlU1Z_Y_xX4pfEkpykHwDyVDpuYF1ZR31VOv-cnj6Px6pOK3T7mFwHGBHBQzqDwXrXc5qMByE1kRUsSpRbJSYkICFKUPTED1cQZ0gVcXVa3K6TOaeLQEf_BpJjyybrb0hZFceTMtL-iUaCgYKAaUSARISFQHGX2MiE4Vo_1EjPZr1TFSNqzyhnA0175";
+
+  const unsubscribeData: UnsubscribeData[] = [];
+
+  for (const messageId of messageIds) {
+    const header = await getUnsubscribeData(messageId, token);
+    unsubscribeData.push(header);
+  }
+
+  return unsubscribeData;
+}
+
+export async function getUnsubscribeData(
+  messageId: string,
+  token: any
+): Promise<UnsubscribeData> {
+//   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
+  const headerData: UnsubscribeData = await getListUnsubscribeHeader(
+    messageId,
+    token
+  );
+
+  // Return if we have some unsubscribe data from the headers
+  if (headerData.posturl || headerData.mailto) {
+    return headerData;
+  }
+
+  // If no unsubscribe data found in headers, look for a link in the email body
+  const unsubscribeLink = await getUnsubscribeLinkFromBody(messageId, token);
+  return { posturl: null, mailto: null, clickurl: unsubscribeLink };
+}
+
+async function getListUnsubscribeHeader(
+  messageId: string,
+  token: any
+): Promise<UnsubscribeData> {
+  // Get the List-Unsubscribe header for a specific message
+  const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=metadata&metadataHeaders=List-Unsubscribe`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  // Handle rate limiting
+  if (response.status === 429) {
+    console.warn("Rate limit hit. Pausing...");
+    await sleep(1000);
+    return await getListUnsubscribeHeader(token, messageId); // Retry
+  }
+
+  const data = await response.json();
+  const header = data.payload?.headers?.find(
+    (header: { name: string }) => header.name === "List-Unsubscribe"
+  )?.value;
+
+  const parsedHeader = parseListUnsubscribeHeader(header);
+
+  return parsedHeader;
+}
+
+function parseListUnsubscribeHeader(
+  header: string | undefined
+): UnsubscribeData {
+  const unsubscribeData: UnsubscribeData = {
+    posturl: null,
+    mailto: null,
+    clickurl: null,
+  };
+
+  // Return empty data if header is not present
+  if (!header) {
+    return unsubscribeData;
+  }
+
+  const parts = header.split(",");
+
+  for (const part of parts) {
+    const trimmedPart = part.trim().substring(1, part.length - 1); // Remove surrounding angle brackets
+    if (trimmedPart.startsWith("http") || trimmedPart.startsWith("https")) {
+      // It's a URL
+      unsubscribeData.posturl = trimmedPart; // Store the URL
+    } else if (trimmedPart.startsWith("mailto:")) {
+      // It's an email address
+      unsubscribeData.mailto = trimmedPart.slice(7); // Store the email address, removing "mailto:" prefix
+    }
+  }
+
+  return unsubscribeData;
+}
+
+async function getUnsubscribeLinkFromBody(
+  messageId: string,
+  token: any
+): Promise<string | null> {
+  const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (response.status === 429) {
+    console.warn("Rate limit hit. Pausing...");
+    await sleep(1000);
+    return await getUnsubscribeLinkFromBody(messageId, token); // Retry
+  }
+
+  const data = await response.json();
+  const body = data.payload?.parts?.find(
+    (part: { mimeType: string }) => part.mimeType === "text/html"
+  )?.body?.data;
+
+  if (!body) {
+    return null; // No HTML body found
+  }
+
+  // Decode base64url encoded body
+  const decodedBody = atob(body.replace(/-/g, "+").replace(/_/g, "/"));
+
+  // Extract unsubscribe link from the HTML body
+  const match = decodedBody.match(
+    /<a[^>]+href="([^"]+)"[^>]*>unsubscribe<\/a>/i
+  );
+
+  return match ? match[1] : null; // Return the link or null if not found
+}
+
+export const exportForTesting = {
+  parseListUnsubscribeHeader,
+  getUnsubscribeLinkFromBody,
+};
