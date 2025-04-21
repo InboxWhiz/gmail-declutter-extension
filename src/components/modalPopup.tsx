@@ -5,16 +5,34 @@ import { useSelectedSenders } from "../providers/selectedSendersContext";
 import { useSenders } from "../providers/sendersContext";
 import { useActions } from "../providers/actionsContext";
 import { ToggleOption } from "./toggleOption";
+import { ManualUnsubscribeData } from "../types/types";
 
 function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
-  const { getUnsubscribeLink, deleteSenders, blockSender } = useActions();
+  const { deleteSenders, blockSender, unsubscribeSendersAuto } = useActions();
   const { setModal } = useModal();
   const { reloadSenders } = useSenders();
   const { selectedSenders, clearSelectedSenders } = useSelectedSenders();
 
+  let linkOnlySenders: [string, string][] = []; // List of senders that require manual unsubscribe via link, and their links to click
+  let noUnsubscribeSenders: string[] = []; // List of senders with no unsubscribe option
+
   // Kick off the flow
-  const startUnsubscribeFlow = () => {
-    processNext(0);
+  const startUnsubscribeFlow = async () => {
+    // Set modal to pending state
+    setModal({
+      action: "unsubscribe",
+      type: "pending",
+      subtype: "working",
+    });
+
+    // Attempt to unsubscribe all senders automatically
+    const unsubscribeResults: ManualUnsubscribeData = await unsubscribeSendersAuto(Object.keys(selectedSenders));
+    linkOnlySenders = unsubscribeResults.linkOnlySenders;
+    noUnsubscribeSenders = unsubscribeResults.noUnsubscribeSenders;
+
+    // Start processing link-only senders
+    processNextLink(0);
+
   };
 
   // End the flow
@@ -41,55 +59,52 @@ function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
     reloadSenders();
   };
 
-  // Process one sender at `i`
-  const processNext = async (i: number) => {
-    const senders = Object.keys(selectedSenders);
+  // Process one link-only sender at `i`
+  const processNextLink = async (i: number) => {
+    if (i >= linkOnlySenders.length) {
+      processNextBlock(0);
+      return;
+    }
 
-    if (i >= senders.length) {
+    const [email, link] = linkOnlySenders[i];
+
+    setModal({
+      action: "unsubscribe",
+      type: "continue",
+      extras: {
+        email,
+        link,
+        onContinue: () => {
+          processNextLink(i + 1);
+        },
+      },
+    });
+
+  };
+
+  // Process one block-only sender at `i`
+  const processNextBlock = async (i: number) => {
+    if (i >= noUnsubscribeSenders.length) {
       endUnsubscribeFlow();
       return;
     }
 
-    const email = senders[i];
-    try {
-      setModal({
-        action: "unsubscribe",
-        type: "pending",
-        subtype: "finding-link",
-      });
-      const link = await getUnsubscribeLink(email);
+    const email = noUnsubscribeSenders[i];
 
-      if (link) {
-        window.open(link, "_blank");
-        setModal({
-          action: "unsubscribe",
-          type: "continue",
-          extras: {
-            email,
-            link,
-            onContinue: () => {
-              processNext(i + 1);
-            },
-          },
-        });
-      } else {
-        throw new Error("No link");
-      }
-    } catch {
-      setModal({
-        action: "unsubscribe",
-        type: "error",
-        extras: {
-          email,
-          onContinue: () => {
-            processNext(i + 1);
-          },
+    setModal({
+      action: "unsubscribe",
+      type: "error",
+      extras: {
+        email,
+        onContinue: () => {
+          processNextBlock(i + 1);
         },
-      });
-    }
+      },
+    });
+
   };
 
-  return { startUnsubscribeFlow: startUnsubscribeFlow };
+  return { startUnsubscribeFlow };
 }
 
 interface ConfirmProps {
@@ -141,10 +156,22 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
 };
 
 const UnsubscribePending = ({ subtype }: { subtype: string }) => {
-  const message =
-    subtype === "finding-link"
-      ? "Finding unsubscribe links..."
-      : "Blocking sender...";
+  let message: string;
+  switch (subtype) {
+    case "working":
+      message = "Unsubscribing from senders...";
+      break;
+    case "finding-link":
+      message = "Finding unsubscribe links...";
+      break;
+    case "blocking":
+      message = "Blocking sender...";
+      break;
+    default:
+      message = "Processing...";
+      break;
+  }
+
   return (
     <>
       <p>{message}</p>
@@ -163,36 +190,21 @@ const UnsubscribeContinue = ({
   link: string;
   onContinue: () => void;
 }) => {
-  const reopenLink = () => {
+  const openLink = () => {
     window.open(link, "_blank");
   };
   return (
     <>
       <p>
-        Unsubscribe link for <b>{email}</b> found.
-      </p>
-      <p className="note">
-        To stop getting messages from <b>{email}</b>, go to their website to unsubscribe.
+      To stop getting messages from <b>{email}</b>, go to their website to unsubscribe.
       </p>
 
-      <button className="secondary" onClick={reopenLink}>
-        Reopen Link
+      <button className="primary" onClick={openLink}>
+        Go to Website
       </button>
-      <button className="primary" onClick={onContinue}>
+      <button className="secondary" onClick={onContinue}>
         Continue
       </button>
-    </>
-  );
-};
-
-const UnsubscribeSuccess = () => {
-  return (
-    <>
-      <p>✅ Success!</p>
-      <p>You have been unsubscribed from selected senders.</p>
-      <p className="note">
-        Note: You may need to reload your browser to see changes.
-      </p>
     </>
   );
 };
@@ -225,6 +237,18 @@ const UnsubscribeError = ({
       <button className="primary" onClick={handleBlockSender}>
         Block
       </button>
+    </>
+  );
+};
+
+const UnsubscribeSuccess = () => {
+  return (
+    <>
+      <p>✅ Success!</p>
+      <p>You have been unsubscribed from selected senders.</p>
+      <p className="note">
+        Note: You may need to reload your browser to see changes.
+      </p>
     </>
   );
 };
