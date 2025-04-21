@@ -5,15 +5,12 @@ import { UnsubscribeData } from "../types/types";
 export async function getMultipleUnsubscribeData(
   messageIds: string[]
 ): Promise<UnsubscribeData[]> {
-  //   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
-  const token =
-    "ya29.a0AZYkNZgdxMXhZdZ12_R2BZ4DbPCbhlU1Z_Y_xX4pfEkpykHwDyVDpuYF1ZR31VOv-cnj6Px6pOK3T7mFwHGBHBQzqDwXrXc5qMByE1kRUsSpRbJSYkICFKUPTED1cQZ0gVcXVa3K6TOaeLQEf_BpJjyybrb0hZFceTMtL-iUaCgYKAaUSARISFQHGX2MiE4Vo_1EjPZr1TFSNqzyhnA0175";
-
+  const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
   const unsubscribeData: UnsubscribeData[] = [];
 
   for (const messageId of messageIds) {
-    const header = await getUnsubscribeData(messageId, token);
-    unsubscribeData.push(header);
+    const data = await getUnsubscribeData(messageId, token);
+    unsubscribeData.push(data);
   }
 
   return unsubscribeData;
@@ -23,7 +20,6 @@ export async function getUnsubscribeData(
   messageId: string,
   token: any
 ): Promise<UnsubscribeData> {
-//   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
   const headerData: UnsubscribeData = await getListUnsubscribeHeader(
     messageId,
     token
@@ -144,9 +140,10 @@ export async function unsubscribeUsingPostUrl(url: string) {
 
   if (!response.ok) {
     throw new Error(
-      `Failed to unsubscribe using POST URL: ${response.statusText}`
+      `Failed to unsubscribe using POST URL: ${response.status} ${response.statusText}`
     );
   }
+  console.log(`Unsubscribed using POST URL: ${url}`);
 }
 
 export async function unsubscribeUsingMailTo(email: string) {
@@ -164,7 +161,7 @@ export async function unsubscribeUsingMailTo(email: string) {
   const raw = rawLines.join("\r\n");
 
   // Encode message
-  const encoded = btoa(unescape(encodeURIComponent(raw)))
+  const encoded = btoa(encodeURIComponent(raw))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");

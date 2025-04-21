@@ -1,789 +1,18 @@
-import { get } from "http";
-import { exportForTesting, getMultipleUnsubscribeData } from "../../src/utils/unsubscribeSenders";
+import {
+  exportForTesting,
+  getMultipleUnsubscribeData,
+  unsubscribeUsingMailTo,
+  unsubscribeUsingPostUrl,
+  getUnsubscribeData
+} from "../../src/utils/unsubscribeSenders";
 const { parseListUnsubscribeHeader, getUnsubscribeLinkFromBody } =
   exportForTesting;
 
-const allIds = [
-  "1958bd6bc8c2432c",
-  "18c1e1892beec5f1",
-  "196364a94d0f50ad",
-  "193f41971d9d1ffb",
-  "194583700d19d267",
-  "191955c9660205fe",
-  "18419b0082386a8b",
-  "195e809e1a6171fa",
-  "195ebddb48949b7a",
-  "185ea4027b182cbf",
-  "193f3fb5047e8283",
-  "193c62461791ccc1",
-  "195d367e36d745ee",
-  "184b4381ef97d6e9",
-  "1956c077078ba237",
-  "18f01eaeb9b9a452",
-  "185c0086c89a2e58",
-  "189e9de39e3f594a",
-  "196540d348fa215c",
-  "19640bd7be935dd7",
-  "18c0ba63202dbd0a",
-  "17cd74c9a184fbb6",
-  "1919402dd5164473",
-  "1866f92bb8f3a846",
-  "194ccf5dc8206e56",
-  "1897701067f1dd04",
-  "193ea4e39505f5b2",
-  "19258cf67ab8e836",
-  "18e1a1915c010be5",
-  "18347b16224988ba",
-  "19640d54e3cd5627",
-  "19079d3c6670ae91",
-  "1946b4bf36e5828a",
-  "18b390770708c414",
-  "1961592481cc25fd",
-  "1845e4ac0513783c",
-  "17c8cde03c4d8316",
-  "19286d4f235fd1ef",
-  "18af7c8274e71edd",
-  "18867373b1e02d0c",
-  "1964f587139e62a2",
-  "17ec117543b5ebab",
-  "19291a3831164cd9",
-  "1727841dd00ca1d6",
-  "18efb569d363da3f",
-  "192f6395431cdeda",
-  "1913821c313b01a2",
-  "1964619e6461741a",
-  "18da3251c51c0660",
-  "19643a6cc30dda13",
-  "193c2aa15a840b7d",
-  "192d2779cf5c4316",
-  "19641cbf02a13d3c",
-  "184e5ee2e9c3fbf3",
-  "15ecf7e19ae9144d",
-  "18d3293b9d09e1be",
-  "185e9e84a1b69c62",
-  "18483f82f5433401",
-  "19638fbccc75de2b",
-  "1960cb8f83bbbecb",
-  "1963a083bdddd3d0",
-  "1939833e243720e7",
-  "1744dc58365d2e31",
-  "1940f371d1b11bd3",
-  "184771a996a07c8a",
-  "1959269e96eba4ee",
-  "18df63de55c39f47",
-  "1877e49efa4fc574",
-  "1964b62940c3c888",
-  "1962cb20a268b649",
-  "19392a2aa4e5fab6",
-  "184c4ff4b06ec9af",
-  "1808079a5815ce45",
-  "196460a2eb8eb053",
-  "18dfc2577e5cde19",
-  "18cc58cb2dc558b4",
-  "19626455b4cab79d",
-  "1944b638097b6bc4",
-  "195915adef2e905b",
-  "19409de21d2637f1",
-  "18e7dc254f914511",
-  "18e1bc46c69b0b69",
-  "186571a5c3840ef4",
-  "185e4a74267a1924",
-  "190a2a3e15a17fc0",
-  "195fa5ebe9bcb99e",
-  "1948a65a52c755ff",
-  "190849a4f364f07e",
-  "17f3ac8c705f24bb",
-  "194443afc309eccb",
-  "1941518ffd7a1fdb",
-  "190ea4722d571cba",
-  "1906d3713ee8d865",
-  "18688e2948660aae",
-  "179e7f07c87266da",
-  "1963b195dd0e9358",
-  "19620d75fd22a7bc",
-  "18d6088cd6d30a18",
-  "195d7eb7a352fe84",
-  "1948a143e2ba4ad2",
-  "18028944be3d3e21",
-  "17db91021070c995",
-  "195ce9ee04342219",
-  "1956d1b23c90b19b",
-  "18f18a120eb18015",
-  "184d3ba6e70036be",
-  "17fa27e995e71211",
-  "19112aa8577deb78",
-  "190fef2bcfd7ae8f",
-  "190e90c73a5bb3d7",
-  "18ca2b93878ce67e",
-  "185f137818d8e497",
-  "181b5748321718a8",
-  "19643e8a49530afa",
-  "19430c76ab74d701",
-  "1812165b1ca129b0",
-  "180426164f4b6ab6",
-  "17dba5a9fae9b70b",
-  "15e0abd58dc554ce",
-  "19602b904acc7483",
-  "190b18d060b85ff4",
-  "18e3610e5714a406",
-  "185d062dfd5d810f",
-  "17cea80b12911245",
-  "15c21a5defe30bf3",
-  "158c617557f78510",
-  "1961f3ffc4dcbc94",
-  "1961c6453bb7d3f5",
-  "192d3dd9881e1329",
-  "18fa27a027c6ed15",
-  "18f8eaea8e57aad7",
-  "18a8ec2c47379ea7",
-  "17d1597f83984fde",
-  "17482a64afab30e8",
-  "195d846fb0468593",
-  "1941d407262946b6",
-  "19414c58fe8fb90b",
-  "190ef4028fcb41f4",
-  "18ffe5b53f283376",
-  "18fc771591c706e7",
-  "18d511659ba98789",
-  "18cadfd3bfc1429a",
-  "18a6ad0ed298e18f",
-  "189b88bc28875b9b",
-  "18873043d5f43321",
-  "17ff518c733597f7",
-  "17413c692742c9f9",
-  "172c74812caacc41",
-  "161de7bff4c26a7a",
-  "1964161e93272c51",
-  "195fd8c762f65412",
-  "195f729858a3809c",
-  "19550f1813396038",
-  "194138ce3dd58ccb",
-  "1937cd60eb687cc4",
-  "19243290f2cf5756",
-  "191dd4e9d095b88f",
-  "1910ea294114ac46",
-  "190ce89c6e05f62c",
-  "190af23be0447c21",
-  "18f6dc6451b4e449",
-  "187c95596648b4c7",
-  "186f879229432646",
-  "185ae80005fb8d1f",
-  "1842e7a1429f1364",
-  "1830483afdae0414",
-  "17fd0c60144a1840",
-  "17e6923cfc4c60f8",
-  "1796824c3f8af482",
-  "172fc1d246733e96",
-  "196450d2178b0030",
-  "19611a72fc8434de",
-  "1957c6b4f61b6af2",
-  "194e2256881800de",
-  "1942de1947a16cfa",
-  "191d7518db230315",
-  "19107d350760f056",
-  "190e721621b64765",
-  "18f6388a75b2483f",
-  "18d67169536bdd32",
-  "188e44c4508d9fe3",
-  "17a7c57fb8772bd8",
-  "174b195b9b041548",
-  "17060069d037c941",
-  "1964e08f53ce999c",
-  "195f15591a185ba5",
-  "19525d9e98810201",
-  "193dfeb76ffb105a",
-  "193d107e63d43b4a",
-  "1936fd8bc93efdf6",
-  "1928784e05f50ab1",
-  "1914cb8b3d6fe5ab",
-  "190083af9d567e98",
-  "18cd610e5f60d484",
-  "18a6cbb179c042aa",
-  "189fff97e2ca31ab",
-  "1885ed8c95a58aea",
-  "186ce9f35ff02283",
-  "185b206ea3c04bb6",
-  "184a7f07b3510129",
-  "183ef96b99a4a8e4",
-  "182c17b22b0de25e",
-  "18023352ec4426c7",
-  "17f529a4d0dbc63e",
-  "17b8a0668a411d7e",
-  "1798bbea58573906",
-  "172df02f36a92d24",
-  "17299e1544d98786",
-  "1963499a026e001f",
-  "1961347bf9da25b4",
-  "19600b23ff13d29d",
-  "195d303305a986b3",
-  "1957cc3c05d6e98e",
-  "1953839ce0d1dfd6",
-  "194a92a83bf54749",
-  "194a8e2cc0cc9b8f",
-  "1948bc1a9084bb6b",
-  "193cedb739d88b56",
-  "19360145e4a8b269",
-  "192b9fa061c7550e",
-  "191a518a745c51be",
-  "1914e3c2fe9d9c3e",
-  "190f316fc9faed69",
-  "18e85d4a5326c8e3",
-  "18dc3ca6bb37e675",
-  "18d62a1b3858cafc",
-  "18cf2f02bd1d23bf",
-  "18c3fb274f23b6bf",
-  "18b5f8cba83537ef",
-  "18a98f723a800841",
-  "188e903e015ef268",
-  "18780bd6cf37d62a",
-  "186a4967447c6d4d",
-  "1839867c08bdd153",
-  "182d23ad6a7a4dd7",
-  "18199938d7e26b33",
-  "1811c9fabc4c4915",
-  "17f6aa00f0607031",
-  "1761a2e42c8daaea",
-  "172be6f36f4d8c82",
-  "15c9ec6f9557a0d6",
-  "196523173dcf33f4",
-  "19645bada0dd54a6",
-  "196447681cd28522",
-  "196269eefb37dcfa",
-  "195fda43830f1fcb",
-  "195ec91b4706b75f",
-  "195bc86019fd3d9b",
-  "1956878ae8a632b5",
-  "1951b4e7f9e7ebe0",
-  "195185914195b7be",
-  "19498099fc56d59c",
-  "194522e93cd3eab8",
-  "193c16759ac48670",
-  "1937053be524b9de",
-  "191060185127ccd2",
-  "190ffee601eb5682",
-  "18fc290d361f9ffe",
-  "18fbf9f2b8ec9c94",
-  "18fa03c4fb104c10",
-  "18ea147f661b6120",
-  "18e675a063d9a27c",
-  "18c209a2fbd2a330",
-  "189be46281cb9fb1",
-  "187a4bf0c1d44ea1",
-  "1869e58fc44e3bb0",
-  "1850e47610feb61c",
-  "18393ea4c4fdc31a",
-  "1823063d345d1fd5",
-  "17eafdaf2b553a5c",
-  "17da576667654037",
-  "17cbb6b73f2ad7f8",
-  "17b8d122f58357b4",
-  "17b4c766771a9078",
-  "17b09c17612f9704",
-  "1796183a1e364e68",
-  "179617a5b980f58b",
-  "1754cc39c602366f",
-  "1963a1f06ef49acf",
-  "1962ffde24814553",
-  "1962a91712cb3838",
-  "195d9e4afcb7ec9f",
-  "195b0692d3c7c437",
-  "1958aebdba94a368",
-  "194429b3b74cffbc",
-  "19408f8c94da9cfe",
-  "193f0ff49c72b927",
-  "193d0ac6a1f1b58e",
-  "193cbde0a39ce225",
-  "193c0f2e1b9b39de",
-  "1936a0f9ce826453",
-  "1934a692eebe31b0",
-  "193466a41476193f",
-  "192fdeadcce52a90",
-  "1928c70f5e8fd311",
-  "191f6764f99d30b8",
-  "191de019b8fcd638",
-  "191762db45c133f6",
-  "1916c6af9ed7cde9",
-  "1915bb45b9a2c91b",
-  "18fe9878cc3e8665",
-  "18fdc545983c85c6",
-  "18f6757058e87fdb",
-  "18f33682a7b113ec",
-  "18e862e1bdd42536",
-  "18de8596eeeb541d",
-  "18bd58ac7a0c01b6",
-  "18a6c7b178c4cf28",
-  "189e7b0abac19a47",
-  "189dbb9aca93411a",
-  "1898d04fe421f20a",
-  "18795b9852ed4e3b",
-  "1874d469d9c78a2d",
-  "186f7660c3f8874d",
-  "1869fa37421b0307",
-  "185c17d85a49e265",
-  "185bdf45473e4fc7",
-  "184ce8f5e3ab4a9d",
-  "1843a2dd5966508c",
-  "183d29bff9d56f11",
-  "183a6395cb4b7e56",
-  "183a52ada2de4080",
-  "1811eedb9f843094",
-  "1805dad42c1b848a",
-  "17c7a8f525157c01",
-  "17b86c850a74ae79",
-  "1791ef7e9588345c",
-  "178ccc6c8d99ba1a",
-  "17708403bb1aa15b",
-  "17697f7f114e3a70",
-  "1751e9470c47e596",
-  "1750d54b43ae44ef",
-  "1740319765206603",
-  "1737f0537ecbaab2",
-  "173009a1ebfc5b34",
-  "172739aeb7882067",
-  "171eaec2dc94c361",
-  "15e3ce6b9ce06175",
-  "15aedf4ceae1a57f",
-  "19653c21787f7b8d",
-  "1964aae862e80f54",
-  "1963fdbf6252c406",
-  "196332ac8fccba22",
-  "196240c703e100bd",
-  "195f6a8ea36e9776",
-  "195cf19cce309286",
-  "195ca4f30478fce6",
-  "195b3f651654ded7",
-  "1957b33075dac198",
-  "1955e627886de4dc",
-  "1954e0070c1eec45",
-  "19514dd2111a83ee",
-  "195051f5f60ab918",
-  "194cc7d6b8dbc20d",
-  "194b3813087010f4",
-  "194902333e782aa9",
-  "19484b8fe4ae55e7",
-  "19461786c24a2e01",
-  "1943c76caf9af140",
-  "1942d14882424a0a",
-  "1941995d022542af",
-  "193ea4e13b39b5b3",
-  "193da230d17b8e88",
-  "19369d8f007e978f",
-  "19346dc63004b3cd",
-  "19345cdafa9e9e91",
-  "193384747692e4c0",
-  "1929b4039c6ab330",
-  "19296e9daa4f35f1",
-  "1927828759250219",
-  "192600f1dd4c4b23",
-  "1922fe16950d34d3",
-  "19155d6b0f20b790",
-  "191530cc8d395527",
-  "1914a0cc61fdf5d6",
-  "19113f700469004d",
-  "1910025a8ed9d3fb",
-  "190f03e3cba42c05",
-  "190c7eea46b73707",
-  "190b80a55cbddaf3",
-  "190a3935afc56fb2",
-  "1907adb627f861d5",
-  "19056d48b89ccf5d",
-  "1903728dfc5dade1",
-  "18fe07dee3cd5f11",
-  "18fc4de4263e80c7",
-  "18f7fce3f4063b6a",
-  "18f106295743d874",
-  "18ed596b8454bd6c",
-  "18e21dd94f9905f7",
-  "18e10883a9ffb778",
-  "18e10344525bea5d",
-  "18e0d41707c08c54",
-  "18da25f8bf6b5b20",
-  "18d893efa96335b9",
-  "18d109fe2adc272d",
-  "18cdff2d87c1bc19",
-  "18c832f343b296ba",
-  "18c49ffa495c34d8",
-  "18be8e84145d9794",
-  "18b0254da230a2a3",
-  "18accb2214465b75",
-  "18a9f148d255d8c6",
-  "18a9946391ee2930",
-  "18a72f1449b121d3",
-  "18a6729256862f96",
-  "18a4224938399c1f",
-  "18a3df8e1723b12d",
-  "189b1f3d510fe4cd",
-  "1899e812c62ce920",
-  "189698ea8cdbd06a",
-  "18955a0fe6feaba2",
-  "18884ee7807379f6",
-  "187fb0b354fbc3fd",
-  "187954ae397a0638",
-  "18795386cdfe2d6a",
-  "1879251b94467c67",
-  "186a8a80e519b020",
-  "1869b0d0e649fea9",
-  "18694ef29ef15327",
-  "18675cfb4f8b3425",
-  "18613635034dc5ef",
-  "185bd4f246826ac6",
-  "185b74836e453f32",
-  "184d3be92eb6ae4f",
-  "184b29475793eead",
-  "184624f40df8d154",
-  "183f30be5458c2f4",
-  "183b3e0075b8846c",
-  "183992f5e14c3b14",
-  "1837f8a8c2347840",
-  "182ad1b86bd94bfa",
-  "182a1f7c9d878e40",
-  "18289092e42548a3",
-  "181b325bb73d5db5",
-  "1819e4d0c81b75b0",
-  "1810ab4b66b83c12",
-  "180feb9123e7e202",
-  "18056913b04aa2fa",
-  "180053de0e02f038",
-  "18001c224e8d2459",
-  "17f18e762badd917",
-  "17f06a84cc3c1f63",
-  "17ed6865a21be149",
-  "17dc9545c4c2d5c1",
-  "17dc435737c3d292",
-  "17d39a21a16f3501",
-  "17be4eb4e4fc2352",
-  "17b8d46aeaa1e1e4",
-  "17b7b54f4db311e3",
-  "17b797ebbdb9e7a2",
-  "17b2c36ed7b2d3bb",
-  "179fc611447d1298",
-  "179679e19a42b81e",
-  "178845d1ec581821",
-  "1771bfa873d55f82",
-  "176dedd581a41895",
-  "17590356069b3d61",
-  "17521d4e3cf461c3",
-  "1737cd2ce7d2516a",
-  "172e0e05cde0e5b1",
-  "172cd702b4bbea92",
-  "171f61c98935c525",
-  "17142c872e03a174",
-  "1674c52da271016f",
-  "15cd27fa239151bb",
-  "159295dd47d9b309",
-  "196535a755734d7d",
-  "19649702345eab3e",
-  "19635ddf6d59673b",
-  "196189c675d48cfd",
-  "195f7d4f00e87ce1",
-  "195f1f685f0a48c4",
-  "195d8c5bcd73fa21",
-  "195d366ab649d56a",
-  "195d2f7de13fc766",
-  "195ced86a2a70c32",
-  "195c3b0f6e821db9",
-  "195bf06fd62e5c5b",
-  "195b9d224641c526",
-  "195af1159a7d1e1f",
-  "195ae907c68ece9d",
-  "1958a1ea10ad10b4",
-  "1957a5233668dadc",
-  "1957929d6fb9fc69",
-  "1953bc300161f597",
-  "1952a1eab7e5c08b",
-  "195210b912283a45",
-  "19511da570b26e47",
-  "194f189a5877f01f",
-  "194b82021dc1f0a6",
-  "194b36794fc22120",
-  "1949944943aceeb2",
-  "1948e5aee4ad2cf0",
-  "19409d05bfe3196c",
-  "19404cc6b4a04301",
-  "193f04a20b555fbe",
-  "193dfc20670ea8f1",
-  "193d04abbbe36595",
-  "193c61e91f244aaf",
-  "193bc81d66715fb0",
-  "193982a13eadd91c",
-  "19387e6d90576c03",
-  "193698ae454d98e4",
-  "19364e48b9f70e05",
-  "19364e32536cb13f",
-  "19309c7125dadaee",
-  "192f565f4a8cd805",
-  "192d1f1c73b8d5b2",
-  "192b624dff3a787a",
-  "1929c482e1613ec0",
-  "1928bc8634763c05",
-  "19267b22b41aa4d5",
-  "1924af090ec02962",
-  "19231adbe27b8558",
-  "192062f93bea5efc",
-  "192014460fc0c93b",
-  "191fb5999c5bb18d",
-  "191de4fe6b4e2196",
-  "191d89150a3abd2c",
-  "191c30ee2330a8c4",
-  "1918ffd4e0a0eac8",
-  "19176c2d320d44f0",
-  "19175ca5fb8cccb3",
-  "19151677b9d7ddf2",
-  "191199db0af67a06",
-  "190ce8dc47315db5",
-  "190b78a2fff23b4d",
-  "190b28ed4ee8a816",
-  "190a824c865dd441",
-  "1909350db891266e",
-  "1908fe2a043c05f7",
-  "1907e5d79e33caa1",
-  "1906c7ae6cb9ad39",
-  "1906af6cc4103cdc",
-  "1906a0d5262994a3",
-  "19028ddc7aa20fd1",
-  "19022bf05198b598",
-  "19017a5910f3af7d",
-  "1901187445cece46",
-  "18ffdea355255bd5",
-  "18fcaec30932b5bd",
-  "18fbd3356d14131b",
-  "18f9bae97f2eac9e",
-  "18f652d49418d10e",
-  "18f59d42d27f603f",
-  "18f4fc52cd1bc02d",
-  "18f2288b8d406a2b",
-  "18f22887e5d6e706",
-  "18f223b016001157",
-  "18f13d6cc0494c58",
-  "18ef1cba51a57466",
-  "18ee78825c4229a3",
-  "18ee52ca940f34a4",
-  "18ee2d9222b6420d",
-  "18edff4dc48d7069",
-  "18ead80ee9879696",
-  "18ea5c37c9d1e9e9",
-  "18e97f717e67d4b0",
-  "18e7c948a33befc6",
-  "18e7620cf1f8e753",
-  "18e67ace3362fb37",
-  "18e29f836edc963e",
-  "18e1261c75354739",
-  "18deeffcfadf86a8",
-  "18dde739a127774b",
-  "18dd2ee9089c0bef",
-  "18dd29e6da7dab65",
-  "18dae92a1ecfb292",
-  "18d5b489124764a1",
-  "18d3dab8d7e987e7",
-  "18cd07a8abec384d",
-  "18cd02dae7e6c98a",
-  "18ca3b4a2fe6136e",
-  "18c4bdf704445315",
-  "18c462165f40dd32",
-  "18c00a7468319c54",
-  "18bf370197d3384b",
-  "18b8cee893dfa137",
-  "18b830a9a5ff0aba",
-  "18b8307a9df02abf",
-  "18b830279dcf04e5",
-  "18b8103de4bddcda",
-  "18b6ecc1cbdf21ef",
-  "18b00039acf749e7",
-  "18acf0309b9ad287",
-  "18a9a9eece0d6cbe",
-  "18a8a611b236ab4a",
-  "18a717921d3e99c0",
-  "18a70e570269602e",
-  "18a6c66ed1d7b80d",
-  "18a666659a741b2b",
-  "18a6659593fb33f1",
-  "18a44f361bd8c8c3",
-  "18a3d89184fbdfc2",
-  "18a2b064af506e1a",
-  "18a133a03850ccab",
-  "18a012c0458a58a2",
-  "189dd6a07b7ff7c5",
-  "189c13cefcf50ccb",
-  "189bd5082a389b06",
-  "189b86ee8979c2a0",
-  "1899e5d1ad39ce95",
-  "1899423efdff4d47",
-  "1898e0671cb9fc3e",
-  "18964b35aebfc716",
-  "189517b8581fb64c",
-  "18950ec590fa9c29",
-  "1894d42fcc308b3d",
-  "1894c96928b34209",
-  "1894108441703aed",
-  "189367fd907199d6",
-  "1892de342d88d28d",
-  "189001138c65851c",
-  "188f9816f7ab5666",
-  "188da8d999483d1d",
-  "188d99986a9c5c2c",
-  "188c651ef1ddd876",
-  "188ba4710dab3ab3",
-  "188a85f513e000fa",
-  "18884e03e6068c89",
-  "1887f792ea7b56b3",
-  "18826857521c05d5",
-  "187ec4ccb69f389f",
-  "1879626b30c3c032",
-  "18795967ee516606",
-  "186ed8ce3df3bc72",
-  "186bae181cdefea8",
-  "186ba56b215a814a",
-  "1869e057edc4b19a",
-  "186792c94f28a102",
-  "1865b2da3da86092",
-  "1863daa563ccc363",
-  "186098c1d04d3447",
-  "18606dc15d2a9d23",
-  "186039003ac65828",
-  "185f40b4981ea0b9",
-  "185e0b3f89d88f1f",
-  "185cbef6c96add0c",
-  "1857601fe863ec18",
-  "18512db3c5a58dfb",
-  "1850e531c2644dd9",
-  "184efc100f764892",
-  "184e873ad3e1d469",
-  "184af76baf0f1ff1",
-  "1844a23d48c040bc",
-  "183f5c6a62aebf17",
-  "183d7c85ccefd396",
-  "183d40831dfc7b06",
-  "183cd63dc6b7d430",
-  "183c28008287b640",
-  "183b3c8355e8da2b",
-  "183ac73abf11076a",
-  "1837ad0bf49b79c3",
-  "1836b3aade889414",
-  "182ada33a5743c0b",
-  "1828eac7e98c2a5d",
-  "18284204611e107d",
-  "1827de1374172290",
-  "18279f599b015c85",
-  "18197bf126b5f2ca",
-  "181974a074d60709",
-  "181968e0a100100e",
-  "181842cc70db5760",
-  "181564411c038b98",
-  "181411b4d0042762",
-  "1811b98c92ac6e68",
-  "181171d7638e0780",
-  "1810885d0f664481",
-  "180cd4a93da60dd6",
-  "1807dc1299830cb9",
-  "18053c853014cc57",
-  "1802a936f7cb2364",
-  "17fc38abcc5d3f73",
-  "17fadca66d2bd79f",
-  "17fa09777473bcec",
-  "17f952f6578cec7e",
-  "17f943b361e8e118",
-  "17f6cbe5c100b6af",
-  "17f5045e8a36380e",
-  "17ef67917a107cec",
-  "17ee237fa69f76fe",
-  "17ed6f111da11db2",
-  "17ed5713e90d2972",
-  "17de05c746935af4",
-  "17dbf3f29928af66",
-  "17d21230f4b5c81e",
-  "17d06b6796131267",
-  "17ce1ea1c3b3fb8a",
-  "17cdecc5d255a2dd",
-  "17ca035eb2c2abc7",
-  "17c395d3673c580f",
-  "17c379bbf7181600",
-  "17bb6ec6ede7e1ca",
-  "17ba5d9a8dd211fd",
-  "17b844381a3d7b86",
-  "17b38c3ec9a7aefb",
-  "17aaa6acb565ab0d",
-  "17aa15a2d30399b6",
-  "17a898d7b67eb0a2",
-  "179ef0e19d4f1b9c",
-  "17978024ec5638c7",
-  "17977ec07eb61f00",
-  "179680d934b895d5",
-  "179617dd138ec038",
-  "17958b323231e56c",
-  "1792027f58ff3319",
-  "178edb8d1ba04953",
-  "1782146550357851",
-  "177f4bf8a9028af3",
-  "177f4bc5cad3fb70",
-  "17770f88879966ce",
-  "17712e470a9f4760",
-  "176f83118fc93e71",
-  "176e2d56a7539076",
-  "176e2a4cbdf9445f",
-  "176d51f291e92034",
-  "176a45838237913f",
-  "1769d7be4ed355a1",
-  "1768b5a82d58d19b",
-  "1763aec3cfeb8196",
-  "17589b7e2cb81003",
-  "1754cc3259adf614",
-  "175424da9503af3c",
-  "175373be27a491b6",
-  "1752ff4877873a14",
-  "174b088c93b59530",
-  "1749d756b9b9bae4",
-  "17495d06bf592ff9",
-  "1745b87491dadfc1",
-  "173f96a0e674820d",
-  "173b1136f5724646",
-  "17335eef00f5a6d3",
-  "172cd34009db4529",
-  "172a1735c77d4b1d",
-  "1729998ac1457446",
-  "1727791fa9b302d4",
-  "172679eaa44cfe9c",
-  "1726696b640d3e2a",
-  "17160a3a2d91971a",
-  "1713320d7682e9a5",
-  "17128e51cbe44baf",
-  "16f20d175f3493e4",
-  "16f05b7d50a8b42d",
-  "16d4ac21044e216a",
-  "16cd3a7b72a54010",
-  "16c4b3673046a5a2",
-  "16b5672b7e392ad0",
-  "169dbba92fee5b31",
-  "1680c61a2fdd4ed4",
-  "164a3824ac102be1",
-  "15e4ec95c33c4663",
-  "15e02bf4ba678382",
-  "15daa1f229cd9ed7",
-  "15c4030a87b6caee",
-  "15a1ab9507308dbe",
-  "155dc748351f8747",
-];
-
-// test("getMultipleUnsubscribeData", async () => {
-//   const data = await getMultipleUnsubscribeData(allIds);
-//   expect(data.length).toBe(allIds.length);
-
-//   const allNullCount = data.filter(
-//     (header) => header.mailto === null && header.posturl === null && header.clickurl === null
-//   ).length;
-
-//   const allPercentage = (allNullCount / data.length) * 100;
-//   console.log(`Percentage of null headers: ${allPercentage.toFixed(2)}%`);
-
-//   // console.log(headers)
-// }, 500000);
-
-// test("sjhgflq", async () => {
-//   const header = await getListUnsubscribeHeader(
-//     "191955c9660205fe",
-//     "ya29.a0AZYkNZjcSfvJdVWzE2xmqiMhiaHQ0a_uanUCPy_oEcUPHNIJNCEK5fqjE8G3o9D-yiKSDw7V6NhjJ-wQ0oNab8qs9jtH0Z3cnpvmmGPhHHXOZIwGDKLEh9H_ORhIKrfJirNpdGKQPP5q1RfYhW2gWvn3vcni9a43E5Av9DW0aCgYKAYESARISFQHGX2MiIffUtxHuYTbGlG93V6TPbA0175"
-//   );
-//   console.log(header);
-// });
+// Mock dependencies
+import { getOAuthToken } from "../../src/utils/auth";
+jest.mock("../../src/utils/auth", () => ({
+  getOAuthToken: jest.fn(),
+}));
 
 describe("parseListUnsubscribeHeader", () => {
   test("should parse a header with both posturl and mailto", () => {
@@ -832,11 +61,223 @@ describe("parseListUnsubscribeHeader", () => {
   });
 });
 
-// describe("getUnsubscribeLinkFromBody", () => {
-//   test("", async () => {
-//     const token =
-//       "ya29.a0AZYkNZgdxMXhZdZ12_R2BZ4DbPCbhlU1Z_Y_xX4pfEkpykHwDyVDpuYF1ZR31VOv-cnj6Px6pOK3T7mFwHGBHBQzqDwXrXc5qMByE1kRUsSpRbJSYkICFKUPTED1cQZ0gVcXVa3K6TOaeLQEf_BpJjyybrb0hZFceTMtL-iUaCgYKAaUSARISFQHGX2MiE4Vo_1EjPZr1TFSNqzyhnA0175";
-//     const url = await getUnsubscribeLinkFromBody("18780bd6cf37d62a", token);
-//     expect(url).toBe("hgkjfk");
-//   });
-// });
+describe("getUnsubscribeLinkFromBody", () => {
+  const messageId = "msg-id";
+  const token = "test-token";
+
+  // Helper to Base64-encode HTML
+  const htmlToBase64 = (html: string) =>
+    Buffer.from(html, "utf-8").toString("base64");
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("returns the first unsubscribe link from HTML body", async () => {
+    // Arrange
+    const html = '<a href="https://example.com/unsubscribe">Unsubscribe</a>';
+    const encoded = htmlToBase64(html);
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          payload: {
+            parts: [{ mimeType: "text/html", body: { data: encoded } }],
+          },
+        }),
+    });
+
+    // Act
+    const result = await getUnsubscribeLinkFromBody(messageId, token);
+
+    // Assert
+    expect(result).toBe("https://example.com/unsubscribe");
+  });
+
+  it("matches unsubscribe case-insensitively", async () => {
+    const html = '<a href="https://example.com/unsubscribe">UNSUBSCRIBE</a>';
+    const encoded = htmlToBase64(html);
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          payload: {
+            parts: [{ mimeType: "text/html", body: { data: encoded } }],
+          },
+        }),
+    });
+
+    const result = await getUnsubscribeLinkFromBody(messageId, token);
+    expect(result).toBe("https://example.com/unsubscribe");
+  });
+
+  it("ignores non-unsubscribe links and returns the correct one", async () => {
+    // Arrange
+    const html = `
+      <a href="https://not-it.com">Click here</a>
+      <a href="https://good.com/unsub">unsubscribe</a>
+      <a href="https://also-ignore.com">foo</a>
+    `;
+    const encoded = htmlToBase64(html);
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          payload: {
+            parts: [{ mimeType: "text/html", body: { data: encoded } }],
+          },
+        }),
+    });
+
+    // Act
+    const result = await getUnsubscribeLinkFromBody(messageId, token);
+
+    // Assert
+    expect(result).toBe("https://good.com/unsub");
+  });
+
+  it("returns null when there is no unsubscribe link", async () => {
+    // Arrange
+    const html = "<p>Hello world</p>";
+    const encoded = htmlToBase64(html);
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          payload: {
+            parts: [{ mimeType: "text/html", body: { data: encoded } }],
+          },
+        }),
+    });
+
+    // Act
+    const result = await getUnsubscribeLinkFromBody(messageId, token);
+
+    // Assert
+    expect(result).toBeNull();
+  });
+
+  it("retries and returns value after rate limit (429)", async () => {
+    const html = '<a href="https://retry.com">unsubscribe</a>';
+    const encoded = htmlToBase64(html);
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({ status: 429 })
+      .mockResolvedValueOnce({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            payload: {
+              parts: [{ mimeType: "text/html", body: { data: encoded } }],
+            },
+          }),
+      });
+
+    const result = await getUnsubscribeLinkFromBody(messageId, token);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(result).toBe("https://retry.com");
+  });
+});
+
+describe("unsubscribeUsingPostUrl", () => {
+  const testUrl = "https://example.com/unsubscribe";
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("should POST to the given URL and resolve when response.ok is true", async () => {
+    // Mock global.fetch to return ok
+    (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
+
+    // Expect the promise to resolve without throwing error
+    await expect(unsubscribeUsingPostUrl(testUrl)).resolves.toBeUndefined();
+
+    // Verify fetch was called correctly
+    expect((global as any).fetch).toHaveBeenCalledTimes(1);
+    expect((global as any).fetch).toHaveBeenCalledWith(testUrl, {
+      method: "POST",
+    });
+  });
+
+  it("should throw an error with statusText when response.ok is false", async () => {
+    // Mock global.fetch to return not ok
+    (global as any).fetch = jest
+      .fn()
+      .mockResolvedValue({ ok: false, status: 400, statusText: "Bad Request" });
+
+    // Expect the promise to reject with appropriate error message
+    await expect(unsubscribeUsingPostUrl(testUrl)).rejects.toThrow(
+      "Failed to unsubscribe using POST URL: 400 Bad Request"
+    );
+
+    // Verify fetch was called correctly
+    expect((global as any).fetch).toHaveBeenCalledTimes(1);
+    expect((global as any).fetch).toHaveBeenCalledWith(testUrl, {
+      method: "POST",
+    });
+  });
+});
+
+describe("unsubscribeUsingMailTo", () => {
+  const email = "test@example.com";
+  const token = "mock-token";
+
+  beforeEach(() => {
+    (getOAuthToken as jest.Mock).mockResolvedValue(token);
+    global.fetch = jest.fn().mockResolvedValue({ ok: true });
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("sends a correctly formatted raw message via Gmail API", async () => {
+    await expect(unsubscribeUsingMailTo(email)).resolves.toBeUndefined();
+
+    // Verify token retrieval
+    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+
+    // Verify fetch call
+    const fetchMock = (global.fetch as jest.Mock).mock;
+    expect(fetchMock.calls.length).toBe(1);
+    const [url, options] = fetchMock.calls[0];
+    expect(url).toBe(
+      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
+    );
+    expect(options.method).toBe("POST");
+    expect(options.headers.Authorization).toBe(`Bearer ${token}`);
+    expect(options.headers["Content-Type"]).toBe("application/json");
+
+    // Reconstruct expected raw and encoded values
+    const rawLines = [
+      `To: ${email}`,
+      "Subject: unsubscribe",
+      'Content-Type: text/plain; charset="UTF-8"',
+      "",
+      "This message was automatically generated by Gmail Declutter.",
+    ];
+    const raw = rawLines.join("\r\n");
+    const expectedEncoded = btoa(encodeURIComponent(raw))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+
+    const body = JSON.parse(options.body);
+    expect(body.raw).toBe(expectedEncoded);
+  });
+
+  it("throws an error when the Gmail API returns not ok", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: "Server Error",
+    });
+
+    await expect(unsubscribeUsingMailTo(email)).rejects.toThrow(
+      "Gmail API error: 500 Server Error"
+    );
+    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect((global.fetch as jest.Mock).mock.calls.length).toBe(1);
+  });
+});
