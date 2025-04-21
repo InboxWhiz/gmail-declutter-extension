@@ -1,13 +1,13 @@
 import "./modalPopup.css";
-import { ToggleSwitch } from "./toggleSwitch";
 import { useState } from "react";
 import { useModal } from "../providers/modalContext";
 import { useSelectedSenders } from "../providers/selectedSendersContext";
 import { useSenders } from "../providers/sendersContext";
 import { useActions } from "../providers/actionsContext";
+import { ToggleOption } from "./toggleOption";
 
-function useUnsubscribeFlow(deleteEmails: boolean) {
-  const { getUnsubscribeLink, deleteSenders } = useActions();
+function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
+  const { getUnsubscribeLink, deleteSenders, blockSender } = useActions();
   const { setModal } = useModal();
   const { reloadSenders } = useSenders();
   const { selectedSenders, clearSelectedSenders } = useSelectedSenders();
@@ -23,6 +23,14 @@ function useUnsubscribeFlow(deleteEmails: boolean) {
     if (deleteEmails) {
       setModal({ action: "delete", type: "pending" });
       await deleteSenders(Object.keys(selectedSenders));
+    }
+
+    // Block senders if needed
+    if (blockSenders) {
+      setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
+      for (const email of Object.keys(selectedSenders)) {
+        await blockSender(email);
+      }
     }
 
     // Deselect all senders
@@ -90,10 +98,12 @@ interface ConfirmProps {
 }
 
 const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
-  const [deleteEmails, setDeleteEmails] = useState(true);
+  const [deleteEmails, setDeleteEmails] = useState<boolean>(true);
+  const [blockSenders, setBlockSenders] = useState<boolean>(false);
+
   const { searchEmailSenders } = useActions();
   const { selectedSenders } = useSelectedSenders();
-  const { startUnsubscribeFlow } = useUnsubscribeFlow(deleteEmails);
+  const { startUnsubscribeFlow } = useUnsubscribeFlow(deleteEmails, blockSenders);
 
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
@@ -106,12 +116,18 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
         selected sender(s)?
       </p>
 
-      <div className="toggle-option">
-        <ToggleSwitch defaultChecked={true} onChange={setDeleteEmails} />
-        <div style={{ width: "10px" }}></div>
-        <p className="note">
-          Delete <b>{emailsNum} email(s)</b> from selected senders
-        </p>
+      <div className="toggle-options">
+        <ToggleOption
+          label={<>Delete <b>{emailsNum} email(s)</b> from selected senders</>}
+          defaultChecked={true}
+          onChange={(checked) => setDeleteEmails(checked)}
+        />
+
+        <ToggleOption
+          label="Also block senders"
+          defaultChecked={false}
+          onChange={(checked) => setBlockSenders(checked)}
+        />
       </div>
 
       <button className="secondary" onClick={showEmails}>
@@ -147,19 +163,8 @@ const UnsubscribeContinue = ({
   link: string;
   onContinue: () => void;
 }) => {
-  const { blockSender } = useActions();
-  const { setModal } = useModal();
-  const [toBlock, setToBlock] = useState<boolean>(false);
-
   const reopenLink = () => {
     window.open(link, "_blank");
-  };
-  const continueToNext = async () => {
-    if (toBlock) {
-      setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
-      await blockSender(email);
-    }
-    onContinue();
   };
   return (
     <>
@@ -167,23 +172,13 @@ const UnsubscribeContinue = ({
         Unsubscribe link for <b>{email}</b> found.
       </p>
       <p className="note">
-        Make sure to follow any instructions on the unsubscribe page to complete
-        the process.
+        To stop getting messages from <b>{email}</b>, go to their website to unsubscribe.
       </p>
-
-      <div className="toggle-option">
-        <ToggleSwitch
-          defaultChecked={false}
-          onChange={(checked) => setToBlock(checked)}
-        />
-        <div style={{ width: "10px" }}></div>
-        <p className="note">Also block sender</p>
-      </div>
 
       <button className="secondary" onClick={reopenLink}>
         Reopen Link
       </button>
-      <button className="primary" onClick={continueToNext}>
+      <button className="primary" onClick={onContinue}>
         Continue
       </button>
     </>

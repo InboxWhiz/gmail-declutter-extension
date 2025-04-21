@@ -22,10 +22,10 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await expect(modal).toContainText("2 selected sender(s)");
     await expect(modal).toContainText("110 email(s)");
     await expect(
-      page.getByRole("button", { name: "Show all emails" }),
+      page.getByRole("button", { name: "Show all emails" })
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Unsubscribe" }),
+      page.getByRole("button", { name: "Unsubscribe" })
     ).toBeVisible();
   });
 
@@ -40,7 +40,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // check that the search function was called
     expect(logs).toContain(
-      "[MOCK] Searching for emails: [alice@email.com, bob@email.com]",
+      "[MOCK] Searching for emails: [alice@email.com, bob@email.com]"
     );
 
     // check that the modal is still visible
@@ -66,7 +66,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     // Wait for it to load, then assert its URL
     await newTab.waitForLoadState("domcontentloaded");
     expect(newTab.url()).toBe(
-      "https://example.com/unsubscribe/alice@email.com",
+      "https://example.com/unsubscribe/alice@email.com"
     );
   });
 
@@ -83,7 +83,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     // Wait for it to load, then assert its URL
     await newTab1.waitForLoadState("domcontentloaded");
     expect(newTab1.url()).toBe(
-      "https://example.com/unsubscribe/alice@email.com",
+      "https://example.com/unsubscribe/alice@email.com"
     );
 
     // "Link found" modal appears
@@ -115,7 +115,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // Emails were deleted (by default)
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [alice@email.com, bob@email.com]",
+      "[MOCK] Trashed senders successfully: [alice@email.com, bob@email.com]"
     );
 
     // Blocking action was not called (by default)
@@ -150,7 +150,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // check that the delete action was called
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [carol@email.com]",
+      "[MOCK] Trashed senders successfully: [carol@email.com]"
     );
   });
 
@@ -183,7 +183,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // check that the delete action was called
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [carol@email.com, dave@email.com]",
+      "[MOCK] Trashed senders successfully: [carol@email.com, dave@email.com]"
     );
   });
 
@@ -199,7 +199,10 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await page.click("#unsubscribe-button");
 
     // check that the delete toggle is checked by default
-    const toggle = page.locator(".switch");
+    const toggle = page
+      .locator("div")
+      .filter({ hasText: /^Delete 32 email\(s\) from selected senders$/ })
+      .locator(".switch");
     await expect(toggle).toBeChecked();
 
     // toggle it off
@@ -218,28 +221,28 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
   test("3.6 - senders can be blocked even when link is found", async ({
     page,
   }) => {
-    // select a sender
-    await page
-      .locator("div")
-      .filter({ hasText: /^Alicealice@email\.com32$/ })
-      .getByRole("checkbox")
-      .check();
-    await page.click("#unsubscribe-button");
-    page.getByRole("button", { name: "Confirm" }).click();
+    // select two senders
+    await selectAliceBob(page, "unsubscribe");
 
     // check that the toggle is not checked by default
-    const toggle = page.locator(".switch");
+    const toggle = page
+      .locator("div")
+      .filter({ hasText: /^Also block senders$/ })
+      .locator("span");
     await expect(toggle).not.toBeChecked();
 
     // toggle it on
     await toggle.click();
     await expect(toggle).toBeChecked();
 
-    // click "Continue" button
-    page.getByRole("button", { name: "Continue" }).click();
+    // click through the unsubscribe flow
+    page.getByRole("button", { name: "Confirm" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.locator("#unsubscribe-success-modal")).toBeVisible();
 
     // check that block action was called
     expect(logs).toContain("[MOCK] Blocked alice@email.com successfully");
+    expect(logs).toContain("[MOCK] Blocked bob@email.com successfully");
   });
 });
