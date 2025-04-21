@@ -1,12 +1,22 @@
 import { realActions } from "../../src/utils/actions/realActions";
 export const actions = realActions;
 
-export const { searchEmailSenders, deleteSenders, getAllSenders } = actions;
+export const {
+  searchEmailSenders,
+  deleteSenders,
+  getAllSenders,
+  unsubscribeSendersAuto,
+} = actions;
 
 import { Sender } from "../../src/types/types";
 
 import { trashMultipleSenders } from "../../src/utils/trashSenders";
 import { fetchAllSenders } from "../../src/utils/fetchSenders";
+import {
+  getMultipleUnsubscribeData,
+  unsubscribeUsingPostUrl,
+  unsubscribeUsingMailTo,
+} from "../../src/utils/unsubscribeSenders";
 
 // Create mocks for dependent functions
 jest.mock("../../src/utils/trashSenders", () => ({
@@ -14,6 +24,11 @@ jest.mock("../../src/utils/trashSenders", () => ({
 }));
 jest.mock("../../src/utils/fetchSenders", () => ({
   fetchAllSenders: jest.fn(() => Promise.resolve()),
+}));
+jest.mock("../../src/utils/unsubscribeSenders", () => ({
+  getMultipleUnsubscribeData: jest.fn(),
+  unsubscribeUsingPostUrl: jest.fn(),
+  unsubscribeUsingMailTo: jest.fn(),
 }));
 
 beforeEach(() => {
@@ -45,7 +60,7 @@ describe("searchEmailSenders", () => {
     (chrome.tabs.query as jest.Mock).mockImplementation(
       (queryObj: any, callback: (tabs: any[]) => void) => {
         callback([{ id: 123 }]);
-      },
+      }
     );
 
     // Act
@@ -54,7 +69,7 @@ describe("searchEmailSenders", () => {
     // Assert
     expect(chrome.tabs.query).toHaveBeenCalledWith(
       { active: true, currentWindow: true },
-      expect.any(Function),
+      expect.any(Function)
     );
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(123, {
       type: "SEARCH_EMAIL_SENDERS",
@@ -80,14 +95,14 @@ describe("deleteSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: initialSenders });
-      },
+      }
     );
 
     // Setup chrome.storage.local.set mock
     (chrome.storage.local.set as jest.Mock).mockImplementation(
       (data: any, callback) => {
         callback();
-      },
+      }
     );
 
     // Call the function and wait for the promise to resolve
@@ -98,11 +113,11 @@ describe("deleteSenders", () => {
 
     // After trashing, the local storage should have been updated to remove any senders with emails in the list.
     const expectedSenders = initialSenders.filter(
-      (sender) => !emails.includes(sender[0]),
+      (sender) => !emails.includes(sender[0])
     );
     expect(chrome.storage.local.set).toHaveBeenCalledWith(
       { senders: expectedSenders },
-      expect.any(Function),
+      expect.any(Function)
     );
 
     expect(logSpy).toHaveBeenCalledWith("Trashed senders successfully");
@@ -120,7 +135,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      },
+      }
     );
 
     const result = await getAllSenders();
@@ -142,7 +157,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      },
+      }
     );
 
     // Call with fetchNew true. This should await fetchAllSenders.
@@ -162,7 +177,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({});
-      },
+      }
     );
 
     // Because of recursion in getAllSenders implementation, we need to break the cycle.
@@ -178,11 +193,133 @@ describe("getAllSenders", () => {
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         chrome.runtime.lastError = "Some error" as chrome.runtime.LastError;
         callback({ senders: [] });
-      },
+      }
     );
 
     await expect(getAllSenders()).rejects.toEqual("Some error");
     // Reset lastError for further tests.
     chrome.runtime.lastError = null as unknown as chrome.runtime.LastError;
+  });
+});
+
+describe("unsubscribeSendersAuto", () => {
+  const mockSenders = [
+    ["sender1@example.com", "Sender 1", 10, "message-id-1"],
+    ["sender2@example.com", "Sender 2", 5, "message-id-2"],
+    ["sender3@example.com", "Sender 3", 25, "message-id-3"],
+    ["sender4@example.com", "Sender 4", 14, "message-id-4"],
+  ];
+
+  const mockUnsubscribeData = [
+    {
+      posturl: "http://unsubscribe-url.com/post",
+      mailto: null,
+      clickurl: null,
+    },
+    { posturl: null, mailto: "mailto:unsubscribe@sender.com", clickurl: null },
+    {
+      posturl: null,
+      mailto: null,
+      clickurl: "http://unsubscribe-url.com/click",
+    },
+    { posturl: null, mailto: null, clickurl: null },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should call getMultipleUnsubscribeData with correct message ids", async () => {
+    // Arrange
+    const emails = [
+      "sender1@example.com",
+      "sender2@example.com",
+      "sender3@example.com",
+      "sender4@example.com",
+    ];
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
+        callback({ senders: mockSenders });
+      }
+    );
+    (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue(
+      mockUnsubscribeData
+    );
+
+    // Act
+    await unsubscribeSendersAuto(emails);
+
+    // Assert
+    expect(getMultipleUnsubscribeData).toHaveBeenCalledTimes(1);
+    expect(getMultipleUnsubscribeData).toHaveBeenCalledWith([
+      "message-id-1",
+      "message-id-2",
+      "message-id-3",
+      "message-id-4",
+    ]);
+  });
+
+  it("should call unsubscribeUsingPostUrl when posturl is present", async () => {
+    // Arrange
+    const emails = ["sender1@example.com"];
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
+        callback({ senders: [mockSenders[0]] });
+      }
+    );
+    (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
+      mockUnsubscribeData[0],
+    ]);
+
+    // Act
+    await unsubscribeSendersAuto(emails);
+
+    // Assert
+    expect(unsubscribeUsingPostUrl).toHaveBeenCalledWith(
+      "http://unsubscribe-url.com/post"
+    );
+    expect(unsubscribeUsingMailTo).not.toHaveBeenCalled();
+  });
+
+  it("should call unsubscribeUsingMailTo when mailto is present and posturl is not", async () => {
+    // Arrange
+    const emails = ["sender2@example.com"];
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
+        callback({ senders: [mockSenders[1]] });
+      }
+    );
+    (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
+      mockUnsubscribeData[1],
+    ]);
+
+    // Act
+    await unsubscribeSendersAuto(emails);
+
+    // Assert
+    expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
+    expect(unsubscribeUsingMailTo).toHaveBeenCalledWith(
+      "mailto:unsubscribe@sender.com"
+    );
+  });
+
+  it("should not call unsubscribeUsingPostUrl or unsubscribeUsingMailTo if no auto-unsubscribe method is available", async () => {
+    // Arrange
+    const emails = ["sender3@example.com"];
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
+        callback({ senders: [mockSenders[2]] });
+      }
+    );
+    (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
+      mockUnsubscribeData[2],
+    ]);
+
+    // Act
+    await unsubscribeSendersAuto(emails);
+
+    // Assert: Neither method should be called
+    expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
+    expect(unsubscribeUsingMailTo).not.toHaveBeenCalled();
   });
 });
