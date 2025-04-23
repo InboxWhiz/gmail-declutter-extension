@@ -32,10 +32,10 @@ export async function getUnsubscribeData(
 
   // If no unsubscribe data found in headers, look for a link in the email body
   const unsubscribeLink = await getUnsubscribeLinkFromBody(messageId, token);
-  return { posturl: null, mailto: null, clickurl: unsubscribeLink };
+  return { posturl: headerData.posturl, mailto: headerData.mailto, clickurl: unsubscribeLink };
 }
 
-async function getListUnsubscribeHeader(
+export async function getListUnsubscribeHeader(
   messageId: string,
   token: any
 ): Promise<UnsubscribeData> {
@@ -56,13 +56,14 @@ async function getListUnsubscribeHeader(
     return await getListUnsubscribeHeader(token, messageId); // Retry
   }
 
+  // Get the List-Unsubscribe header from the response
   const data = await response.json();
   const header = data.payload?.headers?.find(
     (header: { name: string }) => header.name === "List-Unsubscribe"
   )?.value;
 
+  // Parse the List-Unsubscribe header and return the data
   const parsedHeader = parseListUnsubscribeHeader(header);
-
   return parsedHeader;
 }
 
@@ -152,9 +153,5 @@ export async function unsubscribeUsingMailTo(email: string) {
   if (!response.ok) {
     throw new Error(`Gmail API error: ${response.status} ${response.statusText}`);
   }
+  console.log(`Unsubscribed using mailto: ${email}`);
 }
-
-export const exportForTesting = {
-  parseListUnsubscribeHeader,
-  getUnsubscribeLinkFromBody,
-};
