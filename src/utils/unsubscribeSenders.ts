@@ -3,14 +3,14 @@ import { sleep, parseListUnsubscribeHeader } from "./utils";
 import { UnsubscribeData } from "../types/types";
 
 export async function getMultipleUnsubscribeData(
-  messageIds: string[]
+  messageIds: string[],
+  getUnsubscribeDataFunc = getUnsubscribeData,
 ): Promise<UnsubscribeData[]> {
-  console.log("Calling getMultipleUnsubscribeData");
   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
   const unsubscribeData: UnsubscribeData[] = [];
 
   for (const messageId of messageIds) {
-    const data = await getUnsubscribeData(messageId, token);
+    const data = await getUnsubscribeDataFunc(messageId, token);
     unsubscribeData.push(data);
   }
 
@@ -84,46 +84,47 @@ export async function getUnsubscribeLinkFromBody(
   token: any
 ): Promise<string | null> {
   try {
-    const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+  const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
 
-    if (response.status === 429) {
-      console.warn("Rate limit hit. Pausing...");
-      await sleep(1000);
-      return await getUnsubscribeLinkFromBody(messageId, token); // Retry
-    }
+  if (response.status === 429) {
+    console.warn("Rate limit hit. Pausing...");
+    await sleep(1000);
+    return await getUnsubscribeLinkFromBody(messageId, token); // Retry
+  }
 
-    const data = await response.json();
-    const body = data.payload?.parts?.find(
-      (part: { mimeType: string }) => part.mimeType === "text/html"
-    )?.body?.data;
+  const data = await response.json();
+  const body = data.payload?.parts?.find(
+    (part: { mimeType: string }) => part.mimeType === "text/html"
+  )?.body?.data;
 
-    if (!body) {
-      return null; // No HTML body found
-    }
+  if (!body) {
+    return null; // No HTML body found
+  }
 
-    // Decode base64url encoded body
-    const decodedBody = atob(body.replace(/-/g, "+").replace(/_/g, "/"));
+  // Decode base64url encoded body
+  const decodedBody = atob(body.replace(/-/g, "+").replace(/_/g, "/"));
 
-    // Extract unsubscribe link from the HTML body
-    const match = decodedBody.match(
-      /<a[^>]+href="([^"]+)"[^>]*>unsubscribe<\/a>/i
-    );
+  // Extract unsubscribe link from the HTML body
+  const match = decodedBody.match(
+    /<a[^>]+href="([^"]+)"[^>]*>unsubscribe<\/a>/i
+  );
 
-    return match ? match[1] : null; // Return the link or null if not found
-  } catch (error) {
+  return match ? match[1] : null; // Return the link or null if not found
+} catch (error) {
     console.error(
       `Error getting unsubscribe link from body for message ${messageId}:`,
       error
     );
     return null; // Return null on error
   }
+
 }
 
 export async function unsubscribeUsingPostUrl(url: string) {

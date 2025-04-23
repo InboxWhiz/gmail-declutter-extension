@@ -25,6 +25,71 @@ global.fetch = jest.fn();
 
 // Test suites
 
+describe("getMultipleUnsubscribeData", () => {
+  const mockGetUnsubscribeData = jest.fn();
+  const dummyToken = "token-123";
+
+  beforeEach(() => {
+    // Always resolve the token
+    (getOAuthToken as jest.Mock).mockResolvedValue(dummyToken);
+  });
+
+  afterEach(() => {
+    mockGetUnsubscribeData.mockReset();
+    (getOAuthToken as jest.Mock).mockReset();
+  });
+
+  it("returns an empty array without calling getUnsubscribeData when given no IDs", async () => {
+    // Act
+    const result = await getMultipleUnsubscribeData([], mockGetUnsubscribeData);
+
+    // Assert
+    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(mockGetUnsubscribeData).not.toHaveBeenCalled();
+    expect(result).toEqual([]);
+  });
+
+  it("calls getUnsubscribeData once and returns its result for a single ID", async () => {
+    // Arrange
+    const messageId = "id1";
+    const expectedData = { posturl: "P1", mailto: "M1", clickurl: "C1" };
+    mockGetUnsubscribeData.mockResolvedValueOnce(expectedData);
+
+    // Act
+    const result = await getMultipleUnsubscribeData(
+      [messageId],
+      mockGetUnsubscribeData
+    );
+
+    // Assert
+    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(mockGetUnsubscribeData).toHaveBeenCalledTimes(1);
+    expect(mockGetUnsubscribeData).toHaveBeenCalledWith(messageId, dummyToken);
+    expect(result).toEqual([expectedData]);
+  });
+
+  it("calls getUnsubscribeData for each ID in order and returns all results", async () => {
+    // Arrange
+    const ids = ["idA", "idB"];
+    const dataA = { posturl: "PA", mailto: null, clickurl: null };
+    const dataB = { posturl: null, mailto: "MB", clickurl: null };
+    mockGetUnsubscribeData
+      .mockResolvedValueOnce(dataA)
+      .mockResolvedValueOnce(dataB);
+
+    // Act
+    const result = await getMultipleUnsubscribeData(ids, mockGetUnsubscribeData);
+
+    // Assert
+    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(mockGetUnsubscribeData).toHaveBeenCalledTimes(2);
+    expect(mockGetUnsubscribeData.mock.calls[0]).toEqual(["idA", dummyToken]);
+    expect(mockGetUnsubscribeData.mock.calls[1]).toEqual(["idB", dummyToken]);
+    expect(result).toEqual([dataA, dataB]);
+  });
+
+});
+
 describe("getUnsubscribeData", () => {
   const messageId = "msg-1";
   const token = "tok-1";
