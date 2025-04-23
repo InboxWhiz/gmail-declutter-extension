@@ -5,6 +5,7 @@ import { UnsubscribeData } from "../types/types";
 export async function getMultipleUnsubscribeData(
   messageIds: string[]
 ): Promise<UnsubscribeData[]> {
+  console.log("Calling getMultipleUnsubscribeData");
   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
   const unsubscribeData: UnsubscribeData[] = [];
 
@@ -18,92 +19,111 @@ export async function getMultipleUnsubscribeData(
 
 export async function getUnsubscribeData(
   messageId: string,
-  token: any
+  token: any,
+  getHeader = getListUnsubscribeHeader,
+  getClickLink = getUnsubscribeLinkFromBody
 ): Promise<UnsubscribeData> {
-  const headerData: UnsubscribeData = await getListUnsubscribeHeader(
-    messageId,
-    token
-  );
+  const headerData: UnsubscribeData = await getHeader(messageId, token);
 
-  // Return if we have some unsubscribe data from the headers
-  if (headerData.posturl || headerData.mailto) {
+  // Return if we have a mailto link in the header
+  if (headerData.mailto) {
     return headerData;
   }
 
   // If no unsubscribe data found in headers, look for a link in the email body
-  const unsubscribeLink = await getUnsubscribeLinkFromBody(messageId, token);
-  return { posturl: headerData.posturl, mailto: headerData.mailto, clickurl: unsubscribeLink };
+  const unsubscribeLink = await getClickLink(messageId, token);
+  return {
+    posturl: headerData.posturl,
+    mailto: headerData.mailto,
+    clickurl: unsubscribeLink,
+  };
 }
 
 export async function getListUnsubscribeHeader(
   messageId: string,
   token: any
 ): Promise<UnsubscribeData> {
-  // Get the List-Unsubscribe header for a specific message
-  const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=metadata&metadataHeaders=List-Unsubscribe`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    // Get the List-Unsubscribe header for a specific message
+    const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=metadata&metadataHeaders=List-Unsubscribe`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-  // Handle rate limiting
-  if (response.status === 429) {
-    console.warn("Rate limit hit. Pausing...");
-    await sleep(1000);
-    return await getListUnsubscribeHeader(token, messageId); // Retry
+    // Handle rate limiting
+    if (response.status === 429) {
+      console.warn("Rate limit hit. Pausing...");
+      await sleep(1000);
+      return await getListUnsubscribeHeader(token, messageId); // Retry
+    }
+
+    // Get the List-Unsubscribe header from the response
+    const data = await response.json();
+    const header = data.payload?.headers?.find(
+      (header: { name: string }) => header.name === "List-Unsubscribe"
+    )?.value;
+
+    // Parse the List-Unsubscribe header and return the data
+    const parsedHeader = parseListUnsubscribeHeader(header);
+    return parsedHeader;
+  } catch (error) {
+    console.error(
+      `Error getting List-Unsubscribe header for message ${messageId}:`,
+      error
+    );
+    return { posturl: null, mailto: null, clickurl: null }; // Return empty data on error
   }
-
-  // Get the List-Unsubscribe header from the response
-  const data = await response.json();
-  const header = data.payload?.headers?.find(
-    (header: { name: string }) => header.name === "List-Unsubscribe"
-  )?.value;
-
-  // Parse the List-Unsubscribe header and return the data
-  const parsedHeader = parseListUnsubscribeHeader(header);
-  return parsedHeader;
 }
 
 export async function getUnsubscribeLinkFromBody(
   messageId: string,
   token: any
 ): Promise<string | null> {
-  const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-  if (response.status === 429) {
-    console.warn("Rate limit hit. Pausing...");
-    await sleep(1000);
-    return await getUnsubscribeLinkFromBody(messageId, token); // Retry
+    if (response.status === 429) {
+      console.warn("Rate limit hit. Pausing...");
+      await sleep(1000);
+      return await getUnsubscribeLinkFromBody(messageId, token); // Retry
+    }
+
+    const data = await response.json();
+    const body = data.payload?.parts?.find(
+      (part: { mimeType: string }) => part.mimeType === "text/html"
+    )?.body?.data;
+
+    if (!body) {
+      return null; // No HTML body found
+    }
+
+    // Decode base64url encoded body
+    const decodedBody = atob(body.replace(/-/g, "+").replace(/_/g, "/"));
+
+    // Extract unsubscribe link from the HTML body
+    const match = decodedBody.match(
+      /<a[^>]+href="([^"]+)"[^>]*>unsubscribe<\/a>/i
+    );
+
+    return match ? match[1] : null; // Return the link or null if not found
+  } catch (error) {
+    console.error(
+      `Error getting unsubscribe link from body for message ${messageId}:`,
+      error
+    );
+    return null; // Return null on error
   }
-
-  const data = await response.json();
-  const body = data.payload?.parts?.find(
-    (part: { mimeType: string }) => part.mimeType === "text/html"
-  )?.body?.data;
-
-  if (!body) {
-    return null; // No HTML body found
-  }
-
-  // Decode base64url encoded body
-  const decodedBody = atob(body.replace(/-/g, "+").replace(/_/g, "/"));
-
-  // Extract unsubscribe link from the HTML body
-  const match = decodedBody.match(
-    /<a[^>]+href="([^"]+)"[^>]*>unsubscribe<\/a>/i
-  );
-
-  return match ? match[1] : null; // Return the link or null if not found
 }
 
 export async function unsubscribeUsingPostUrl(url: string) {
@@ -151,7 +171,9 @@ export async function unsubscribeUsingMailTo(email: string) {
   );
 
   if (!response.ok) {
-    throw new Error(`Gmail API error: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Gmail API error: ${response.status} ${response.statusText}`
+    );
   }
   console.log(`Unsubscribed using mailto: ${email}`);
 }

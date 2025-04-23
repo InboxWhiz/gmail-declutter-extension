@@ -23,6 +23,90 @@ jest.mock("../../src/utils/utils", () => ({
 }));
 global.fetch = jest.fn();
 
+// Test suites
+
+describe("getUnsubscribeData", () => {
+  const messageId = "msg-1";
+  const token = "tok-1";
+  const headerMock = jest.fn();
+  const linkMock = jest.fn();
+
+  beforeEach(() => {
+    headerMock.mockReset();
+    linkMock.mockReset();
+  });
+
+  it("returns headerData immediately when mailto is present", async () => {
+    // Arrange: mock header data with mailto and posturl
+    const headerData = { posturl: "P", mailto: "M", clickurl: null };
+    headerMock.mockResolvedValue(headerData);
+
+    // Act
+    const result = await getUnsubscribeData(
+      messageId,
+      token,
+      headerMock,
+      linkMock
+    );
+
+    // Assert
+    expect(headerMock).toHaveBeenCalledWith(messageId, token);
+    expect(linkMock).not.toHaveBeenCalled();
+    expect(result).toEqual(headerData);
+  });
+
+  it("returns headerData immediately when only mailto is non-null", async () => {
+    // Arrange: mock header data with mailto only
+    const headerData = { posturl: null, mailto: "M2", clickurl: null };
+    headerMock.mockResolvedValue(headerData);
+
+    // Act
+    const result = await getUnsubscribeData(
+      messageId,
+      token,
+      headerMock,
+      linkMock
+    );
+
+    // Assert
+    expect(linkMock).not.toHaveBeenCalled();
+    expect(result).toEqual(headerData);
+  });
+
+  it("looks for clickurl when mailto is null", async () => {
+    const headerData = { posturl: "P3", mailto: null, clickurl: null };
+    const link = "L3";
+    headerMock.mockResolvedValue(headerData);
+    linkMock.mockResolvedValue(link);
+
+    const result = await getUnsubscribeData(
+      messageId,
+      token,
+      headerMock,
+      linkMock
+    );
+
+    expect(headerMock).toHaveBeenCalledWith(messageId, token);
+    expect(linkMock).toHaveBeenCalledWith(messageId, token);
+    expect(result).toEqual({ posturl: "P3", mailto: null, clickurl: link });
+  });
+
+  it("returns null clickurl when both header fields and body link are null", async () => {
+    const headerData = { posturl: null, mailto: null, clickurl: null };
+    headerMock.mockResolvedValue(headerData);
+    linkMock.mockResolvedValue(null);
+
+    const result = await getUnsubscribeData(
+      messageId,
+      token,
+      headerMock,
+      linkMock
+    );
+
+    expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
+  });
+});
+
 describe("getListUnsubscribeHeader", () => {
   const messageId = "msg123";
   const token = "mock-token";
@@ -35,7 +119,7 @@ describe("getListUnsubscribeHeader", () => {
     clickurl: "https://example.com/clickurl",
   };
 
-  afterEach(() => {
+  beforeEach(() => {
     (fetch as jest.Mock).mockReset();
   });
 
@@ -67,7 +151,7 @@ describe("getListUnsubscribeHeader", () => {
 
     // Assert parsing
     expect(parseListUnsubscribeHeader).toHaveBeenCalledWith(rawValue);
-    expect(result).toStrictEqual(mockParsed);
+    expect(result).toEqual(mockParsed);
   });
 
   it("handles missing List-Unsubscribe header gracefully", async () => {
@@ -89,13 +173,17 @@ describe("getListUnsubscribeHeader", () => {
   it("retries after HTTP 429 and then returns parsed data", async () => {
     // Arrange: first rate limit, then success
     const rawValue = "<https://retry/unsub>";
-    (fetch as jest.Mock).mockResolvedValueOnce({ status: 429 }).mockResolvedValueOnce({
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          payload: { headers: [{ name: "List-Unsubscribe", value: rawValue }] },
-        }),
-    });
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({ status: 429 })
+      .mockResolvedValueOnce({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            payload: {
+              headers: [{ name: "List-Unsubscribe", value: rawValue }],
+            },
+          }),
+      });
 
     // Act
     const result = await getListUnsubscribeHeader(messageId, token);
@@ -107,17 +195,18 @@ describe("getListUnsubscribeHeader", () => {
     expect(result).toStrictEqual(mockParsed);
   });
 
-  it("rejects when JSON parsing fails", async () => {
+  it("return null values on error", async () => {
     // Arrange: invalid JSON
     (fetch as jest.Mock).mockResolvedValueOnce({
       status: 200,
       json: () => Promise.reject(new Error("json-error")),
     });
 
-    // Act & Assert
-    await expect(getListUnsubscribeHeader(messageId, token)).rejects.toThrow(
-      "json-error"
-    );
+    // Act
+    const result = await getListUnsubscribeHeader(messageId, token);
+
+    // Assert
+    expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
   });
 });
 
@@ -129,7 +218,7 @@ describe("getUnsubscribeLinkFromBody", () => {
   const htmlToBase64 = (html: string) =>
     Buffer.from(html, "utf-8").toString("base64");
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.resetAllMocks();
   });
 
@@ -236,6 +325,17 @@ describe("getUnsubscribeLinkFromBody", () => {
     const result = await getUnsubscribeLinkFromBody(messageId, token);
     expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(result).toBe("https://retry.com");
+  });
+
+  it("returns null on error", async () => {
+    // Arrange: simulate fetch error
+    global.fetch = jest.fn().mockRejectedValue(new Error("Network error"));
+
+    // Act
+    const result = await getUnsubscribeLinkFromBody(messageId, token);
+
+    // Assert
+    expect(result).toBeNull();
   });
 });
 
