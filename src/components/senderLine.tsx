@@ -31,7 +31,9 @@ export const SenderLine = ({
   return (
     <div
       className={
-        selectedSenders[senderEmail] ? "sender-line selected" : "sender-line"
+        selectedSenders[senderEmail]
+          ? "sender-line sender-line-real selected"
+          : "sender-line sender-line-real"
       }
     >
       <div className="begin">

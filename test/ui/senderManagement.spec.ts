@@ -13,9 +13,10 @@ test.describe("UI tests for Epic 1 - Sender Management", () => {
   test("1.1 - displays senders sorted by email count", async ({ page }) => {
     // Wait for the senders list to be visible
     await page.waitForSelector("#senders");
+    await page.waitForSelector(".sender-line-real");
 
     // Get all sender items
-    const senderItems = await page.$$(".sender-line");
+    const senderItems = await page.$$(".sender-line-real");
 
     // Verify that it shows all senders (mock data has 20 senders)
     expect(senderItems.length).toBe(20);
@@ -31,6 +32,17 @@ test.describe("UI tests for Epic 1 - Sender Management", () => {
       expect(count).toBeLessThanOrEqual(max); // Ensure count is not greater than previous max
       max = count; // Update max for next iteration
     }
+  });
+
+  test("1.1a - displays skeleton loader while loading senders", async ({
+    page,
+  }) => {
+    // Wait for the senders list to be visible
+    await page.waitForSelector("#senders");
+
+    // Verify that skeleton loaders are displayed
+    const skeletons = await page.$$(".sender-line-skeleton");
+    expect(skeletons.length).toBeGreaterThan(0); // Ensure there are skeletons
   });
 
   test("1.2 - clicking a sender opens searches it on Gmail", async ({
