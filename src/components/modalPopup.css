@@ -36,18 +36,18 @@ p {
   margin-top: 10px;
   width: 100%;
   font-size: 16px;
+  padding: 10px 0;
 }
 
 button.primary {
   color: #f4f4f4;
   background-color: #323232;
-  padding: 15px 0;
+  padding: 12px 0;
 }
 
 button.secondary {
   color: #323232;
   background-color: white;
-  padding: 10px 0;
   border: 1px solid #c4c4c4;
 }
 
