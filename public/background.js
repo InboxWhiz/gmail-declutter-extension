@@ -12,7 +12,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (url.origin === GMAIL_ORIGIN) {
     await chrome.sidePanel.setOptions({
       tabId,
-      path: "index.html",
+      path: "sidebar/index.html",
       enabled: true,
     });
   } else {

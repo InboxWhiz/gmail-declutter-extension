@@ -5,15 +5,15 @@ import {
   getUnsubscribeLinkFromBody,
   unsubscribeUsingMailTo,
   unsubscribeUsingPostUrl,
-} from "../../src/utils/unsubscribeSenders";
+} from "../../src/sidebar/utils/unsubscribeSenders";
 
 // Mock dependencies
-import { getOAuthToken } from "../../src/utils/auth";
-import { sleep, parseListUnsubscribeHeader } from "../../src/utils/utils";
-jest.mock("../../src/utils/auth", () => ({
+import { getOAuthToken } from "../../src/sidebar/utils/auth";
+import { sleep, parseListUnsubscribeHeader } from "../../src/sidebar/utils/utils";
+jest.mock("../../src/sidebar/utils/auth", () => ({
   getOAuthToken: jest.fn(),
 }));
-jest.mock("../../src/utils/utils", () => ({
+jest.mock("../../src/sidebar/utils/utils", () => ({
   sleep: jest.fn(),
   parseListUnsubscribeHeader: jest.fn().mockReturnValue({
     posturl: "https://example.com/posturl",

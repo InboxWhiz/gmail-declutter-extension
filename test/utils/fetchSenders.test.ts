@@ -1,4 +1,4 @@
-import { fetchAllSenders, exportForTest } from "../../src/utils/fetchSenders";
+import { fetchAllSenders, exportForTest } from "../../src/sidebar/utils/fetchSenders";
 const {
   fetchMessageIds,
   fetchMessageSenderSingle,
@@ -6,13 +6,13 @@ const {
   storeSenders,
 } = exportForTest;
 
-import { getOAuthToken } from "../../src/utils/auth";
-import { sleep } from "../../src/utils/utils";
+import { getOAuthToken } from "../../src/sidebar/utils/auth";
+import { sleep } from "../../src/sidebar/utils/utils";
 
 // Mock dependencies
-jest.mock("../../src/utils/auth");
-jest.mock("../../src/utils/utils", () => {
-  const originalModule = jest.requireActual("../../src/utils/utils");
+jest.mock("../../src/sidebar/utils/auth");
+jest.mock("../../src/sidebar/utils/utils", () => {
+  const originalModule = jest.requireActual("../../src/sidebar/utils/utils");
   return {
     ...originalModule,
     sleep: jest.fn(),
