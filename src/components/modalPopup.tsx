@@ -198,6 +198,9 @@ const UnsubscribeContinue = ({
       <p>
       To stop getting messages from <b>{email}</b>, go to their website to unsubscribe.
       </p>
+      <p className="note">
+      Once you've finished on the website, click "Continue" to proceed.
+      </p>
 
       <button className="primary" onClick={openLink}>
         Go to Website
