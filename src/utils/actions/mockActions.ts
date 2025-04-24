@@ -1,4 +1,4 @@
-import { Sender } from "../../types/types";
+import { ManualUnsubscribeData, Sender } from "../../types/types";
 import { Actions } from "./types";
 
 export const mockActions: Actions = {
@@ -44,17 +44,43 @@ export const mockActions: Actions = {
     });
   },
 
-  async getUnsubscribeLink(email: string): Promise<string> {
-    // Simulates retrieving an unsubscribe link for the given email.
-    // For the purposes of this mock, it will return a link for most emails,
-    // but will reject for carol@email.com and dave@email.com.
-    console.log(`[MOCK] Getting unsubscribe link for: ${email}`);
-    return new Promise((resolve, reject) => {
+  async unsubscribeSendersAuto(
+    emails: string[],
+  ): Promise<ManualUnsubscribeData> {
+    // Simulates unsubscribing senders automatically.
+    console.log("[MOCK] Automatically unsubscribing:", emails);
+    return new Promise((resolve) => {
       setTimeout(() => {
-        if (email === "carol@email.com" || email === "dave@email.com") {
-          reject(console.log("[MOCK] Unsubscribe link not found."));
+        const linkOnlySenders: [string, string][] = [];
+        const noUnsubscribeSenders: string[] = [];
+
+        // Carol & Dave: Mock that they have a click-link-only unsubscribe option
+        if (emails.includes("carol@email.com")) {
+          linkOnlySenders.push([
+            "carol@email.com",
+            "https://example.com/unsubscribe/carol",
+          ]);
         }
-        resolve(`https://example.com/unsubscribe/${email}`);
+        if (emails.includes("dave@email.com")) {
+          linkOnlySenders.push([
+            "dave@email.com",
+            "https://example.com/unsubscribe/dave",
+          ]);
+        }
+
+        // Eve & Frank: Mock that they have no unsubscribe option
+        if (emails.includes("eve@email.com")) {
+          noUnsubscribeSenders.push("eve@email.com");
+        }
+        if (emails.includes("frank@email.com")) {
+          noUnsubscribeSenders.push("frank@email.com");
+        }
+
+        // All other emails: Mock that they have automatically been unsubscribed
+        resolve({
+          linkOnlySenders: linkOnlySenders,
+          noUnsubscribeSenders: noUnsubscribeSenders,
+        });
       }, 1000);
     });
   },

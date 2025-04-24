@@ -55,45 +55,58 @@ As a user, I want to be able to delete emails from multiple senders at once and 
 
 As a user, I want to unsubscribe from emails in a single click, so that I can reduce unwanted messages without manually searching for unsubscribe links.
 
-- **User Story 3.1:**  
+- **User Story 3.1: Popup**  
   **As a user**, I want a confirmation popup to show when I click unsubscribe with selected senders, displaying the number of senders and emails, so that I can confirm the action before it happens.
 
   - **Acceptance Criteria:**
     - Popup shows the number of senders & emails.
     - Popup includes two buttons: "Show all senders" and "Confirm."
 
-- **User Story 3.2:**  
+- **User Story 3.2: Show All Emails**  
   **As a user**, I want to click "Show all senders" in the unsubscribe confirmation popup to view a Gmail interface showing all emails from the selected senders combined, so that I can review them before unsubscribing.
 
   - **Acceptance Criteria:**
     - Clicking "Show all senders" opens the Gmail interface with all emails from the selected senders.
     - Have the modal persist after emails are shown.
 
-- **User Story 3.3a:**  
-  **As a user**, when I click "Confirm", I want the extension to automatically search for an unsubscribe link in the selected sender’s emails, so that I can unsubscribe in one click.
+- **User Story 3.3: Automatic Unsubscribe Attempt**  
+  **As a user**, when I confirm “Unsubscribe,” I want the extension to first try to unsubscribe me automatically from all selected senders, so that I don’t have to click through links for services that support a direct “POST” or “mailto” method.
 
   - **Acceptance Criteria:**
-    - The extension scans emails for unsubscribe links.
-    - If a link is found, it opens the link for the user to complete the unsubscribe.
+    - After clicking Confirm, a “working” modal appears saying “Unsubscribing…”
+    - The extension calls `unsubscribeSendersAuto` with all selected addresses
+    - For addresses with post or mailto links, manual popups do not show up
 
-- **User Story 3.3b:**  
-  **As a user**, when I unsubscribe from multiple senders at once, I want the extension to guide me through each unsubscribe link one by one - opening each link, letting me complete the unsubscribe in its own tab, and then returning me to a prompt before moving on - so that I can be sure I’ve finished each unsubscribe before proceeding to the next.
+- **User Story 3.4: Manual Unsubscribe Link Wizard**
 
-  - **Acceptance Criteria:**
-    - First link opens automatically.
-    - "Link found" modal appears
-    - Sequential processing
-    - Ability to reopen link
-    - Final success modal
-
-- **User Story 3.4:**
-  **As a user**, I want the extension to notify me if it couldn't find an unsubscribe link and ask if I want to block the sender, so that I can still stop receiving emails from them.
+  **As a user**, for each sender that couldn’t be auto‑unsubscribed but did have a link, I want to be shown each unsubscribe link one at a time so that I can complete any extra steps before moving on.
 
   - **Acceptance Criteria:**
-    - If no unsubscribe link is found, the extension prompts the user to block the sender.
-    - When the user accepts to block, send a call to the "block" function.
+    - After the “working” phase, for the first link‑only sender, a modal appears with the option to go to the website.
+    - Clicking Go to Website opens the unsubscribe URL in a new tab.
+    - Clicking Continue closes the modal and advances to the next link‑only sender’s modal (if any).
+    - Once all senders have been handled, the success modal is shown.
 
-- **User Story 3.5:**  
+- **User Story 3.5: Block Prompt**
+
+  **As a user**, for any sender that has no unsubscribe option, I want the extension to prompt me whether to block them, so that I can still stop receiving emails.
+
+  - **Acceptance Criteria:**
+    - If there are any senders with no unsubscribe links whatsoever, a modal appears per sender with options to "Block" or "No Block"
+    - Clicking Block invokes blockSender then proceeds to the next.
+    - Don’t Block simply proceeds.
+
+- **User Story 3.6: Combination Unsubscribe Wizard**
+
+  **As a user**, when I unsubscribe from a batch of senders that includes some that can be auto‑unsubscribed, some that require manual link clicks, and some with no unsubscribe option, I want the extension to process each category correctly, so that I can handle a mixed set of senders in one smooth flow.
+
+  - **Acceptance Criteria:**
+    - Senders that support automatic unsubscribe are processed immediately with no modals.
+    - For each link‑only sender, a modal appears and is able to open links.
+    - After all link‑only senders, for each no‑unsubscribe sender, a modal appears and is able to block senders.
+    - After all processing, a success modal appears
+
+- **User Story 3.7: Optional Delete‑Emails Step**  
   **As a user**, I want a toggle button to delete all the emails from the senders I unsubscribe from, so that I can clean my inbox as I unsubscribe.
   - **Acceptance Criteria:**
     - The toggle is on by default.

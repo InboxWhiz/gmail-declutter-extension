@@ -1,9 +1,9 @@
-import { Sender } from "../../types/types";
+import { ManualUnsubscribeData, Sender } from "../../types/types";
 
 export interface Actions {
   searchEmailSenders(emails: string[]): void;
   deleteSenders(emails: string[]): Promise<void>;
   getAllSenders(fetchNew?: boolean): Promise<Sender[]>;
-  getUnsubscribeLink(email: string): Promise<string>;
+  unsubscribeSendersAuto(email: string[]): Promise<ManualUnsubscribeData>;
   blockSender(email: string): Promise<void>;
 }

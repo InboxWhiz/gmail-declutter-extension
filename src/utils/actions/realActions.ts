@@ -1,7 +1,16 @@
-// actions/realActions.ts
-import { Sender } from "../../types/types";
+import {
+  ManualUnsubscribeData,
+  Sender,
+  UnsubscribeData,
+} from "../../types/types";
+import { blockOneSender } from "../blockSenders";
 import { fetchAllSenders } from "../fetchSenders";
 import { trashMultipleSenders } from "../trashSenders";
+import {
+  getMultipleUnsubscribeData,
+  unsubscribeUsingMailTo,
+  // unsubscribeUsingPostUrl,
+} from "../unsubscribeSenders";
 import { Actions } from "./types";
 
 export const realActions: Actions = {
@@ -82,25 +91,55 @@ export const realActions: Actions = {
     });
   },
 
-  async getUnsubscribeLink(email: string): Promise<string> {
-    // Retrieves the unsubscribe link for a given email address.
-    // TODO: Implement the actual logic to get the unsubscribe link.
+  async unsubscribeSendersAuto(
+    emails: string[],
+  ): Promise<ManualUnsubscribeData> {
+    // Attempts to automatically unsubscribes from the given email addresses.
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`https://example.com/unsubscribe/${email}`);
-      }, 1000);
+    // Get the latest message ids for each sender
+    console.log("Unsubscribing automatically from senders: ", emails);
+
+    // Get the latestMessageIds for the given emails from local storage
+    const result = await chrome.storage.local.get(["senders"]);
+    const messageIds: string[] = result.senders
+      .filter((sender: [string, string, number, string]) =>
+        emails.includes(sender[0]),
+      )
+      .map((sender: [string, string, number, string]) => sender[3]);
+
+    console.log("Message IDs for unsubscribe: ", messageIds);
+    // Get the unsubscribe data for all the message ids
+    const unsubscribeData: UnsubscribeData[] =
+      await getMultipleUnsubscribeData(messageIds);
+
+    console.log("Unsubscribe data: ", unsubscribeData);
+
+    // Attempt to automatically unsubscribe from each.
+    const linkOnlySenders: [string, string][] = [];
+    const noUnsubscribeSenders: string[] = [];
+    unsubscribeData.forEach((sender, index) => {
+      // if (sender.posturl !== null) {
+      //   unsubscribeUsingPostUrl(sender.posturl);
+      // } else if (sender.mailto !== null) {
+      if (sender.mailto !== null) {
+        unsubscribeUsingMailTo(sender.mailto);
+      } else if (sender.clickurl !== null) {
+        // If only a click URL is available, store it for later use
+        linkOnlySenders.push([emails[index], sender.clickurl]);
+      } else {
+        // No unsubscribe data found, so can only block
+        noUnsubscribeSenders.push(emails[index]);
+      }
     });
+
+    return {
+      linkOnlySenders: linkOnlySenders,
+      noUnsubscribeSenders: noUnsubscribeSenders,
+    };
   },
 
   async blockSender(email: string): Promise<void> {
     // Blocks the sender using the Gmail API.
-    // TODO: Implement the actual logic to block the sender.
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(console.log("Blocked sender successfully", email));
-      }, 1000);
-    });
+    await blockOneSender(email);
   },
 };
