@@ -15,8 +15,7 @@ export const ToggleOption = ({
                 defaultChecked={defaultChecked}
                 onChange={onChange}
             />
-            <div style={{ width: "10px"}}></div>
-            <p className="note">{label}</p>
+            <p className="label">{label}</p>
         </div>
     );
 };

@@ -57,3 +57,9 @@ input:checked + .slider::before {
   transform: translateX(1.4em);
   background-color: #fff;
 }
+
+.label {
+  font-size: 14px;
+  text-align: left;
+  margin-left: 20px;
+}
