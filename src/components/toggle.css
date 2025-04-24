@@ -1,9 +1,16 @@
+.toggle-option {
+  display: flex;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto;
+}
+
 /* The switch - the box around the slider */
 .switch {
   font-size: 12px;
   position: relative;
   display: inline-block;
-  width: 3.5em;
+  min-width: 3.5em;
   height: 2em;
 }
 
@@ -49,4 +56,10 @@ input:focus + .slider {
 input:checked + .slider::before {
   transform: translateX(1.4em);
   background-color: #fff;
+}
+
+.label {
+  font-size: 14px;
+  text-align: left;
+  margin-left: 20px;
 }

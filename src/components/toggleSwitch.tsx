@@ -1,4 +1,4 @@
-import "./toggleSwitch.css";
+import "./toggle.css";
 
 interface ToggleSwitchProps {
   defaultChecked?: boolean;
