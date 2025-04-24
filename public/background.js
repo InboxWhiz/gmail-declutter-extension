@@ -8,18 +8,20 @@ chrome.sidePanel
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url) return;
   const url = new URL(tab.url);
-  // Enables the side panel on google.com
   if (url.origin === GMAIL_ORIGIN) {
+    // Enables the side panel and disables popup on Gmail pages
     await chrome.sidePanel.setOptions({
       tabId,
       path: "sidebar/index.html",
       enabled: true,
     });
+    await chrome.action.setPopup({ tabId, popup: "" });
   } else {
-    // Disables the side panel on all other sites
+    // Disables the side panel and enables popup on all other sites
     await chrome.sidePanel.setOptions({
       tabId,
       enabled: false,
     });
+    chrome.action.setPopup({ tabId, popup: "popup/index.html" });
   }
 });

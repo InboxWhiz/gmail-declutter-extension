@@ -11,7 +11,7 @@
   },
   "permissions": ["sidePanel", "storage", "identity", "tabs"],
   "action": {
-    "default_state": "disabled"
+    "default_popup": "popup/index.html"
   },
   "background": {
     "service_worker": "background.js",
