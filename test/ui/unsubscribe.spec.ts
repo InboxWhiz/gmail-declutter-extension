@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { selectAliceBob } from "./helpers";
+import { selectAliceBob, selectEveFrank } from "./helpers";
 
 test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
   let logs: string[] = [];
@@ -124,17 +124,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     page,
   }) => {
     // select two senders
-    await page
-      .locator("div")
-      .filter({ hasText: /^Eveeve@email\.com49$/ })
-      .getByRole("checkbox")
-      .check();
-    await page
-      .locator("div")
-      .filter({ hasText: /^Frankfrank@email\.com12$/ })
-      .getByRole("checkbox")
-      .check();
-    await page.click("#unsubscribe-button");
+    selectEveFrank(page, "unsubscribe");
     await page.getByRole("button", { name: "Confirm" }).click();
 
     // check that the modal is visible
@@ -164,17 +154,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
   test("3.5a - multiple senders can be blocked in a row", async ({ page }) => {
     // select a sender
-    await page
-      .locator("div")
-      .filter({ hasText: /^Eveeve@email\.com49$/ })
-      .getByRole("checkbox")
-      .check();
-    await page
-      .locator("div")
-      .filter({ hasText: /^Frankfrank@email\.com12$/ })
-      .getByRole("checkbox")
-      .check();
-    await page.click("#unsubscribe-button");
+    selectEveFrank(page, "unsubscribe");
     await page.getByRole("button", { name: "Confirm" }).click();
 
     // click "Block" button twice

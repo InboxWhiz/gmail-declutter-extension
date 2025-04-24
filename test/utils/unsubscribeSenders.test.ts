@@ -285,13 +285,8 @@ describe("getUnsubscribeLinkFromBody", () => {
   const htmlToBase64 = (html: string) =>
     Buffer.from(html, "utf-8").toString("base64");
 
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
-
-  it("returns the first unsubscribe link from HTML body", async () => {
-    // Arrange
-    const html = '<a href="https://example.com/unsubscribe">Unsubscribe</a>';
+  // Helper to mock fetch response
+  const mockFetch = (html: string) => {
     const encoded = htmlToBase64(html);
     global.fetch = jest.fn().mockResolvedValue({
       status: 200,
@@ -302,6 +297,15 @@ describe("getUnsubscribeLinkFromBody", () => {
           },
         }),
     });
+  };
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("returns the first unsubscribe link from HTML body", async () => {
+    // Arrange
+    mockFetch('<a href="https://example.com/unsubscribe">Unsubscribe</a>');
 
     // Act
     const result = await getUnsubscribeLinkFromBody(messageId, token);
@@ -311,17 +315,7 @@ describe("getUnsubscribeLinkFromBody", () => {
   });
 
   it("matches unsubscribe case-insensitively", async () => {
-    const html = '<a href="https://example.com/unsubscribe">UNSUBSCRIBE</a>';
-    const encoded = htmlToBase64(html);
-    global.fetch = jest.fn().mockResolvedValue({
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          payload: {
-            parts: [{ mimeType: "text/html", body: { data: encoded } }],
-          },
-        }),
-    });
+    mockFetch('<a href="https://example.com/unsubscribe">UNSUBSCRIBE</a>');
 
     const result = await getUnsubscribeLinkFromBody(messageId, token);
     expect(result).toBe("https://example.com/unsubscribe");
@@ -334,16 +328,7 @@ describe("getUnsubscribeLinkFromBody", () => {
       <a href="https://good.com/unsub">unsubscribe</a>
       <a href="https://also-ignore.com">foo</a>
     `;
-    const encoded = htmlToBase64(html);
-    global.fetch = jest.fn().mockResolvedValue({
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          payload: {
-            parts: [{ mimeType: "text/html", body: { data: encoded } }],
-          },
-        }),
-    });
+    mockFetch(html);
 
     // Act
     const result = await getUnsubscribeLinkFromBody(messageId, token);
@@ -354,17 +339,7 @@ describe("getUnsubscribeLinkFromBody", () => {
 
   it("returns null when there is no unsubscribe link", async () => {
     // Arrange
-    const html = "<p>Hello world</p>";
-    const encoded = htmlToBase64(html);
-    global.fetch = jest.fn().mockResolvedValue({
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          payload: {
-            parts: [{ mimeType: "text/html", body: { data: encoded } }],
-          },
-        }),
-    });
+    mockFetch("<p>Hello world</p>");
 
     // Act
     const result = await getUnsubscribeLinkFromBody(messageId, token);

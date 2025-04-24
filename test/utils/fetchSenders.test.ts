@@ -249,6 +249,7 @@ describe("fetchMessageSenderSingle", () => {
   });
 });
 
+/* jscpd:ignore-start */
 describe("updateSenders", () => {
   test("correctly increments sender counts and sets first message ID", () => {
     // Arrange
@@ -312,6 +313,7 @@ describe("updateSenders", () => {
     });
   });
 });
+/* jscpd:ignore-end */
 
 describe("storeSenders", () => {
   beforeEach(() => {
