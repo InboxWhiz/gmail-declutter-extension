@@ -43,7 +43,7 @@ export const mockActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    emails: string[]
+    emails: string[],
   ): Promise<ManualUnsubscribeData> {
     // Simulates unsubscribing senders automatically.
     console.log("[MOCK] Automatically unsubscribing:", emails);

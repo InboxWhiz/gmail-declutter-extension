@@ -40,7 +40,7 @@ export const realActions: Actions = {
         chrome.storage.local.get(["senders"], (result) => {
           if (result.senders) {
             const updatedSenders = result.senders.filter(
-              (sender: [string, string, number]) => !emails.includes(sender[0])
+              (sender: [string, string, number]) => !emails.includes(sender[0]),
             );
             chrome.storage.local.set({ senders: updatedSenders }, () => {
               console.log("Updated senders in local storage.");
@@ -75,7 +75,7 @@ export const realActions: Actions = {
               email: sender[0],
               name: sender[1],
               count: sender[2],
-            })
+            }),
           );
           resolve(realSenders);
         } else {
@@ -92,7 +92,7 @@ export const realActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    emails: string[]
+    emails: string[],
   ): Promise<ManualUnsubscribeData> {
     // Attempts to automatically unsubscribes from the given email addresses.
 
@@ -103,7 +103,7 @@ export const realActions: Actions = {
     const result = await chrome.storage.local.get(["senders"]);
     const messageIds: string[] = result.senders
       .filter((sender: [string, string, number, string]) =>
-        emails.includes(sender[0])
+        emails.includes(sender[0]),
       )
       .map((sender: [string, string, number, string]) => sender[3]);
 

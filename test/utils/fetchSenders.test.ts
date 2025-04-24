@@ -170,7 +170,7 @@ describe("fetchMessageIds", () => {
 
     const result = await fetchMessageIds(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      null
+      null,
     );
 
     expect(result).toEqual({
@@ -192,7 +192,7 @@ describe("fetchMessageIds", () => {
     // Act
     const result = await fetchMessageIds(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      null
+      null,
     );
 
     // Assert
@@ -217,7 +217,7 @@ describe("fetchMessageSenderSingle", () => {
 
     const sender = await fetchMessageSenderSingle(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      "123"
+      "123",
     );
 
     expect(sender).toStrictEqual({
@@ -238,7 +238,7 @@ describe("fetchMessageSenderSingle", () => {
 
     const sender = await fetchMessageSenderSingle(
       "mock-token" as chrome.identity.GetAuthTokenResult,
-      "123"
+      "123",
     );
 
     expect(sender).toStrictEqual({
@@ -261,7 +261,7 @@ describe("updateSenders", () => {
         { senderEmail: "b@example.com", senderName: "Bob", messageId: "2" },
         { senderEmail: "a@example.com", senderName: "Alice", messageId: "3" },
       ],
-      senders
+      senders,
     );
 
     // Assert
@@ -294,7 +294,7 @@ describe("updateSenders", () => {
           messageId: "3",
         },
       ],
-      senders
+      senders,
     );
 
     // Assert

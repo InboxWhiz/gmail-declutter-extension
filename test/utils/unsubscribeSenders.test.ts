@@ -58,7 +58,7 @@ describe("getMultipleUnsubscribeData", () => {
     // Act
     const result = await getMultipleUnsubscribeData(
       [messageId],
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -80,7 +80,7 @@ describe("getMultipleUnsubscribeData", () => {
     // Act
     const result = await getMultipleUnsubscribeData(
       ids,
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -113,7 +113,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     // Assert
@@ -132,7 +132,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     // Assert
@@ -150,7 +150,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     expect(headerMock).toHaveBeenCalledWith(messageId, token);
@@ -167,7 +167,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
@@ -435,7 +435,7 @@ describe("unsubscribeUsingPostUrl", () => {
 
     // Expect the promise to reject with appropriate error message
     await expect(unsubscribeUsingPostUrl(testUrl)).rejects.toThrow(
-      "Failed to unsubscribe using POST URL: 400 Bad Request"
+      "Failed to unsubscribe using POST URL: 400 Bad Request",
     );
 
     // Verify fetch was called correctly
@@ -470,7 +470,7 @@ describe("unsubscribeUsingMailTo", () => {
     expect(fetchMock.calls.length).toBe(1);
     const [url, options] = fetchMock.calls[0];
     expect(url).toBe(
-      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
+      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
     );
     expect(options.method).toBe("POST");
     expect(options.headers.Authorization).toBe(`Bearer ${token}`);
@@ -502,7 +502,7 @@ describe("unsubscribeUsingMailTo", () => {
     });
 
     await expect(unsubscribeUsingMailTo(email)).rejects.toThrow(
-      "Gmail API error: 500 Server Error"
+      "Gmail API error: 500 Server Error",
     );
     expect(getOAuthToken).toHaveBeenCalledTimes(1);
     expect((global.fetch as jest.Mock).mock.calls.length).toBe(1);

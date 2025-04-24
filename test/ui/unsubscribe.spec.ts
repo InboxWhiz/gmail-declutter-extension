@@ -22,10 +22,10 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await expect(modal).toContainText("2 selected sender(s)");
     await expect(modal).toContainText("110 email(s)");
     await expect(
-      page.getByRole("button", { name: "Show all emails" })
+      page.getByRole("button", { name: "Show all emails" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Unsubscribe" })
+      page.getByRole("button", { name: "Unsubscribe" }),
     ).toBeVisible();
   });
 
@@ -40,7 +40,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // check that the search function was called
     expect(logs).toContain(
-      "[MOCK] Searching for emails: [alice@email.com, bob@email.com]"
+      "[MOCK] Searching for emails: [alice@email.com, bob@email.com]",
     );
 
     // check that the modal is still visible
@@ -61,7 +61,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     const successModal = page.locator("#unsubscribe-success-modal");
     await expect(successModal).toBeVisible();
     expect(logs).toContain(
-      "[MOCK] Automatically unsubscribing: [alice@email.com, bob@email.com]"
+      "[MOCK] Automatically unsubscribing: [alice@email.com, bob@email.com]",
     );
   });
 
@@ -112,7 +112,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // Emails were deleted (by default)
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [carol@email.com, dave@email.com]"
+      "[MOCK] Trashed senders successfully: [carol@email.com, dave@email.com]",
     );
 
     // Blocking action was not called (by default)
@@ -158,7 +158,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // check that the delete action was called
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [eve@email.com, frank@email.com]"
+      "[MOCK] Trashed senders successfully: [eve@email.com, frank@email.com]",
     );
   });
 
@@ -191,7 +191,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // check that the delete action was called
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [eve@email.com, frank@email.com]"
+      "[MOCK] Trashed senders successfully: [eve@email.com, frank@email.com]",
     );
   });
 
@@ -230,7 +230,6 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await page.click("#unsubscribe-button");
     await page.getByRole("button", { name: "Confirm" }).click();
 
-
     // Carol & Dave are processed with manual unsubscribe links
     const modal1 = page.locator("#unsubscribe-continue-modal");
     await expect(modal1).toBeVisible();
@@ -266,7 +265,7 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
 
     // Emails were deleted (by default)
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [alice@email.com, carol@email.com, frank@email.com, bob@email.com, dave@email.com, eve@email.com]"
+      "[MOCK] Trashed senders successfully: [alice@email.com, carol@email.com, frank@email.com, bob@email.com, dave@email.com, eve@email.com]",
     );
 
     // Blocking action was called only on manually blocked senders (by default)
@@ -276,7 +275,6 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     expect(logs).not.toContain("[MOCK] Blocked bob@email.com successfully");
     expect(logs).not.toContain("[MOCK] Blocked carol@email.com successfully");
     expect(logs).not.toContain("[MOCK] Blocked dave@email.com successfully");
-
   });
 
   test("3.7 - delete-emails toggle defaults on and can be toggled off", async ({
@@ -306,7 +304,9 @@ test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
     await expect(page.locator("#unsubscribe-success-modal")).toBeVisible();
 
     // check that delete action was not called
-    expect(logs).not.toContain("[MOCK] Trashed senders successfully: [alice@email.com]");
+    expect(logs).not.toContain(
+      "[MOCK] Trashed senders successfully: [alice@email.com]",
+    );
   });
 
   test("3.8 - senders can be blocked even when link is found", async ({

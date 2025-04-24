@@ -26,13 +26,13 @@ function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
     });
 
     // Attempt to unsubscribe all senders automatically
-    const unsubscribeResults: ManualUnsubscribeData = await unsubscribeSendersAuto(Object.keys(selectedSenders));
+    const unsubscribeResults: ManualUnsubscribeData =
+      await unsubscribeSendersAuto(Object.keys(selectedSenders));
     linkOnlySenders = unsubscribeResults.linkOnlySenders;
     noUnsubscribeSenders = unsubscribeResults.noUnsubscribeSenders;
 
     // Start processing link-only senders
     processNextLink(0);
-
   };
 
   // End the flow
@@ -79,7 +79,6 @@ function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
         },
       },
     });
-
   };
 
   // Process one block-only sender at `i`
@@ -101,7 +100,6 @@ function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
         },
       },
     });
-
   };
 
   return { startUnsubscribeFlow };
@@ -118,7 +116,10 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
 
   const { searchEmailSenders } = useActions();
   const { selectedSenders } = useSelectedSenders();
-  const { startUnsubscribeFlow } = useUnsubscribeFlow(deleteEmails, blockSenders);
+  const { startUnsubscribeFlow } = useUnsubscribeFlow(
+    deleteEmails,
+    blockSenders,
+  );
 
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
@@ -133,7 +134,11 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
 
       <div className="toggle-options">
         <ToggleOption
-          label={<>Delete <b>{emailsNum} email(s)</b> from selected senders</>}
+          label={
+            <>
+              Delete <b>{emailsNum} email(s)</b> from selected senders
+            </>
+          }
           defaultChecked={true}
           onChange={(checked) => setDeleteEmails(checked)}
         />
@@ -196,10 +201,11 @@ const UnsubscribeContinue = ({
   return (
     <>
       <p>
-      To stop getting messages from <b>{email}</b>, go to their website to unsubscribe.
+        To stop getting messages from <b>{email}</b>, go to their website to
+        unsubscribe.
       </p>
       <p className="note">
-      Once you've finished on the website, click "Continue" to proceed.
+        Once you've finished on the website, click "Continue" to proceed.
       </p>
 
       <button className="primary" onClick={openLink}>

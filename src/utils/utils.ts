@@ -21,7 +21,7 @@ export function parseSender(raw: string | null): [string, string] {
 }
 
 export function parseListUnsubscribeHeader(
-  header: string | undefined
+  header: string | undefined,
 ): UnsubscribeData {
   const unsubscribeData: UnsubscribeData = {
     posturl: null,
@@ -37,7 +37,10 @@ export function parseListUnsubscribeHeader(
   const parts = header.split(",");
 
   for (const part of parts) {
-    const trimmedPart = part.trim().substring(1, part.length - 1).trim(); // Remove surrounding angle brackets
+    const trimmedPart = part
+      .trim()
+      .substring(1, part.length - 1)
+      .trim(); // Remove surrounding angle brackets
     if (trimmedPart.startsWith("http") || trimmedPart.startsWith("https")) {
       // It's a URL
       unsubscribeData.posturl = trimmedPart; // Store the URL
