@@ -1,11 +1,15 @@
-import { ManualUnsubscribeData, Sender, UnsubscribeData } from "../../types/types";
+import {
+  ManualUnsubscribeData,
+  Sender,
+  UnsubscribeData,
+} from "../../types/types";
 import { blockOneSender } from "../blockSenders";
 import { fetchAllSenders } from "../fetchSenders";
 import { trashMultipleSenders } from "../trashSenders";
 import {
   getMultipleUnsubscribeData,
   unsubscribeUsingMailTo,
-  unsubscribeUsingPostUrl,
+  // unsubscribeUsingPostUrl,
 } from "../unsubscribeSenders";
 import { Actions } from "./types";
 
@@ -87,32 +91,37 @@ export const realActions: Actions = {
     });
   },
 
-  async unsubscribeSendersAuto(emails: string[]): Promise<ManualUnsubscribeData> {
+  async unsubscribeSendersAuto(
+    emails: string[]
+  ): Promise<ManualUnsubscribeData> {
     // Attempts to automatically unsubscribes from the given email addresses.
 
     // Get the latest message ids for each sender
-    let messageIds: string[] = [];
-    chrome.storage.local.get(["senders"], (result) => {
-      if (result.senders) {
-        messageIds = result.senders
-          .filter((sender: [string, string, number, string]) =>
-            emails.includes(sender[0])
-          )
-          .map((sender: [string, string, number, string]) => sender[3]);
-      }
-    });
+    console.log("Unsubscribing automatically from senders: ", emails);
 
+    // Get the latestMessageIds for the given emails from local storage
+    const result = await chrome.storage.local.get(["senders"]);
+    const messageIds: string[] = result.senders
+      .filter((sender: [string, string, number, string]) =>
+        emails.includes(sender[0])
+      )
+      .map((sender: [string, string, number, string]) => sender[3]);
+
+    console.log("Message IDs for unsubscribe: ", messageIds);
     // Get the unsubscribe data for all the message ids
     const unsubscribeData: UnsubscribeData[] =
       await getMultipleUnsubscribeData(messageIds);
+
+    console.log("Unsubscribe data: ", unsubscribeData);
 
     // Attempt to automatically unsubscribe from each.
     const linkOnlySenders: [string, string][] = [];
     const noUnsubscribeSenders: string[] = [];
     unsubscribeData.forEach((sender, index) => {
-      if (sender.posturl !== null) {
-        unsubscribeUsingPostUrl(sender.posturl);
-      } else if (sender.mailto !== null) {
+      // if (sender.posturl !== null) {
+      //   unsubscribeUsingPostUrl(sender.posturl);
+      // } else if (sender.mailto !== null) {
+      if (sender.mailto !== null) {
         unsubscribeUsingMailTo(sender.mailto);
       } else if (sender.clickurl !== null) {
         // If only a click URL is available, store it for later use
@@ -123,7 +132,10 @@ export const realActions: Actions = {
       }
     });
 
-    return {linkOnlySenders: linkOnlySenders, noUnsubscribeSenders: noUnsubscribeSenders};
+    return {
+      linkOnlySenders: linkOnlySenders,
+      noUnsubscribeSenders: noUnsubscribeSenders,
+    };
   },
 
   async blockSender(email: string): Promise<void> {

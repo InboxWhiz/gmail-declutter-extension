@@ -1,7 +1,7 @@
 import { realActions } from "../../src/utils/actions/realActions";
-export const actions = realActions;
+const actions = realActions;
 
-export const {
+const {
   searchEmailSenders,
   deleteSenders,
   getAllSenders,
@@ -237,11 +237,7 @@ describe("unsubscribeSendersAuto", () => {
       "sender3@example.com",
       "sender4@example.com",
     ];
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: mockSenders });
-      }
-    );
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({ senders: mockSenders });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue(
       mockUnsubscribeData
     );
@@ -259,36 +255,10 @@ describe("unsubscribeSendersAuto", () => {
     ]);
   });
 
-  it("should call unsubscribeUsingPostUrl when posturl is present", async () => {
-    // Arrange
-    const emails = ["sender1@example.com"];
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: [mockSenders[0]] });
-      }
-    );
-    (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
-      mockUnsubscribeData[0],
-    ]);
-
-    // Act
-    await unsubscribeSendersAuto(emails);
-
-    // Assert
-    expect(unsubscribeUsingPostUrl).toHaveBeenCalledWith(
-      "http://unsubscribe-url.com/post"
-    );
-    expect(unsubscribeUsingMailTo).not.toHaveBeenCalled();
-  });
-
-  it("should call unsubscribeUsingMailTo when mailto is present and posturl is not", async () => {
+  it("should call unsubscribeUsingMailTo when mailto is present", async () => {
     // Arrange
     const emails = ["sender2@example.com"];
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: [mockSenders[1]] });
-      }
-    );
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({ senders: [mockSenders[1]] });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
       mockUnsubscribeData[1],
     ]);
@@ -306,11 +276,7 @@ describe("unsubscribeSendersAuto", () => {
   it("should not call unsubscribeUsingPostUrl or unsubscribeUsingMailTo if no auto-unsubscribe method is available", async () => {
     // Arrange
     const emails = ["sender3@example.com"];
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: [mockSenders[2]] });
-      }
-    );
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({ senders: [mockSenders[2]] });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
       mockUnsubscribeData[2],
     ]);
