@@ -38,7 +38,9 @@ export const mockActions: Actions = {
         { email: "uma@email.com", name: "Uma", count: 66 },
         { email: "victor@email.com", name: "Victor", count: 29 },
       ];
-      resolve(mockSenders);
+      setTimeout(() => {
+        resolve(mockSenders);
+      }, 500);
     });
   },
 
