@@ -1,0 +1,44 @@
+.popupContent {
+    background-color: white;
+    padding: 0 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+.linkGroup {
+    margin: 20px 0;
+}
+
+.versionInfo {
+    margin-top: 10px;
+    font-size: 0.85rem;
+}
+
+.socialMedia {
+    margin-top: 20px;
+}
+
+.centeredButtonContainer { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.openGmailButton {
+    padding: 15px 30px;
+    font-size: 0.95rem;
+    background-color: #233b86;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.openGmailButton:hover {
+    background-color: #1a4c9b;
+}
