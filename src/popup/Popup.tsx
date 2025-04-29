@@ -11,12 +11,12 @@ const PopupApp = () => {
   };
 
   return (
-    <div className="popupContent">
+    <div className="popup-content">
       <h2>InboxWhiz</h2>
       <p>Manage your inbox effortlessly with InboxWhiz!</p>
 
-      <div className="centeredButtonContainer">
-        <button className="openGmailButton" onClick={openGmail}>
+      <div className="centered-button-container">
+        <button className="open-gmail-button" onClick={openGmail}>
           <img
             src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
             alt="Gmail Logo"
@@ -33,7 +33,7 @@ const PopupApp = () => {
         <p><strong>Loved the tool? </strong> <a href={feedbackLink} target="_blank" rel="noopener noreferrer">Leave a Review</a>⭐</p>
       </div>
 
-      <div className="versionInfo">
+      <div className="version-info">
         <p>Version {version}</p>
       </div>
     </div>

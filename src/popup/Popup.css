@@ -1,4 +1,4 @@
-.popupContent {
+.popup-content {
     background-color: white;
     padding: 0 20px;
     border-radius: 8px;
@@ -6,26 +6,18 @@
     text-align: center;
 }
 
-.linkGroup {
-    margin: 20px 0;
-}
-
-.versionInfo {
+.version-info {
     margin-top: 10px;
     font-size: 0.85rem;
 }
 
-.socialMedia {
-    margin-top: 20px;
+.centered-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.centeredButtonContainer { 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-}
-
-.openGmailButton {
+.open-gmail-button {
     padding: 15px 30px;
     font-size: 0.95rem;
     background-color: #233b86;
@@ -39,6 +31,6 @@
     gap: 8px;
 }
 
-.openGmailButton:hover {
+.open-gmail-button:hover {
     background-color: #1a4c9b;
 }
