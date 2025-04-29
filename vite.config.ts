@@ -20,6 +20,6 @@ export default defineConfig({
         sidebar: resolve(root, "sidebar", "index.html"),
         popup: resolve(root, "popup", "index.html"),
       },
-    }
-  }
+    },
+  },
 });

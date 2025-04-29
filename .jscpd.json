@@ -1,4 +1,4 @@
 {
   "threshold": 1,
-  "ignore": ["**/dist/**", "**/node_modules/**"]
+  "ignore": ["**/dist/**", "**/node_modules/**", "**.html"]
 }

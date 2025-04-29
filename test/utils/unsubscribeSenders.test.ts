@@ -9,7 +9,10 @@ import {
 
 // Mock dependencies
 import { getOAuthToken } from "../../src/sidebar/utils/auth";
-import { sleep, parseListUnsubscribeHeader } from "../../src/sidebar/utils/utils";
+import {
+  sleep,
+  parseListUnsubscribeHeader,
+} from "../../src/sidebar/utils/utils";
 jest.mock("../../src/sidebar/utils/auth", () => ({
   getOAuthToken: jest.fn(),
 }));

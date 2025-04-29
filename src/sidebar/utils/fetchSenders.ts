@@ -25,13 +25,13 @@ export async function fetchAllSenders(): Promise<void> {
     do {
       const { messageIds, nextPage } = await fetchMessageIds(
         authToken,
-        nextPageToken
+        nextPageToken,
       );
       allMessageIds.push(...messageIds);
       nextPageToken = nextPage;
     } while (nextPageToken);
     console.log(
-      `Fetched ${allMessageIds.length} email IDs. Getting senders...`
+      `Fetched ${allMessageIds.length} email IDs. Getting senders...`,
     );
 
     // Process messages in batches of 40
@@ -39,13 +39,13 @@ export async function fetchAllSenders(): Promise<void> {
       const batchIds = allMessageIds.slice(i, i + 40);
       const batchSenders: MessageData[] = await fetchMessageSendersBatch(
         authToken,
-        batchIds
+        batchIds,
       );
       updateSenders(batchSenders, senders);
     }
 
     console.log(
-      `Fetched ${allMessageIds.length} emails. Found ${Object.keys(senders).length} unique senders.`
+      `Fetched ${allMessageIds.length} emails. Found ${Object.keys(senders).length} unique senders.`,
     );
 
     storeSenders(senders);
@@ -56,7 +56,7 @@ export async function fetchAllSenders(): Promise<void> {
 
 async function fetchMessageIds(
   token: chrome.identity.GetAuthTokenResult,
-  pageToken: string | null
+  pageToken: string | null,
 ): Promise<{ messageIds: string[]; nextPage: string | null }> {
   let url =
     "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=500";
@@ -91,16 +91,16 @@ async function fetchMessageIds(
 
 export async function fetchMessageSendersBatch(
   token: chrome.identity.GetAuthTokenResult,
-  messageIds: string[]
+  messageIds: string[],
 ): Promise<MessageData[]> {
   return Promise.all(
-    messageIds.map((id) => fetchMessageSenderSingle(token, id))
+    messageIds.map((id) => fetchMessageSenderSingle(token, id)),
   );
 }
 
 async function fetchMessageSenderSingle(
   token: chrome.identity.GetAuthTokenResult,
-  messageId: string
+  messageId: string,
 ): Promise<MessageData> {
   // Fetch message metadata
   const response = await fetch(
@@ -111,7 +111,7 @@ async function fetchMessageSenderSingle(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    }
+    },
   );
 
   // Handle rate limiting
@@ -131,7 +131,7 @@ async function fetchMessageSenderSingle(
   // Extract sender from response
   const msgData = await response.json();
   const sender = msgData.payload?.headers?.find(
-    (header: { name: string }) => header.name === "From"
+    (header: { name: string }) => header.name === "From",
   )?.value;
 
   // Parse the name and email from the sender
@@ -142,7 +142,7 @@ async function fetchMessageSenderSingle(
 
 function updateSenders(
   messageList: MessageData[],
-  allSenders: { [x: string]: SenderData }
+  allSenders: { [x: string]: SenderData },
 ): void {
   messageList.forEach((message) => {
     if (allSenders[message.senderEmail]) {

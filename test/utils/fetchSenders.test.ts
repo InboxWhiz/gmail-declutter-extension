@@ -1,4 +1,7 @@
-import { fetchAllSenders, exportForTest } from "../../src/sidebar/utils/fetchSenders";
+import {
+  fetchAllSenders,
+  exportForTest,
+} from "../../src/sidebar/utils/fetchSenders";
 const {
   fetchMessageIds,
   fetchMessageSenderSingle,
