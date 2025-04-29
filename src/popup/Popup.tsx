@@ -1,8 +1,8 @@
 import "./Popup.css"
 
-const supportLink = 'https://your-support-link.com'; // TODO: Replace with actual support link
+const supportLink = ''; // TODO: Replace with actual support link
 const donateLink = 'https://buymeacoffee.com/inboxwhiz';
-const feedbackLink = 'https://your-feedback-link.com'; // TODO: Replace with actual feedback link
+const feedbackLink = ''; // TODO: Replace with actual feedback link
 const version = '1.0.0';
 
 const PopupApp = () => {
