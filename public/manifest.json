@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Gmail Declutter",
+  "name": "InboxWhiz - Bulk Unsubscribe & Clean Gmail",
   "version": "1.0.0",
   "description": "Declutter your Gmail in seconds - unsubscribe and remove bulk emails effortlessly.",
   "icons": {
