@@ -1,4 +1,7 @@
-import { parseSender, parseListUnsubscribeHeader } from "../../src/utils/utils";
+import {
+  parseSender,
+  parseListUnsubscribeHeader,
+} from "../../src/sidebar/utils/utils";
 
 describe("parseSender", () => {
   test("extracts name and email", () => {

@@ -1,0 +1,36 @@
+.popup-content {
+  background-color: white;
+  padding: 0 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+}
+
+.version-info {
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+
+.centered-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.open-gmail-button {
+  padding: 15px 30px;
+  font-size: 0.95rem;
+  background-color: #233b86;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.open-gmail-button:hover {
+  background-color: #1a4c9b;
+}

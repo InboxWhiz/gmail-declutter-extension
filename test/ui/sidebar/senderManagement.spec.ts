@@ -4,7 +4,7 @@ test.describe("UI tests for Epic 1 - Sender Management", () => {
   let logs: string[] = [];
 
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/sidebar/");
 
     logs = []; // reset logs before each test
     page.on("console", (msg) => logs.push(msg.text()));

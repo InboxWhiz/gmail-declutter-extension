@@ -1,4 +1,4 @@
-import { realActions } from "../../src/utils/actions/realActions";
+import { realActions } from "../../src/sidebar/utils/actions/realActions";
 const actions = realActions;
 
 const {
@@ -8,24 +8,24 @@ const {
   unsubscribeSendersAuto,
 } = actions;
 
-import { Sender } from "../../src/types/types";
+import { Sender } from "../../src/sidebar/types/types";
 
-import { trashMultipleSenders } from "../../src/utils/trashSenders";
-import { fetchAllSenders } from "../../src/utils/fetchSenders";
+import { trashMultipleSenders } from "../../src/sidebar/utils/trashSenders";
+import { fetchAllSenders } from "../../src/sidebar/utils/fetchSenders";
 import {
   getMultipleUnsubscribeData,
   unsubscribeUsingPostUrl,
   unsubscribeUsingMailTo,
-} from "../../src/utils/unsubscribeSenders";
+} from "../../src/sidebar/utils/unsubscribeSenders";
 
 // Create mocks for dependent functions
-jest.mock("../../src/utils/trashSenders", () => ({
+jest.mock("../../src/sidebar/utils/trashSenders", () => ({
   trashMultipleSenders: jest.fn(() => Promise.resolve()),
 }));
-jest.mock("../../src/utils/fetchSenders", () => ({
+jest.mock("../../src/sidebar/utils/fetchSenders", () => ({
   fetchAllSenders: jest.fn(() => Promise.resolve()),
 }));
-jest.mock("../../src/utils/unsubscribeSenders", () => ({
+jest.mock("../../src/sidebar/utils/unsubscribeSenders", () => ({
   getMultipleUnsubscribeData: jest.fn(),
   unsubscribeUsingPostUrl: jest.fn(),
   unsubscribeUsingMailTo: jest.fn(),
