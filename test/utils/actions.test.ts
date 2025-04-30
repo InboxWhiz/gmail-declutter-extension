@@ -200,6 +200,31 @@ describe("getAllSenders", () => {
     // Reset lastError for further tests.
     chrome.runtime.lastError = null as unknown as chrome.runtime.LastError;
   });
+
+  test("filters out @gmail.com senders from the result", async () => {
+    // Arrange
+    const storedSenders: [string, string, number][] = [
+      ["user1@gmail.com", "User 1", 2],
+      ["user2@gmail.com", "User 2", 3],
+      ["external@example.com", "External", 5],
+      ["another@domain.com", "Another", 1],
+    ];
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
+        callback({ senders: storedSenders });
+      },
+    );
+
+    // Act
+    const result = await getAllSenders();
+
+    // Assert
+    const expected: Sender[] = [
+      { email: "external@example.com", name: "External", count: 5 },
+      { email: "another@domain.com", name: "Another", count: 1 },
+    ];
+    expect(result).toEqual(expected);
+  });
 });
 
 describe("unsubscribeSendersAuto", () => {

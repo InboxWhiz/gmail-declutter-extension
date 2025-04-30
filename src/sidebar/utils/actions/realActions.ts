@@ -70,13 +70,15 @@ export const realActions: Actions = {
 
         const senders = result.senders;
         if (senders) {
-          const realSenders: Sender[] = senders.map(
-            (sender: [string, string, number]) => ({
+            const realSenders: Sender[] = senders
+            .filter((sender: [string, string, number]) => !sender[0].endsWith("@gmail.com"))
+            .map(
+              (sender: [string, string, number]) => ({
               email: sender[0],
               name: sender[1],
               count: sender[2],
-            }),
-          );
+              }),
+            );
           resolve(realSenders);
         } else {
           if (!fetchNew) {
