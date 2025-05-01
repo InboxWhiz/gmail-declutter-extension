@@ -156,6 +156,48 @@ describe("fetchAllSenders", () => {
     expect(sleep).toHaveBeenCalledWith(1000);
     expect(fetch).toHaveBeenCalledTimes(3);
   });
+
+  test("periodically updates fetchProgress in chrome.storage.local during batch processing", async () => {
+    // Arrange
+    (getOAuthToken as jest.Mock).mockResolvedValue("mock-token");
+
+    // Simulate 80 message IDs (2 batches of 40)
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      status: 200,
+      json: async () => ({
+        messages: Array.from({ length: 80 }, (_, i) => ({ id: `id${i}` })),
+        nextPageToken: null,
+      }),
+    });
+
+    // Each metadata fetch returns a valid sender
+    for (let i = 0; i < 80; i++) {
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        status: 200,
+        json: async () => ({
+          payload: {
+            headers: [{ name: "From", value: `Sender${i} <sender${i}@example.com>` }],
+          },
+        }),
+      });
+    }
+
+    // Act
+    await fetchAllSenders();
+
+    // Assert
+    // There should be 2 calls to chrome.storage.local.set with fetchProgress (one per batch)
+    const setCalls = (chrome.storage.local.set as jest.Mock).mock.calls.filter(
+      ([arg]) => arg && typeof arg.fetchProgress === "number"
+    );
+    expect(setCalls.length).toBeGreaterThanOrEqual(2);
+
+    // The progress should increase and be <= 1
+    setCalls.forEach(([arg]) => {
+      expect(arg.fetchProgress).toBeGreaterThan(0);
+      expect(arg.fetchProgress).toBeLessThanOrEqual(1);
+    });
+  });
 });
 
 describe("fetchMessageIds", () => {

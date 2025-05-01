@@ -93,6 +93,20 @@ export const realActions: Actions = {
     });
   },
 
+  async checkFetchProgress(setProgressCallback: Function): Promise<number> {
+    return new Promise((resolve) => {
+      chrome.storage.local.get('fetchProgress', (data) => {
+        if (data.fetchProgress !== undefined) {
+          setProgressCallback(data.fetchProgress);
+          resolve(data.fetchProgress);
+        } else {
+          setProgressCallback(0);
+          resolve(0);
+        }
+      });
+    });
+  },
+
   async unsubscribeSendersAuto(
     emails: string[],
   ): Promise<ManualUnsubscribeData> {

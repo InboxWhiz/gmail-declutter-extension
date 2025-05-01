@@ -60,7 +60,7 @@ describe("searchEmailSenders", () => {
     (chrome.tabs.query as jest.Mock).mockImplementation(
       (queryObj: any, callback: (tabs: any[]) => void) => {
         callback([{ id: 123 }]);
-      },
+      }
     );
 
     // Act
@@ -69,7 +69,7 @@ describe("searchEmailSenders", () => {
     // Assert
     expect(chrome.tabs.query).toHaveBeenCalledWith(
       { active: true, currentWindow: true },
-      expect.any(Function),
+      expect.any(Function)
     );
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(123, {
       type: "SEARCH_EMAIL_SENDERS",
@@ -95,14 +95,14 @@ describe("deleteSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: initialSenders });
-      },
+      }
     );
 
     // Setup chrome.storage.local.set mock
     (chrome.storage.local.set as jest.Mock).mockImplementation(
       (data: any, callback) => {
         callback();
-      },
+      }
     );
 
     // Call the function and wait for the promise to resolve
@@ -113,11 +113,11 @@ describe("deleteSenders", () => {
 
     // After trashing, the local storage should have been updated to remove any senders with emails in the list.
     const expectedSenders = initialSenders.filter(
-      (sender) => !emails.includes(sender[0]),
+      (sender) => !emails.includes(sender[0])
     );
     expect(chrome.storage.local.set).toHaveBeenCalledWith(
       { senders: expectedSenders },
-      expect.any(Function),
+      expect.any(Function)
     );
 
     expect(logSpy).toHaveBeenCalledWith("Trashed senders successfully");
@@ -135,7 +135,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      },
+      }
     );
 
     const result = await getAllSenders();
@@ -157,7 +157,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      },
+      }
     );
 
     // Call with fetchNew true. This should await fetchAllSenders.
@@ -177,7 +177,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({});
-      },
+      }
     );
 
     // Because of recursion in getAllSenders implementation, we need to break the cycle.
@@ -193,7 +193,7 @@ describe("getAllSenders", () => {
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         chrome.runtime.lastError = "Some error" as chrome.runtime.LastError;
         callback({ senders: [] });
-      },
+      }
     );
 
     await expect(getAllSenders()).rejects.toEqual("Some error");
@@ -212,7 +212,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      },
+      }
     );
 
     // Act
@@ -266,7 +266,7 @@ describe("unsubscribeSendersAuto", () => {
       senders: mockSenders,
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue(
-      mockUnsubscribeData,
+      mockUnsubscribeData
     );
 
     // Act
@@ -298,7 +298,7 @@ describe("unsubscribeSendersAuto", () => {
     // Assert
     expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
     expect(unsubscribeUsingMailTo).toHaveBeenCalledWith(
-      "mailto:unsubscribe@sender.com",
+      "mailto:unsubscribe@sender.com"
     );
   });
 
@@ -318,5 +318,45 @@ describe("unsubscribeSendersAuto", () => {
     // Assert: Neither method should be called
     expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
     expect(unsubscribeUsingMailTo).not.toHaveBeenCalled();
+  });
+});
+
+describe("checkFetchProgress", () => {
+  test("calls setProgressCallback with fetchProgress from storage", async () => {
+    // Arrange
+    const mockSetProgress = jest.fn();
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (key: string, callback: (data: { fetchProgress: number }) => void) => {
+        callback({ fetchProgress: 0.75 });
+      }
+    );
+
+    // Act
+    const result = await actions.checkFetchProgress(mockSetProgress);
+
+    // Assert
+    expect(chrome.storage.local.get).toHaveBeenCalledWith(
+      "fetchProgress",
+      expect.any(Function)
+    );
+    expect(mockSetProgress).toHaveBeenCalledWith(0.75);
+    expect(result).toBe(0.75);
+  });
+
+  test("calls setProgressCallback with 0 if fetchProgress is undefined", async () => {
+    // Arrange
+    const mockSetProgress = jest.fn();
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (key: string, callback: (data: {}) => void) => {
+        callback({});
+      }
+    );
+
+    // Act
+    const result = await actions.checkFetchProgress(mockSetProgress);
+
+    // Assert
+    expect(mockSetProgress).toHaveBeenCalledWith(0);
+    expect(result).toBe(0);
   });
 });

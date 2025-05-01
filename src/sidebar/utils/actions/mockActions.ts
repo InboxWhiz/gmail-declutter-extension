@@ -44,8 +44,19 @@ export const mockActions: Actions = {
     });
   },
 
+  async checkFetchProgress(setProgressCallback: Function): Promise<number> {
+    // Mock fetch progress by incrementing a static variable
+    if (!('mockProgress' in globalThis)) {
+      (globalThis as any).mockProgress = 0;
+    }
+    (globalThis as any).mockProgress = Math.min((globalThis as any).mockProgress + 0.05, 1);
+    const progress = (globalThis as any).mockProgress;
+    setProgressCallback(progress);
+    return Promise.resolve(progress);
+  },
+
   async unsubscribeSendersAuto(
-    emails: string[],
+    emails: string[]
   ): Promise<ManualUnsubscribeData> {
     // Simulates unsubscribing senders automatically.
     console.log("[MOCK] Automatically unsubscribing:", emails);
