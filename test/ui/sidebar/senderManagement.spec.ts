@@ -3,12 +3,14 @@ import { test, expect } from "@playwright/test";
 test.describe("UI tests for Epic 1 - Sender Management", () => {
   let logs: string[] = [];
 
+  /* jscpd:ignore-start */
   test.beforeEach(async ({ page }) => {
     await page.goto("/sidebar/");
 
     logs = []; // reset logs before each test
     page.on("console", (msg) => logs.push(msg.text()));
   });
+  /* jscpd:ignore-end */
 
   test("1.1 - displays senders sorted by email count", async ({ page }) => {
     // Wait for the senders list to be visible

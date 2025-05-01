@@ -2,6 +2,7 @@ import { SenderLine } from "./senderLine";
 import { useSenders } from "../providers/sendersContext";
 import { useMemo } from "react";
 import SenderLineSkeleton from "./senderLineSkeleton";
+import LoadingBar from "./loadingBar";
 
 export const SendersContainer = () => {
   const { senders, loading } = useSenders();
@@ -12,16 +13,23 @@ export const SendersContainer = () => {
 
   return (
     <div id="senders">
-      {loading
-        ? Array.from({ length: 9 }).map(() => <SenderLineSkeleton />)
-        : sortedSenders.map((sender, index) => (
-            <SenderLine
-              key={index}
-              senderName={sender.name}
-              senderEmail={sender.email}
-              senderCount={sender.count}
-            />
+      {loading ? (
+        <>
+          <LoadingBar />
+          {Array.from({ length: 8 }).map(() => (
+            <SenderLineSkeleton />
           ))}
+        </>
+      ) : (
+        sortedSenders.map((sender, index) => (
+          <SenderLine
+            key={index}
+            senderName={sender.name}
+            senderEmail={sender.email}
+            senderCount={sender.count}
+          />
+        ))
+      )}
     </div>
   );
 };

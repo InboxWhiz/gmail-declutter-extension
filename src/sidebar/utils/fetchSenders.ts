@@ -19,6 +19,7 @@ export async function fetchAllSenders(): Promise<void> {
 
   let nextPageToken = null;
   const allMessageIds: string[] = [];
+  let percentageComplete: number = 0;
 
   try {
     // Fetch all message IDs
@@ -42,6 +43,10 @@ export async function fetchAllSenders(): Promise<void> {
         batchIds,
       );
       updateSenders(batchSenders, senders);
+
+      // Send a message about progress
+      percentageComplete += 40 / allMessageIds.length;
+      chrome.storage.local.set({ fetchProgress: percentageComplete });
     }
 
     console.log(

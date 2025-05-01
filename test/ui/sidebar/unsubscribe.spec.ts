@@ -4,12 +4,14 @@ import { selectAliceBob, selectEveFrank } from "./helpers";
 test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
   let logs: string[] = [];
 
+  /* jscpd:ignore-start */
   test.beforeEach(async ({ page }) => {
     await page.goto("/sidebar/");
 
     logs = []; // reset logs before each test
     page.on("console", (msg) => logs.push(msg.text()));
   });
+  /* jscpd:ignore-end */
 
   test("3.1 - shows modal with correct email & sender count & buttons", async ({
     page,

@@ -200,6 +200,31 @@ describe("getAllSenders", () => {
     // Reset lastError for further tests.
     chrome.runtime.lastError = null as unknown as chrome.runtime.LastError;
   });
+
+  test("filters out @gmail.com senders from the result", async () => {
+    // Arrange
+    const storedSenders: [string, string, number][] = [
+      ["user1@gmail.com", "User 1", 2],
+      ["user2@gmail.com", "User 2", 3],
+      ["external@example.com", "External", 5],
+      ["another@domain.com", "Another", 1],
+    ];
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
+        callback({ senders: storedSenders });
+      },
+    );
+
+    // Act
+    const result = await getAllSenders();
+
+    // Assert
+    const expected: Sender[] = [
+      { email: "external@example.com", name: "External", count: 5 },
+      { email: "another@domain.com", name: "Another", count: 1 },
+    ];
+    expect(result).toEqual(expected);
+  });
 });
 
 describe("unsubscribeSendersAuto", () => {
@@ -293,5 +318,45 @@ describe("unsubscribeSendersAuto", () => {
     // Assert: Neither method should be called
     expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
     expect(unsubscribeUsingMailTo).not.toHaveBeenCalled();
+  });
+});
+
+describe("checkFetchProgress", () => {
+  test("calls setProgressCallback with fetchProgress from storage", async () => {
+    // Arrange
+    const mockSetProgress = jest.fn();
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (key: string, callback: (data: { fetchProgress: number }) => void) => {
+        callback({ fetchProgress: 0.75 });
+      },
+    );
+
+    // Act
+    const result = await actions.checkFetchProgress(mockSetProgress);
+
+    // Assert
+    expect(chrome.storage.local.get).toHaveBeenCalledWith(
+      "fetchProgress",
+      expect.any(Function),
+    );
+    expect(mockSetProgress).toHaveBeenCalledWith(0.75);
+    expect(result).toBe(0.75);
+  });
+
+  test("calls setProgressCallback with 0 if fetchProgress is undefined", async () => {
+    // Arrange
+    const mockSetProgress = jest.fn();
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (key: string, callback: (data: object) => void) => {
+        callback({});
+      },
+    );
+
+    // Act
+    const result = await actions.checkFetchProgress(mockSetProgress);
+
+    // Assert
+    expect(mockSetProgress).toHaveBeenCalledWith(0);
+    expect(result).toBe(0);
   });
 });
