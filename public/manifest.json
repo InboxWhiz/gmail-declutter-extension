@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "InboxWhiz - Bulk Unsubscribe & Clean Gmail",
   "version": "1.0.0",
-  "description": "Declutter your Gmail in seconds - unsubscribe and remove bulk emails effortlessly.",
+  "description": "Declutter your Gmail in seconds - mass unsubscribe and remove emails in bulk effortlessly.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA9Cv0qfOMUXfojZCsia00e9MU65oVIjZOWAaVyzWbywpsaNXfAz9r7mEa0wLyrlE9AOn5Yqb+J8NUknT1ntHL4yUOAeOZ71d1kCT20Ox+8RroRwnQOP7SKHqbia4TvKVvSGlsI/IL879yNGTbrrZ7Er4vd6UsNEyVK5Sb7CcceTmaZ9WmXi695u4ynXVTbun74Qgm3aDjRFcw+901J0lpHisCMzRhdAz2yuaZ0WTSQ4HB4cYDOe+wOPb2z02fU600JfKMS6B0vNJ6wPlv0onnpjh+7wjMMYwT4wyP4V6arg+v+4wUK9t42HyqVSxZ3bTfh22IwDiEKo4ibahTH+vxfwIDAQAB",
   "icons": {
     "16": "images/icon-16.png",
     "32": "images/icon-32.png",
