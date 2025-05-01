@@ -9,7 +9,6 @@ function App() {
   return (
     <AllGlobalProviders>
       <div id="declutter-body">
-
         <div className="button-bar">
           <div className="sender-actions">
             <ActionButton id="unsubscribe-button" />

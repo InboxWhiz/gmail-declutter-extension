@@ -13,19 +13,23 @@ export const SendersContainer = () => {
 
   return (
     <div id="senders">
-      {loading
-        ? <>
+      {loading ? (
+        <>
           <LoadingBar />
-          {Array.from({ length: 8 }).map(() => <SenderLineSkeleton />)}
+          {Array.from({ length: 8 }).map(() => (
+            <SenderLineSkeleton />
+          ))}
         </>
-        : sortedSenders.map((sender, index) => (
+      ) : (
+        sortedSenders.map((sender, index) => (
           <SenderLine
             key={index}
             senderName={sender.name}
             senderEmail={sender.email}
             senderCount={sender.count}
           />
-        ))}
+        ))
+      )}
     </div>
   );
 };

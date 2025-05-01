@@ -176,7 +176,9 @@ describe("fetchAllSenders", () => {
         status: 200,
         json: async () => ({
           payload: {
-            headers: [{ name: "From", value: `Sender${i} <sender${i}@example.com>` }],
+            headers: [
+              { name: "From", value: `Sender${i} <sender${i}@example.com>` },
+            ],
           },
         }),
       });
@@ -188,7 +190,7 @@ describe("fetchAllSenders", () => {
     // Assert
     // There should be 2 calls to chrome.storage.local.set with fetchProgress (one per batch)
     const setCalls = (chrome.storage.local.set as jest.Mock).mock.calls.filter(
-      ([arg]) => arg && typeof arg.fetchProgress === "number"
+      ([arg]) => arg && typeof arg.fetchProgress === "number",
     );
     expect(setCalls.length).toBeGreaterThanOrEqual(2);
 

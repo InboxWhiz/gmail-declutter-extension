@@ -4,7 +4,9 @@ export interface Actions {
   searchEmailSenders(emails: string[]): void;
   deleteSenders(emails: string[]): Promise<void>;
   getAllSenders(fetchNew?: boolean): Promise<Sender[]>;
-  checkFetchProgress(setProgressCallback: Function): Promise<number>;
+  checkFetchProgress(
+    setProgressCallback: (progress: number) => void,
+  ): Promise<number>;
   unsubscribeSendersAuto(email: string[]): Promise<ManualUnsubscribeData>;
   blockSender(email: string): Promise<void>;
 }

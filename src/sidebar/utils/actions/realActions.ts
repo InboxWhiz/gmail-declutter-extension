@@ -70,15 +70,16 @@ export const realActions: Actions = {
 
         const senders = result.senders;
         if (senders) {
-            const realSenders: Sender[] = senders
-            .filter((sender: [string, string, number]) => !sender[0].endsWith("@gmail.com"))
-            .map(
-              (sender: [string, string, number]) => ({
+          const realSenders: Sender[] = senders
+            .filter(
+              (sender: [string, string, number]) =>
+                !sender[0].endsWith("@gmail.com"),
+            )
+            .map((sender: [string, string, number]) => ({
               email: sender[0],
               name: sender[1],
               count: sender[2],
-              }),
-            );
+            }));
           resolve(realSenders);
         } else {
           if (!fetchNew) {
@@ -93,9 +94,11 @@ export const realActions: Actions = {
     });
   },
 
-  async checkFetchProgress(setProgressCallback: Function): Promise<number> {
+  async checkFetchProgress(
+    setProgressCallback: (progress: number) => void,
+  ): Promise<number> {
     return new Promise((resolve) => {
-      chrome.storage.local.get('fetchProgress', (data) => {
+      chrome.storage.local.get("fetchProgress", (data) => {
         if (data.fetchProgress !== undefined) {
           setProgressCallback(data.fetchProgress);
           resolve(data.fetchProgress);
