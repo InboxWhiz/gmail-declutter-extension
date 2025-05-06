@@ -1,5 +1,6 @@
 import { GoogleAuthButton } from "./googleAuthButton";
 import { getAssetUrl } from "../utils/utils";
+import { SuccessIcon } from "./successIcon";
 
 export const WelcomeStep = ({ onNext }: { onNext: () => void }) => {
     return (
@@ -64,8 +65,14 @@ export const Step4 = ({ onNext }: { onNext: () => void }) => {
 
 export const Success = () => {
     return (
-        <div className="step">
-            <h2 className="tutorial-header">✅ Success!</h2>
+        <div className="step" style={{ height: "200px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <h2 className="tutorial-header" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <SuccessIcon />
+                    Success!
+                </h2>
+            </div>
+            <div style={{ height: "20px" }}></div>
             <p className="tutorial-note">You are ready to clean up your inbox.</p>
             <div style={{ height: "10px" }}></div>
         </div>
