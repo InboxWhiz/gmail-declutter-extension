@@ -12,7 +12,7 @@ export const Modal = ({ children, isOpen, onClose }: { children: ReactNode; isOp
         <div
             className="modal"
             onClick={handleBackgroundClick}
-            style={{ display: isOpen ? "block" : "none" }}
+            style={{ display: isOpen ? "flex" : "none" }}
         >
             {children}
         </div>
