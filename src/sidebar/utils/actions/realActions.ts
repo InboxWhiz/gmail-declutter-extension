@@ -63,6 +63,13 @@ export const realActions: Actions = {
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(["senders"], async (result) => {
+        // If "senders" key does not exist, fetch all senders and retry
+        if (!result.senders) {
+          await fetchAllSenders();
+          const refreshed = await chrome.storage.local.get(["senders"]);
+          result = refreshed;
+        }
+
         if (chrome.runtime.lastError) {
           reject(chrome.runtime.lastError);
           return;
