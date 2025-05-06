@@ -176,7 +176,7 @@ describe("getAllSenders", () => {
     // First call returns no senders
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({});
+        callback({ senders: [] });
       },
     );
 
@@ -185,6 +185,31 @@ describe("getAllSenders", () => {
     // Here, we simply call getAllSenders with fetchNew true.
     const result = await getAllSenders(true);
     expect(result).toEqual([]);
+  });
+
+  test("calls fetchAllSenders if senders key is not found in storage", async () => {
+    // Simulate that the senders key is not found in local storage on first call,
+    // and after fetchAllSenders is called, senders are available.
+    let callCount = 0;
+    (chrome.storage.local.get as jest.Mock).mockImplementation(
+      (keys: string[], callback?: (result: { [key: string]: any }) => void) => {
+        callCount++;
+        const result =
+          callCount === 1
+            ? {}
+            : { senders: [["sender4@example.com", "Sender 4", 7]] };
+        if (callback && typeof callback === "function") {
+          callback(result);
+        } else {
+          return Promise.resolve(result);
+        }
+      },
+    );
+
+    await getAllSenders();
+
+    // Check if fetchAllSenders was called
+    expect(fetchAllSenders).toHaveBeenCalled();
   });
 
   test("rejects if chrome.runtime.lastError is present", async () => {
