@@ -1,4 +1,4 @@
-import { getOAuthToken } from "../../tutorial/utils/auth";
+import { getOAuthToken } from "../../auth";
 
 export async function blockOneSender(senderEmail: string): Promise<void> {
   const filter: gapi.client.gmail.Filter = {
@@ -19,7 +19,7 @@ export async function blockOneSender(senderEmail: string): Promise<void> {
         method: "POST",
         headers: headers,
         body: JSON.stringify(filter),
-      },
+      }
     );
     if (!response.ok) {
       throw new Error(`Failed to create block filter: ${response.statusText}`);
