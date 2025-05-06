@@ -9,11 +9,11 @@ const {
   storeSenders,
 } = exportForTest;
 
-import { getOAuthToken } from "../../src/sidebar/utils/auth";
+import { getOAuthToken } from "../../src/auth";
 import { sleep } from "../../src/sidebar/utils/utils";
 
 // Mock dependencies
-jest.mock("../../src/sidebar/utils/auth");
+jest.mock("../../src/auth");
 jest.mock("../../src/sidebar/utils/utils", () => {
   const originalModule = jest.requireActual("../../src/sidebar/utils/utils");
   return {

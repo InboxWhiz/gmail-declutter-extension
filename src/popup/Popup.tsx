@@ -2,7 +2,8 @@ import "./Popup.css";
 
 const supportLink = "mailto:inboxwhiz.help@gmail.com";
 const donateLink = "https://buymeacoffee.com/inboxwhiz";
-const feedbackLink = "https://chromewebstore.google.com/detail/inboxwhiz/bjcegpgebdbhkkhngbahpfjfolcmkpma/reviews";
+const feedbackLink =
+  "https://chromewebstore.google.com/detail/inboxwhiz/bjcegpgebdbhkkhngbahpfjfolcmkpma/reviews";
 const version = "1.0.0";
 
 const PopupApp = () => {
@@ -30,9 +31,7 @@ const PopupApp = () => {
       <div className="popupLinks">
         <p>
           <strong>Need help? Have suggestions?</strong>{" "}
-          <a href={supportLink}>
-            Contact Us
-          </a>
+          <a href={supportLink}>Contact Us</a>
         </p>
         <p>
           <strong>Support Development:</strong>{" "}

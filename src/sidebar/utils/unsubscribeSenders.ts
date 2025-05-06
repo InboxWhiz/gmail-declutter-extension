@@ -1,4 +1,4 @@
-import { getOAuthToken } from "./auth";
+import { getOAuthToken } from "../../auth";
 import { sleep, parseListUnsubscribeHeader } from "./utils";
 import { UnsubscribeData } from "../types/types";
 

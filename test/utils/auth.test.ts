@@ -1,4 +1,4 @@
-import { getOAuthToken } from "../../src/sidebar/utils/auth";
+import { getOAuthToken } from "../../src/auth";
 
 describe("getOAuthToken", () => {
   beforeEach(() => {

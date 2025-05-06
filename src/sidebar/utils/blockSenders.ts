@@ -1,4 +1,4 @@
-import { getOAuthToken } from "./auth";
+import { getOAuthToken } from "../../auth";
 
 export async function blockOneSender(senderEmail: string): Promise<void> {
   const filter: gapi.client.gmail.Filter = {
