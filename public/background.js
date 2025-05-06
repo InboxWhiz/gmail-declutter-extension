@@ -25,3 +25,10 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
     chrome.action.setPopup({ tabId, popup: "popup/index.html" });
   }
 });
+
+// Shows a tutorial when the extension is installed
+chrome.runtime.onInstalled.addListener(function (object) {
+  if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    chrome.tabs.create({ url: "https://mail.google.com/" }, function (tab) {});
+  }
+});

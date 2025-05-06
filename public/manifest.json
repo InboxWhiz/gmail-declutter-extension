@@ -25,6 +25,12 @@
       "type": "module"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["tutorial/*", "assets/*"],
+      "matches": ["https://mail.google.com/*"]
+    }
+  ],
   "oauth2": {
     "client_id": "396720193118-fggljh2amq0jlgq4v861vqn6rb88q9dt.apps.googleusercontent.com",
     "scopes": [

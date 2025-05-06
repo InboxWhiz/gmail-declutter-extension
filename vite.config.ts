@@ -19,6 +19,7 @@ export default defineConfig({
         main: resolve(root, "index.html"),
         sidebar: resolve(root, "sidebar", "index.html"),
         popup: resolve(root, "popup", "index.html"),
+        tutorial: resolve(root, "tutorial", "index.html"),
       },
     },
   },
