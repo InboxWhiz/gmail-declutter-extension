@@ -1,8 +1,14 @@
 import { useState } from "react";
 import "./Tutorial.css";
-import { Step1, Step2, Step3, Step4, Success, WelcomeStep } from "./components/steps";
+import {
+  Step1,
+  Step2,
+  Step3,
+  Step4,
+  Success,
+  WelcomeStep,
+} from "./components/steps";
 import { Modal } from "./components/modal";
-
 
 const Tutorial = () => {
   const [step, setStep] = useState(0);
@@ -13,7 +19,10 @@ const Tutorial = () => {
   };
 
   return (
-    <Modal isOpen={isModalOpen} onClose={step === 5 ? () => setIsModalOpen(false) : () => {}}>
+    <Modal
+      isOpen={isModalOpen}
+      onClose={step === 5 ? () => setIsModalOpen(false) : () => {}}
+    >
       <div className="tutorial-popup">
         {step === 0 ? (
           <WelcomeStep onNext={handleNext} />
@@ -27,11 +36,10 @@ const Tutorial = () => {
           <Step4 onNext={handleNext} />
         ) : step === 5 ? (
           <Success />
-        ) : (null)}
-
+        ) : null}
       </div>
     </Modal>
   );
-}
+};
 
 export default Tutorial;

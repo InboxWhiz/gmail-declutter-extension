@@ -18,7 +18,7 @@ function displayTutorial() {
   iframe.src = chrome.runtime.getURL("tutorial/index.html");
 
   // Style the iframe as a modal
-  iframe.allowtransparency = "true"
+  iframe.allowtransparency = "true";
   iframe.style.backgroundColor = "transparent";
   iframe.style.position = "fixed";
   iframe.style.top = "50%";
