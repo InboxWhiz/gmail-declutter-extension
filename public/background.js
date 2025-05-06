@@ -30,7 +30,14 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 chrome.runtime.onInstalled.addListener(function (object) {
   if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
     chrome.tabs.create({ url: "https://mail.google.com/" }, function (tab) {
-      chrome.tabs.sendMessage(tab.id, { action: "SHOW_TUTORIAL" });
+      // Wait for the tab to finish loading before sending the message
+      function handleUpdated(tabId, info) {
+        if (tabId === tab.id && info.status === "complete") {
+          chrome.tabs.sendMessage(tab.id, { action: "SHOW_TUTORIAL" });
+          chrome.tabs.onUpdated.removeListener(handleUpdated);
+        }
+      }
+      chrome.tabs.onUpdated.addListener(handleUpdated);
     });
   }
 });
