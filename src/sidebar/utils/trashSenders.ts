@@ -1,4 +1,4 @@
-import { getOAuthToken } from "../../auth";
+import { getOAuthToken } from "../../tutorial/utils/auth";
 
 export async function trashMultipleSenders(
   senders: string[],

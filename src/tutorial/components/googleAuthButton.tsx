@@ -1,4 +1,4 @@
-import { getOAuthToken } from "../../auth";
+import { getOAuthToken } from "../utils/auth";
 import "./googleAuthButton.css";
 
 export const GoogleAuthButton = ({ onAuthSuccess }: { onAuthSuccess: () => void }) => {

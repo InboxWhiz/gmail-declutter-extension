@@ -1,4 +1,4 @@
-import { getOAuthToken } from "../../auth";
+import { getOAuthToken } from "../../tutorial/utils/auth";
 import { parseSender, sleep } from "./utils";
 
 interface SenderData {
