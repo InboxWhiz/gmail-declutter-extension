@@ -29,6 +29,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 // Shows a tutorial when the extension is installed
 chrome.runtime.onInstalled.addListener(function (object) {
   if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-    chrome.tabs.create({ url: "https://mail.google.com/" }, function (tab) {});
+    chrome.tabs.create({ url: "https://mail.google.com/" }, function (tab) {
+      chrome.tabs.sendMessage(tab.id, { action: "SHOW_TUTORIAL" });
+    });
   }
 });

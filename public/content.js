@@ -40,4 +40,9 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-displayTutorial();
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "SHOW_TUTORIAL") {
+    console.log("Received message to show tutorial");
+    displayTutorial();
+  }
+});
