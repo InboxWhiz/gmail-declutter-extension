@@ -1,8 +1,19 @@
+import { getOAuthToken } from "../../auth";
 import "./googleAuthButton.css";
 
-export const GoogleAuthButton = () => {
+export const GoogleAuthButton = ({ onAuthSuccess }: { onAuthSuccess: () => void }) => {
+
+    const handleClick = async () => {
+        try {
+            await getOAuthToken();
+            onAuthSuccess();
+        } catch (error) {
+            // Do nothing on rejection
+        }
+    };
+
     return (
-        <button className="gsi-material-button">
+        <button className="gsi-material-button" onClick={handleClick}>
             <div className="gsi-material-button-state"></div>
             <div className="gsi-material-button-content-wrapper">
                 <div className="gsi-material-button-icon">
