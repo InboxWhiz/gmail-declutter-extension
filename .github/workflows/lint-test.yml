@@ -1,5 +1,5 @@
 ---
-name: Lint and Test
+name: lint & test
 
 on:
   push:
