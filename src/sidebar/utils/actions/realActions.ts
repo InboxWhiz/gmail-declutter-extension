@@ -14,6 +14,34 @@ import {
 import { Actions } from "./types";
 
 export const realActions: Actions = {
+  async getEmailAccount(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tabId = tabs[0]?.id;
+        if (tabId === undefined) {
+          reject("No active tab.");
+          return;
+        }
+
+        chrome.tabs.sendMessage(
+          tabId,
+          { action: "GET_EMAIL_ACCOUNT" },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              console.error(
+                "Could not get email account:",
+                chrome.runtime.lastError
+              );
+              reject(chrome.runtime.lastError.message);
+            } else {
+              resolve(response.result);
+            }
+          }
+        );
+      });
+    });
+  },
+
   searchEmailSenders(emails: string[]): void {
     // Searches for emails in the Gmail tab
 
@@ -31,7 +59,7 @@ export const realActions: Actions = {
     });
   },
 
-  deleteSenders(emails: string[]): Promise<void> {
+  async deleteSenders(emails: string[]): Promise<void> {
     // Moves the senders to trash using Gmail API
 
     return new Promise((resolve) => {
@@ -40,7 +68,7 @@ export const realActions: Actions = {
         chrome.storage.local.get(["senders"], (result) => {
           if (result.senders) {
             const updatedSenders = result.senders.filter(
-              (sender: [string, string, number]) => !emails.includes(sender[0]),
+              (sender: [string, string, number]) => !emails.includes(sender[0])
             );
             chrome.storage.local.set({ senders: updatedSenders }, () => {
               console.log("Updated senders in local storage.");
@@ -80,7 +108,7 @@ export const realActions: Actions = {
           const realSenders: Sender[] = senders
             .filter(
               (sender: [string, string, number]) =>
-                !sender[0].endsWith("@gmail.com"),
+                !sender[0].endsWith("@gmail.com")
             )
             .map((sender: [string, string, number]) => ({
               email: sender[0],
@@ -102,7 +130,7 @@ export const realActions: Actions = {
   },
 
   async checkFetchProgress(
-    setProgressCallback: (progress: number) => void,
+    setProgressCallback: (progress: number) => void
   ): Promise<number> {
     return new Promise((resolve) => {
       chrome.storage.local.get("fetchProgress", (data) => {
@@ -118,7 +146,7 @@ export const realActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    emails: string[],
+    emails: string[]
   ): Promise<ManualUnsubscribeData> {
     // Attempts to automatically unsubscribes from the given email addresses.
 
@@ -129,7 +157,7 @@ export const realActions: Actions = {
     const result = await chrome.storage.local.get(["senders"]);
     const messageIds: string[] = result.senders
       .filter((sender: [string, string, number, string]) =>
-        emails.includes(sender[0]),
+        emails.includes(sender[0])
       )
       .map((sender: [string, string, number, string]) => sender[3]);
 
