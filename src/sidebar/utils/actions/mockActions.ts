@@ -2,6 +2,12 @@ import { ManualUnsubscribeData, Sender } from "../../types/types";
 import { Actions } from "./types";
 
 export const mockActions: Actions = {
+  async getEmailAccount(): Promise<string> {
+    return new Promise((resolve) => {
+      resolve("usertest@gmail.com");
+    });
+  },
+
   searchEmailSenders(emails: string[]): void {
     console.log("[MOCK] Searching for emails:", emails);
   },
@@ -45,7 +51,7 @@ export const mockActions: Actions = {
   },
 
   async checkFetchProgress(
-    setProgressCallback: (progress: number) => void,
+    setProgressCallback: (progress: number) => void
   ): Promise<number> {
     // Mock fetch progress by incrementing a static variable
     if (!("mockProgress" in globalThis)) {
@@ -53,7 +59,7 @@ export const mockActions: Actions = {
     }
     (globalThis as any).mockProgress = Math.min(
       (globalThis as any).mockProgress + 0.05,
-      1,
+      1
     );
     const progress = (globalThis as any).mockProgress;
     setProgressCallback(progress);
@@ -61,7 +67,7 @@ export const mockActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    emails: string[],
+    emails: string[]
   ): Promise<ManualUnsubscribeData> {
     // Simulates unsubscribing senders automatically.
     console.log("[MOCK] Automatically unsubscribing:", emails);
