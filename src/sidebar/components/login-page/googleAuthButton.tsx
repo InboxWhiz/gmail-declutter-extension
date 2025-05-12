@@ -1,4 +1,4 @@
-import { getOAuthToken } from "../../../auth";
+import { getOAuthToken } from "../../../_shared/utils/auth";
 import "./googleAuthButton.css";
 
 export const GoogleAuthButton = ({
