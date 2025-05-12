@@ -3,7 +3,6 @@ import {
   Sender,
   UnsubscribeData,
 } from "../../types/types";
-import { blockOneSender } from "../blockSenders";
 import { fetchAllSenders } from "../fetchSenders";
 import { trashMultipleSenders } from "../trashSenders";
 import {
@@ -192,8 +191,35 @@ export const realActions: Actions = {
     };
   },
 
-  async blockSender(email: string): Promise<void> {
-    // Blocks the sender using the Gmail API.
-    await blockOneSender(email);
+  async blockSender(senderEmail: string): Promise<void> {
+    const filter: gapi.client.gmail.Filter = {
+      criteria: { from: senderEmail },
+      action: { addLabelIds: ["TRASH"] },
+    };
+
+    const token = await getOAuthToken();
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    try {
+      const response = await fetch(
+        "https://www.googleapis.com/gmail/v1/users/me/settings/filters",
+        {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(filter),
+        }
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to create block filter: ${response.statusText}`
+        );
+      }
+    } catch (err) {
+      console.error(`Failed to create block filter for ${senderEmail}:`, err);
+      throw err;
+    }
   },
 };

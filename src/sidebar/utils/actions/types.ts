@@ -9,5 +9,13 @@ export interface Actions {
     setProgressCallback: (progress: number) => void,
   ): Promise<number>;
   unsubscribeSendersAuto(email: string[]): Promise<ManualUnsubscribeData>;
-  blockSender(email: string): Promise<void>;
+
+  /**
+   * Blocks the specified sender by their email address using the Gmail API.
+   * This creates a filter to automatically move emails from the sender to trash.
+   *
+   * @param senderEmailAddress - The email address of the sender to block.
+   * @returns A promise that resolves when the sender has been blocked.
+   */
+  blockSender(senderEmailAddress: string): Promise<void>;
 }

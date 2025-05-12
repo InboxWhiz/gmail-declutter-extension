@@ -107,10 +107,10 @@ export const mockActions: Actions = {
     });
   },
 
-  async blockSender(email: string): Promise<void> {
+  async blockSender(senderEmailAddress: string): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(console.log(`[MOCK] Blocked ${email} successfully`));
+        resolve(console.log(`[MOCK] Blocked ${senderEmailAddress} successfully`));
       }, 1000);
     });
   },
