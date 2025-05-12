@@ -4,11 +4,14 @@ import { ReloadButton } from "./components/reloadButton.tsx";
 import { ModalPopup } from "./components/modalPopup.tsx";
 import { SendersContainer } from "./components/sendersContainer.tsx";
 import { AllGlobalProviders } from "./providers/allGlobalProviders.tsx";
+import { DeclutterHeader } from "./components/header.tsx";
 
 function App() {
   return (
     <AllGlobalProviders>
       <div id="declutter-body">
+        <DeclutterHeader />
+
         <div className="button-bar">
           <div className="sender-actions">
             <ActionButton id="unsubscribe-button" />
@@ -22,7 +25,7 @@ function App() {
 
         <ModalPopup />
       </div>
-    </AllGlobalProviders>
+    </AllGlobalProviders >
   );
 }
 

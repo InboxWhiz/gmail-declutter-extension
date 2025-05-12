@@ -1,0 +1,22 @@
+.declutter-header {
+    text-align: center;
+    padding: 10px;
+    color: #5f6368;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-icon {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background-color: #2f2f2f;
+    color: white;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}

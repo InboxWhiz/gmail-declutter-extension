@@ -6,16 +6,6 @@
   flex-direction: column;
 }
 
-.declutter-body-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.declutter-body-title {
-  font-size: 1rem;
-  padding-left: 20px;
-}
-
 .button-bar {
   padding: 10px 20px 0;
   min-width: 300px;
