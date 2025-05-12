@@ -6,6 +6,18 @@
   flex-direction: column;
 }
 
+#declutter-body.login {
+  color: white;
+  background-color: #233b86;
+  align-items: center;
+  font-size: 1rem;
+}
+
+#declutter-body.login #email-account {
+  margin-top: 7px;
+  font-size: 0.75rem;
+}
+
 .button-bar {
   padding: 10px 20px 0;
   min-width: 300px;
