@@ -1,4 +1,7 @@
-import { getOAuthToken } from "../../src/auth";
+import {
+  getOAuthToken,
+  getAuthenticatedEmail,
+} from "../../src/_shared/utils/auth";
 
 describe("getOAuthToken", () => {
   beforeEach(() => {
@@ -14,7 +17,7 @@ describe("getOAuthToken", () => {
     (chrome.identity.getAuthToken as jest.Mock).mockImplementation(
       (options, callback) => {
         callback("mock-token");
-      },
+      }
     );
 
     const token = await getOAuthToken();
@@ -26,7 +29,7 @@ describe("getOAuthToken", () => {
       (options, callback) => {
         chrome.runtime.lastError = { message: "Permission denied" };
         callback(null);
-      },
+      }
     );
 
     await expect(getOAuthToken()).rejects.toEqual({
@@ -38,7 +41,7 @@ describe("getOAuthToken", () => {
     (chrome.identity.getAuthToken as jest.Mock).mockImplementation(
       (options, callback) => {
         callback(null);
-      },
+      }
     );
 
     await expect(getOAuthToken()).rejects.toEqual({
@@ -51,10 +54,57 @@ describe("getOAuthToken", () => {
       (options, callback) => {
         expect(options).toEqual({ interactive: false });
         callback("mock-token");
-      },
+      }
     );
 
     const token = await getOAuthToken(false);
     expect(token).toBe("mock-token");
+  });
+});
+
+describe("getAuthenticatedEmail", () => {
+  const mockToken = "mock-token" as chrome.identity.GetAuthTokenResult;
+
+  beforeEach(() => {
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("resolves with email when response is valid", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        emailAddress: "user@example.com",
+      }),
+    });
+
+    const email = await getAuthenticatedEmail(mockToken);
+    expect(email).toBe("user@example.com");
+  });
+
+  it("rejects when email is missing from response", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    });
+
+    await expect(getAuthenticatedEmail(mockToken)).rejects.toThrow(
+      "Email address not found in response"
+    );
+  });
+
+  it("rejects on non-ok response (e.g., 400)", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: async () => ({}),
+    });
+
+    await expect(getAuthenticatedEmail(mockToken)).rejects.toThrow(
+      "Failed to fetch user info"
+    );
   });
 });
