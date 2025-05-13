@@ -1,4 +1,3 @@
-import { getOAuthToken } from "../../_shared/utils/auth";
 import { parseSender, sleep } from "./utils";
 
 interface SenderData {
@@ -13,8 +12,7 @@ interface MessageData {
   messageId: string;
 }
 
-export async function fetchAllSenders(): Promise<void> {
-  const authToken = await getOAuthToken();
+export async function fetchAllSenders(authToken: string, accountEmail: string): Promise<void> {
   const senders: { [key: string]: SenderData } = {};
 
   let nextPageToken = null;
@@ -53,14 +51,14 @@ export async function fetchAllSenders(): Promise<void> {
       `Fetched ${allMessageIds.length} emails. Found ${Object.keys(senders).length} unique senders.`,
     );
 
-    storeSenders(senders);
+    storeSenders(senders, accountEmail);
   } catch (err) {
     console.error("Error fetching senders:", err);
   }
 }
 
 async function fetchMessageIds(
-  token: chrome.identity.GetAuthTokenResult,
+  token: string,
   pageToken: string | null,
 ): Promise<{ messageIds: string[]; nextPage: string | null }> {
   let url =
@@ -95,7 +93,7 @@ async function fetchMessageIds(
 }
 
 export async function fetchMessageSendersBatch(
-  token: chrome.identity.GetAuthTokenResult,
+  token: string,
   messageIds: string[],
 ): Promise<MessageData[]> {
   return Promise.all(
@@ -104,7 +102,7 @@ export async function fetchMessageSendersBatch(
 }
 
 async function fetchMessageSenderSingle(
-  token: chrome.identity.GetAuthTokenResult,
+  token: string,
   messageId: string,
 ): Promise<MessageData> {
   // Fetch message metadata
@@ -163,7 +161,7 @@ function updateSenders(
   });
 }
 
-function storeSenders(senders: { [s: string]: SenderData }) {
+function storeSenders(senders: { [s: string]: SenderData }, accountEmail: string): void {
   // Parse and sort senders by email count
   const parsedSenders = Object.entries(senders)
     .map(([email, { name, count, latestMessageId }]) => [
@@ -175,7 +173,7 @@ function storeSenders(senders: { [s: string]: SenderData }) {
     .sort((a, b) => Number(b[2]) - Number(a[2])); // Sort by count in descending order
 
   // Store in local storage
-  chrome.storage.local.set({ senders: parsedSenders });
+  chrome.storage.local.set({ [accountEmail]: { senders: parsedSenders } });
 }
 
 export const exportForTest = {
