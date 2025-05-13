@@ -64,7 +64,7 @@ export interface Actions {
    * @returns A promise that resolves to the current fetch progress value. If no progress is found, resolves to 0.
    */
   checkFetchProgress(
-    setProgressCallback: (progress: number) => void
+    setProgressCallback: (progress: number) => void,
   ): Promise<number>;
 
   /**
@@ -80,7 +80,7 @@ export interface Actions {
    *   - `noUnsubscribeSenders`: An array of sender emails for which no unsubscribe method was found.
    */
   unsubscribeSendersAuto(
-    senderEmailAddresses: string[]
+    senderEmailAddresses: string[],
   ): Promise<ManualUnsubscribeData>;
 
   /**

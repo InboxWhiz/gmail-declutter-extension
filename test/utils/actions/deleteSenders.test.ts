@@ -33,14 +33,14 @@ describe("deleteSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: initialSenders });
-      }
+      },
     );
 
     // Setup chrome.storage.local.set mock
     (chrome.storage.local.set as jest.Mock).mockImplementation(
       (data: any, callback) => {
         callback();
-      }
+      },
     );
 
     // Call the function and wait for the promise to resolve
@@ -51,11 +51,11 @@ describe("deleteSenders", () => {
 
     // After trashing, the local storage should have been updated to remove any senders with emails in the list.
     const expectedSenders = initialSenders.filter(
-      (sender) => !emails.includes(sender[0])
+      (sender) => !emails.includes(sender[0]),
     );
     expect(chrome.storage.local.set).toHaveBeenCalledWith(
       { senders: expectedSenders },
-      expect.any(Function)
+      expect.any(Function),
     );
 
     expect(logSpy).toHaveBeenCalledWith("Trashed senders successfully");

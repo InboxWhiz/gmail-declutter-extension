@@ -22,9 +22,7 @@ function App() {
   }, [checkLoggedIn]);
 
   if (!isLoggedIn) {
-    return (
-      <LoginPage />
-    );
+    return <LoginPage />;
   } else {
     return (
       <div id="declutter-body">

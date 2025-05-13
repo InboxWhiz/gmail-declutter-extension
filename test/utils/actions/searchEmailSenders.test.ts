@@ -16,7 +16,7 @@ describe("searchEmailSenders", () => {
     (chrome.tabs.query as jest.Mock).mockImplementation(
       (queryObj: any, callback: (tabs: any[]) => void) => {
         callback([{ id: 123 }]);
-      }
+      },
     );
 
     // Act
@@ -25,7 +25,7 @@ describe("searchEmailSenders", () => {
     // Assert
     expect(chrome.tabs.query).toHaveBeenCalledWith(
       { active: true, currentWindow: true },
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(123, {
       type: "SEARCH_EMAIL_SENDERS",

@@ -28,7 +28,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      }
+      },
     );
 
     const result = await getAllSenders();
@@ -50,7 +50,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      }
+      },
     );
 
     // Call with fetchNew true. This should await fetchAllSenders.
@@ -70,7 +70,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: [] });
-      }
+      },
     );
 
     // Because of recursion in getAllSenders implementation, we need to break the cycle.
@@ -96,7 +96,7 @@ describe("getAllSenders", () => {
         } else {
           return Promise.resolve(result);
         }
-      }
+      },
     );
 
     await getAllSenders();
@@ -111,7 +111,7 @@ describe("getAllSenders", () => {
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         chrome.runtime.lastError = "Some error" as chrome.runtime.LastError;
         callback({ senders: [] });
-      }
+      },
     );
 
     await expect(getAllSenders()).rejects.toEqual("Some error");
@@ -130,7 +130,7 @@ describe("getAllSenders", () => {
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         callback({ senders: storedSenders });
-      }
+      },
     );
 
     // Act

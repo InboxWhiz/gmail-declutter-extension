@@ -60,7 +60,7 @@ describe("unsubscribeSendersAuto", () => {
       senders: mockSenders,
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue(
-      mockUnsubscribeData
+      mockUnsubscribeData,
     );
 
     // Act
@@ -92,7 +92,7 @@ describe("unsubscribeSendersAuto", () => {
     // Assert
     expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
     expect(unsubscribeUsingMailTo).toHaveBeenCalledWith(
-      "mailto:unsubscribe@sender.com"
+      "mailto:unsubscribe@sender.com",
     );
   });
 

@@ -2,7 +2,7 @@ import { getOAuthToken } from "../../_shared/utils/auth";
 
 export async function trashMultipleSenders(
   senders: string[],
-  trashSenderFunc = trashSender
+  trashSenderFunc = trashSender,
 ) {
   let totalEmailsTrashed: number = 0;
   const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
@@ -14,7 +14,7 @@ export async function trashMultipleSenders(
 
 async function trashSender(
   token: chrome.identity.GetAuthTokenResult,
-  senderEmail: string
+  senderEmail: string,
 ) {
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -31,12 +31,12 @@ async function trashSender(
     return 0; // To indicate no emails were found;
   } else {
     console.log(
-      `Found ${searchData.messages.length} messages from ${senderEmail}`
+      `Found ${searchData.messages.length} messages from ${senderEmail}`,
     );
   }
 
   const messageIds = searchData.messages.map(
-    (msg: gapi.client.gmail.Message) => msg.id
+    (msg: gapi.client.gmail.Message) => msg.id,
   );
 
   // Step 2: Move each message to Trash
@@ -46,7 +46,7 @@ async function trashSender(
       {
         method: "POST",
         headers,
-      }
+      },
     );
   }
 

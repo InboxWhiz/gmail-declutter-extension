@@ -17,7 +17,7 @@ describe("getOAuthToken", () => {
     (chrome.identity.getAuthToken as jest.Mock).mockImplementation(
       (options, callback) => {
         callback("mock-token");
-      }
+      },
     );
 
     const token = await getOAuthToken();
@@ -29,7 +29,7 @@ describe("getOAuthToken", () => {
       (options, callback) => {
         chrome.runtime.lastError = { message: "Permission denied" };
         callback(null);
-      }
+      },
     );
 
     await expect(getOAuthToken()).rejects.toEqual({
@@ -41,7 +41,7 @@ describe("getOAuthToken", () => {
     (chrome.identity.getAuthToken as jest.Mock).mockImplementation(
       (options, callback) => {
         callback(null);
-      }
+      },
     );
 
     await expect(getOAuthToken()).rejects.toEqual({
@@ -54,7 +54,7 @@ describe("getOAuthToken", () => {
       (options, callback) => {
         expect(options).toEqual({ interactive: false });
         callback("mock-token");
-      }
+      },
     );
 
     const token = await getOAuthToken(false);
@@ -92,7 +92,7 @@ describe("getAuthenticatedEmail", () => {
     });
 
     await expect(getAuthenticatedEmail(mockToken)).rejects.toThrow(
-      "Email address not found in response"
+      "Email address not found in response",
     );
   });
 
@@ -104,7 +104,7 @@ describe("getAuthenticatedEmail", () => {
     });
 
     await expect(getAuthenticatedEmail(mockToken)).rejects.toThrow(
-      "Failed to fetch user info"
+      "Failed to fetch user info",
     );
   });
 });

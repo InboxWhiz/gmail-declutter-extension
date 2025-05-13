@@ -55,7 +55,9 @@ describe("isLoggedIn", () => {
     mockGetAuthenticatedEmail.mockResolvedValueOnce("user@example.com");
     mockGetEmailAccount.mockRejectedValueOnce(new Error("No active tab"));
 
-    await expect(isLoggedIn(mockGetEmailAccount)).rejects.toThrow("No active tab");
+    await expect(isLoggedIn(mockGetEmailAccount)).rejects.toThrow(
+      "No active tab",
+    );
   });
 
   it("throws if getAuthenticatedEmail fails", async () => {
