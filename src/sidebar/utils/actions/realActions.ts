@@ -10,9 +10,30 @@ import {
   unsubscribeUsingMailTo,
   // unsubscribeUsingPostUrl,
 } from "../unsubscribeSenders";
+import {
+  getOAuthToken,
+  getAuthenticatedEmail,
+} from "../../../_shared/utils/auth";
 import { Actions } from "./types";
 
 export const realActions: Actions = {
+  async needsSignIn(): Promise<boolean> {
+    let token: chrome.identity.GetAuthTokenResult;
+    try {
+      token = await getOAuthToken(false);
+    } catch (error) {
+      return true; // If getOAuthToken rejects, user needs to sign in
+    }
+    const authEmail = await getAuthenticatedEmail(token);
+    const gmailEmail = await this.getEmailAccount();
+
+    if (authEmail !== gmailEmail) {
+      return true; // User is not logged in to the correct account
+    }
+
+    return false; // User is logged in, and into the correct account
+  },
+
   async getEmailAccount(): Promise<string> {
     return new Promise((resolve, reject) => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -41,16 +62,16 @@ export const realActions: Actions = {
     });
   },
 
-  searchEmailSenders(emails: string[]): void {
+  searchEmailSenders(senderEmailAddresses: string[]): void {
     // Searches for emails in the Gmail tab
 
-    console.log("Searching for emails: ", emails);
+    console.log("Searching for emails: ", senderEmailAddresses);
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(tabs[0].id, {
           type: "SEARCH_EMAIL_SENDERS",
-          emails: emails,
+          emails: senderEmailAddresses,
         });
       } else {
         console.error("No active tab found.");
@@ -58,16 +79,16 @@ export const realActions: Actions = {
     });
   },
 
-  async deleteSenders(emails: string[]): Promise<void> {
+  async deleteSenders(senderEmailAddresses: string[]): Promise<void> {
     // Moves the senders to trash using Gmail API
 
     return new Promise((resolve) => {
-      trashMultipleSenders(emails).then(() => {
+      trashMultipleSenders(senderEmailAddresses).then(() => {
         // Remove senders from local storage
         chrome.storage.local.get(["senders"], (result) => {
           if (result.senders) {
             const updatedSenders = result.senders.filter(
-              (sender: [string, string, number]) => !emails.includes(sender[0])
+              (sender: [string, string, number]) => !senderEmailAddresses.includes(sender[0])
             );
             chrome.storage.local.set({ senders: updatedSenders }, () => {
               console.log("Updated senders in local storage.");
@@ -145,18 +166,18 @@ export const realActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    emails: string[]
+    senderEmailAddresses: string[]
   ): Promise<ManualUnsubscribeData> {
     // Attempts to automatically unsubscribes from the given email addresses.
 
     // Get the latest message ids for each sender
-    console.log("Unsubscribing automatically from senders: ", emails);
+    console.log("Unsubscribing automatically from senders: ", senderEmailAddresses);
 
     // Get the latestMessageIds for the given emails from local storage
     const result = await chrome.storage.local.get(["senders"]);
     const messageIds: string[] = result.senders
       .filter((sender: [string, string, number, string]) =>
-        emails.includes(sender[0])
+        senderEmailAddresses.includes(sender[0])
       )
       .map((sender: [string, string, number, string]) => sender[3]);
 
@@ -178,10 +199,10 @@ export const realActions: Actions = {
         unsubscribeUsingMailTo(sender.mailto);
       } else if (sender.clickurl !== null) {
         // If only a click URL is available, store it for later use
-        linkOnlySenders.push([emails[index], sender.clickurl]);
+        linkOnlySenders.push([senderEmailAddresses[index], sender.clickurl]);
       } else {
         // No unsubscribe data found, so can only block
-        noUnsubscribeSenders.push(emails[index]);
+        noUnsubscribeSenders.push(senderEmailAddresses[index]);
       }
     });
 
@@ -191,9 +212,9 @@ export const realActions: Actions = {
     };
   },
 
-  async blockSender(senderEmail: string): Promise<void> {
+  async blockSender(senderEmailAddress: string): Promise<void> {
     const filter: gapi.client.gmail.Filter = {
-      criteria: { from: senderEmail },
+      criteria: { from: senderEmailAddress },
       action: { addLabelIds: ["TRASH"] },
     };
 
@@ -218,7 +239,7 @@ export const realActions: Actions = {
         );
       }
     } catch (err) {
-      console.error(`Failed to create block filter for ${senderEmail}:`, err);
+      console.error(`Failed to create block filter for ${senderEmailAddress}:`, err);
       throw err;
     }
   },

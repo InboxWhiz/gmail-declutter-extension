@@ -2,6 +2,12 @@ import { ManualUnsubscribeData, Sender } from "../../types/types";
 import { Actions } from "./types";
 
 export const mockActions: Actions = {
+  needsSignIn(): Promise<boolean> {
+    return new Promise((resolve) => {
+      resolve(false); // Simulate that the user does not need to sign in
+    });
+  },
+
   async getEmailAccount(): Promise<string> {
     return new Promise((resolve) => {
       resolve("usertest@gmail.com");
@@ -67,23 +73,23 @@ export const mockActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    emails: string[]
+    senderEmailAddresses: string[]
   ): Promise<ManualUnsubscribeData> {
     // Simulates unsubscribing senders automatically.
-    console.log("[MOCK] Automatically unsubscribing:", emails);
+    console.log("[MOCK] Automatically unsubscribing:", senderEmailAddresses);
     return new Promise((resolve) => {
       setTimeout(() => {
         const linkOnlySenders: [string, string][] = [];
         const noUnsubscribeSenders: string[] = [];
 
         // Carol & Dave: Mock that they have a click-link-only unsubscribe option
-        if (emails.includes("carol@email.com")) {
+        if (senderEmailAddresses.includes("carol@email.com")) {
           linkOnlySenders.push([
             "carol@email.com",
             "https://example.com/unsubscribe/carol",
           ]);
         }
-        if (emails.includes("dave@email.com")) {
+        if (senderEmailAddresses.includes("dave@email.com")) {
           linkOnlySenders.push([
             "dave@email.com",
             "https://example.com/unsubscribe/dave",
@@ -91,10 +97,10 @@ export const mockActions: Actions = {
         }
 
         // Eve & Frank: Mock that they have no unsubscribe option
-        if (emails.includes("eve@email.com")) {
+        if (senderEmailAddresses.includes("eve@email.com")) {
           noUnsubscribeSenders.push("eve@email.com");
         }
-        if (emails.includes("frank@email.com")) {
+        if (senderEmailAddresses.includes("frank@email.com")) {
           noUnsubscribeSenders.push("frank@email.com");
         }
 
@@ -110,7 +116,9 @@ export const mockActions: Actions = {
   async blockSender(senderEmailAddress: string): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(console.log(`[MOCK] Blocked ${senderEmailAddress} successfully`));
+        resolve(
+          console.log(`[MOCK] Blocked ${senderEmailAddress} successfully`)
+        );
       }, 1000);
     });
   },
