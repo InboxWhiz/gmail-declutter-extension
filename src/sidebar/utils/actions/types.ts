@@ -1,21 +1,20 @@
 import { ManualUnsubscribeData, Sender } from "../../types/types";
 
 export interface Actions {
-
   /**
-   * Determines whether the user needs to be shown the sign in page to use the extension.
+   * Determines whether the user is currently logged in and using the correct Gmail account for the extension.
    *
    * This method attempts to retrieve an OAuth token and checks if the authenticated
    * email matches the expected Gmail account. If the token retrieval fails, it is
-   * assumed that the user needs to sign in. If the authenticated email does not
+   * assumed that the user is not logged in. If the authenticated email does not
    * match the Gmail account, it returns `false` indicating the user is not logged
    * in to the correct account. Otherwise, it returns `true` indicating the user is
    * signed in and using the correct account.
    *
-   * @returns {Promise<boolean>} A promise that resolves to `true` if the user needs to sign in,
-   * or `false` if the user does not need to sign in.
+   * @returns {Promise<boolean>} A promise that resolves to `true` if the user is logged in
+   * and using the correct account, or `false` otherwise.
    */
-  needsSignIn(): Promise<boolean>;
+  isLoggedIn(): Promise<boolean>;
 
   /**
    * Retrieves the Gmail account associated with the currently active browser tab.

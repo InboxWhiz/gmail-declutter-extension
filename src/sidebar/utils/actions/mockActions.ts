@@ -2,9 +2,9 @@ import { ManualUnsubscribeData, Sender } from "../../types/types";
 import { Actions } from "./types";
 
 export const mockActions: Actions = {
-  needsSignIn(): Promise<boolean> {
+  isLoggedIn(): Promise<boolean> {
     return new Promise((resolve) => {
-      resolve(false); // Simulate that the user does not need to sign in
+      resolve(true); // Simulate that the user is already logged in
     });
   },
 

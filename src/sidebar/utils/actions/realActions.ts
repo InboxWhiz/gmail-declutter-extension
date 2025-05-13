@@ -17,21 +17,21 @@ import {
 import { Actions } from "./types";
 
 export const realActions: Actions = {
-  async needsSignIn(): Promise<boolean> {
+  async isLoggedIn(): Promise<boolean> {
     let token: chrome.identity.GetAuthTokenResult;
     try {
       token = await getOAuthToken(false);
     } catch (error) {
-      return true; // If getOAuthToken rejects, user needs to sign in
+      return false; // If getOAuthToken rejects, user needs to sign in
     }
     const authEmail = await getAuthenticatedEmail(token);
     const gmailEmail = await this.getEmailAccount();
 
     if (authEmail !== gmailEmail) {
-      return true; // User is not logged in to the correct account
+      return false; // User is not logged in to the correct account
     }
 
-    return false; // User is logged in, and into the correct account
+    return true; // User is logged in, and into the correct account
   },
 
   async getEmailAccount(): Promise<string> {
@@ -88,7 +88,8 @@ export const realActions: Actions = {
         chrome.storage.local.get(["senders"], (result) => {
           if (result.senders) {
             const updatedSenders = result.senders.filter(
-              (sender: [string, string, number]) => !senderEmailAddresses.includes(sender[0])
+              (sender: [string, string, number]) =>
+                !senderEmailAddresses.includes(sender[0])
             );
             chrome.storage.local.set({ senders: updatedSenders }, () => {
               console.log("Updated senders in local storage.");
@@ -171,7 +172,10 @@ export const realActions: Actions = {
     // Attempts to automatically unsubscribes from the given email addresses.
 
     // Get the latest message ids for each sender
-    console.log("Unsubscribing automatically from senders: ", senderEmailAddresses);
+    console.log(
+      "Unsubscribing automatically from senders: ",
+      senderEmailAddresses
+    );
 
     // Get the latestMessageIds for the given emails from local storage
     const result = await chrome.storage.local.get(["senders"]);
@@ -239,7 +243,10 @@ export const realActions: Actions = {
         );
       }
     } catch (err) {
-      console.error(`Failed to create block filter for ${senderEmailAddress}:`, err);
+      console.error(
+        `Failed to create block filter for ${senderEmailAddress}:`,
+        err
+      );
       throw err;
     }
   },
