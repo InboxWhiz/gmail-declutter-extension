@@ -1,25 +1,33 @@
 import { realActions } from "../../../src/sidebar/utils/actions/realActions";
+const { isLoggedIn } = realActions;
 import * as authModule from "../../../src/_shared/utils/auth";
-
-// Create a clone of realActions so we can mock getEmailAccount
-const testActions = {
-  ...realActions,
-  getEmailAccount: jest.fn(),
-};
 
 jest.mock("../../../src/_shared/utils/auth");
 const mockGetOAuthToken = authModule.getOAuthToken as jest.Mock;
 const mockGetAuthenticatedEmail = authModule.getAuthenticatedEmail as jest.Mock;
+const mockGetEmailAccount = jest.fn();
 
 describe("isLoggedIn", () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
+  it("calls getOAuthToken, getAuthenticatedEmail, and getEmailAccount", async () => {
+    mockGetOAuthToken.mockResolvedValueOnce("mock_token");
+    mockGetAuthenticatedEmail.mockResolvedValueOnce("user@example.com");
+    mockGetEmailAccount.mockResolvedValueOnce("user@example.com");
+
+    await isLoggedIn(mockGetEmailAccount);
+
+    expect(mockGetOAuthToken).toHaveBeenCalledWith(false);
+    expect(mockGetAuthenticatedEmail).toHaveBeenCalled();
+    expect(mockGetEmailAccount).toHaveBeenCalled();
+  });
+
   it("returns false when getOAuthToken throws", async () => {
     mockGetOAuthToken.mockRejectedValueOnce(new Error("Token fetch failed"));
 
-    const result = await testActions.isLoggedIn.call(testActions);
+    const result = await isLoggedIn();
     expect(result).toBe(false);
     expect(mockGetOAuthToken).toHaveBeenCalledWith(false);
   });
@@ -27,33 +35,33 @@ describe("isLoggedIn", () => {
   it("returns false when authenticated email does not match Gmail email", async () => {
     mockGetOAuthToken.mockResolvedValueOnce("mock_token");
     mockGetAuthenticatedEmail.mockResolvedValueOnce("auth@example.com");
-    (testActions.getEmailAccount as jest.Mock).mockResolvedValueOnce("gmail@example.com");
+    mockGetEmailAccount.mockResolvedValueOnce("gmail@example.com");
 
-    const result = await testActions.isLoggedIn.call(testActions);
+    const result = await isLoggedIn(mockGetEmailAccount);
     expect(result).toBe(false);
   });
 
   it("returns true when authenticated email matches Gmail email", async () => {
     mockGetOAuthToken.mockResolvedValueOnce("mock_token");
     mockGetAuthenticatedEmail.mockResolvedValueOnce("user@example.com");
-    (testActions.getEmailAccount as jest.Mock).mockResolvedValueOnce("user@example.com");
+    mockGetEmailAccount.mockResolvedValueOnce("user@example.com");
 
-    const result = await testActions.isLoggedIn.call(testActions);
+    const result = await isLoggedIn(mockGetEmailAccount);
     expect(result).toBe(true);
   });
 
   it("throws if getEmailAccount fails", async () => {
     mockGetOAuthToken.mockResolvedValueOnce("mock_token");
     mockGetAuthenticatedEmail.mockResolvedValueOnce("user@example.com");
-    (testActions.getEmailAccount as jest.Mock).mockRejectedValueOnce(new Error("No active tab"));
+    mockGetEmailAccount.mockRejectedValueOnce(new Error("No active tab"));
 
-    await expect(testActions.isLoggedIn.call(testActions)).rejects.toThrow("No active tab");
+    await expect(isLoggedIn(mockGetEmailAccount)).rejects.toThrow("No active tab");
   });
 
   it("throws if getAuthenticatedEmail fails", async () => {
     mockGetOAuthToken.mockResolvedValueOnce("mock_token");
     mockGetAuthenticatedEmail.mockRejectedValueOnce(new Error("Auth error"));
 
-    await expect(testActions.isLoggedIn.call(testActions)).rejects.toThrow("Auth error");
+    await expect(isLoggedIn()).rejects.toThrow("Auth error");
   });
 });

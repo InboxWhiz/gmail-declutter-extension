@@ -11,10 +11,11 @@ export interface Actions {
    * in to the correct account. Otherwise, it returns `true` indicating the user is
    * signed in and using the correct account.
    *
+   * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
    * @returns {Promise<boolean>} A promise that resolves to `true` if the user is logged in
    * and using the correct account, or `false` otherwise.
    */
-  isLoggedIn(): Promise<boolean>;
+  isLoggedIn(getEmailAccount?: () => Promise<string>): Promise<boolean>;
 
   /**
    * Retrieves the Gmail account associated with the currently active browser tab.

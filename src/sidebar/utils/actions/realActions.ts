@@ -17,7 +17,9 @@ import {
 import { Actions } from "./types";
 
 export const realActions: Actions = {
-  async isLoggedIn(): Promise<boolean> {
+  async isLoggedIn(
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+  ): Promise<boolean> {
     let token: chrome.identity.GetAuthTokenResult;
     try {
       token = await getOAuthToken(false);
@@ -25,7 +27,7 @@ export const realActions: Actions = {
       return false; // If getOAuthToken rejects, user needs to sign in
     }
     const authEmail = await getAuthenticatedEmail(token);
-    const gmailEmail = await this.getEmailAccount();
+    const gmailEmail = await getEmailAccount();
 
     if (authEmail !== gmailEmail) {
       return false; // User is not logged in to the correct account
