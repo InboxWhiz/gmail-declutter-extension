@@ -15,6 +15,7 @@ import {
   getAuthenticatedEmail,
 } from "../../../_shared/utils/auth";
 import { Actions } from "./types";
+import { signInWithGoogle } from "../../../_shared/utils/googleAuth";
 
 export const realActions: Actions = {
   async isLoggedIn(
@@ -35,6 +36,8 @@ export const realActions: Actions = {
 
     return true; // User is logged in, and into the correct account
   },
+
+  signInWithGoogle,
 
   async getEmailAccount(): Promise<string> {
     return new Promise((resolve, reject) => {
