@@ -5,7 +5,6 @@ const SCOPES = [
   "https://www.googleapis.com/auth/gmail.settings.basic",
   "https://www.googleapis.com/auth/userinfo.email",
 ];
-const REDIRECT_URI = chrome.identity.getRedirectURL();
 
 export async function signInWithGoogle(
   expectedEmailAddress: string
@@ -23,6 +22,7 @@ export async function signInWithGoogle(
 }
 
 function buildAuthUrl(expectedEmailAddress: string): string {
+  const REDIRECT_URI = chrome.identity.getRedirectURL();
   return (
     `https://accounts.google.com/o/oauth2/v2/auth` +
     `?client_id=${encodeURIComponent(CLIENT_ID)}` +

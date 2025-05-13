@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { ActionButton } from "./components/actionButton.tsx";
 import { ReloadButton } from "./components/reloadButton.tsx";
 import { ModalPopup } from "./components/modalPopup.tsx";
@@ -7,21 +7,22 @@ import { SendersContainer } from "./components/sendersContainer.tsx";
 import { DeclutterHeader } from "./components/header.tsx";
 import { useActions } from "./providers/actionsContext.tsx";
 import { LoginPage } from "./components/login-page/loginPage.tsx";
+import { useLoggedIn } from "./providers/loggedInContext.tsx";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const { isLoggedIn: checkLoggedIn } = useActions();
+  const { loggedIn, setLoggedIn } = useLoggedIn();
+  const { isLoggedIn } = useActions();
 
   useEffect(() => {
     const updateSignInStatus = async () => {
-      const loggedIn = await checkLoggedIn();
-      setIsLoggedIn(loggedIn);
+      const loggedIn = await isLoggedIn();
+      setLoggedIn(loggedIn);
     };
 
     updateSignInStatus();
-  }, [checkLoggedIn]);
+  }, [isLoggedIn]);
 
-  if (!isLoggedIn) {
+  if (!loggedIn) {
     return <LoginPage />;
   } else {
     return (

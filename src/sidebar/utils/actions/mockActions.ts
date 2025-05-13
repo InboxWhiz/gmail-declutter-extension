@@ -4,7 +4,7 @@ import { Actions } from "./types";
 export const mockActions: Actions = {
   async isLoggedIn(): Promise<boolean> {
     return new Promise((resolve) => {
-      resolve(true); // Simulate that the user is already logged in
+      resolve(false); // Simulate that the user is not logged in
     });
   },
 
@@ -14,6 +14,7 @@ export const mockActions: Actions = {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (expectedEmailAddress === "usertest@gmail.com") {
+          console.log("[MOCK] User authenticated successfully");
           resolve({
             token: "mock-oauth-token-123456",
             email: "usertest@gmail.com",

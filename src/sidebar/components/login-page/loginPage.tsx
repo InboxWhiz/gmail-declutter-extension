@@ -25,7 +25,7 @@ export function LoginPage() {
         to use InboxWhiz.
       </span>
       <div style={{ height: "30px" }}></div>
-      <GoogleAuthButton onAuthSuccess={() => {}} />
+      <GoogleAuthButton expectedEmailAddress={email ?? ""}/>
       <span id="email-account">{email}</span>
     </div>
   );
