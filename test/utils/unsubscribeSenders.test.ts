@@ -8,12 +8,12 @@ import {
 } from "../../src/sidebar/utils/unsubscribeSenders";
 
 // Mock dependencies
-import { getOAuthToken } from "../../src/auth";
+import { getOAuthToken } from "../../src/_shared/utils/auth";
 import {
   sleep,
   parseListUnsubscribeHeader,
 } from "../../src/sidebar/utils/utils";
-jest.mock("../../src/auth", () => ({
+jest.mock("../../src/_shared/utils/auth", () => ({
   getOAuthToken: jest.fn(),
 }));
 jest.mock("../../src/sidebar/utils/utils", () => ({
