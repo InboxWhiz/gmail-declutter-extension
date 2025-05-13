@@ -27,7 +27,9 @@ export interface Actions {
    * @param expectedEmailAddress - The expected email address of the user.
    * @returns {Promise<{ token: string; email: string }>} A promise that resolves to an object containing the user's OAuth token and email address upon successful authentication.
    */
-  signInWithGoogle(expectedEmailAddress: string): Promise<{ token: string; email: string }>;
+  signInWithGoogle(
+    expectedEmailAddress: string
+  ): Promise<{ token: string; email: string }>;
 
   /**
    * Retrieves the Gmail account associated with the currently active browser tab.
@@ -54,7 +56,10 @@ export interface Actions {
    * @param senderEmailAddresses - An array of sender email addresses to be deleted.
    * @returns A Promise that resolves when the senders have been trashed and removed from local storage.
    */
-  deleteSenders(senderEmailAddresses: string[]): Promise<void>;
+  deleteSenders(
+    senderEmailAddresses: string[],
+    accountEmail: string
+  ): Promise<void>;
 
   /**
    * Retrieves all senders from local storage, optionally fetching new data from the server.

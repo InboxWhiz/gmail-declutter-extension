@@ -19,7 +19,7 @@ import { signInWithGoogle } from "../../../_shared/utils/googleAuth";
 
 export const realActions: Actions = {
   async isLoggedIn(
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
   ): Promise<boolean> {
     let token: chrome.identity.GetAuthTokenResult;
     try {
@@ -55,13 +55,13 @@ export const realActions: Actions = {
             if (chrome.runtime.lastError) {
               console.error(
                 "Could not get email account:",
-                chrome.runtime.lastError,
+                chrome.runtime.lastError
               );
               reject(chrome.runtime.lastError.message);
             } else {
               resolve(response.result);
             }
-          },
+          }
         );
       });
     });
@@ -84,21 +84,27 @@ export const realActions: Actions = {
     });
   },
 
-  async deleteSenders(senderEmailAddresses: string[]): Promise<void> {
+  async deleteSenders(
+    senderEmailAddresses: string[],
+    accountEmail: string
+  ): Promise<void> {
     // Moves the senders to trash using Gmail API
 
     return new Promise((resolve) => {
       trashMultipleSenders(senderEmailAddresses).then(() => {
         // Remove senders from local storage
-        chrome.storage.local.get(["senders"], (result) => {
-          if (result.senders) {
-            const updatedSenders = result.senders.filter(
+        chrome.storage.local.get([accountEmail], (result) => {
+          if (result[accountEmail].senders) {
+            const updatedSenders = result[accountEmail].senders.filter(
               (sender: [string, string, number]) =>
-                !senderEmailAddresses.includes(sender[0]),
+                !senderEmailAddresses.includes(sender[0])
             );
-            chrome.storage.local.set({ senders: updatedSenders }, () => {
-              console.log("Updated senders in local storage.");
-            });
+            chrome.storage.local.set(
+              { [accountEmail]: { senders: updatedSenders } },
+              () => {
+                console.log("Updated senders in local storage.");
+              }
+            );
           }
         });
 
