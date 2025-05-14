@@ -4,16 +4,16 @@ import {
 } from "../../src/sidebar/utils/trashSenders";
 const { trashSender } = exportForTest;
 
-import { getOAuthToken } from "../../src/_shared/utils/auth";
 
 // Mock dependencies
-jest.mock("../../src/_shared/utils/auth");
-const mockToken = "mock-token" as chrome.identity.GetAuthTokenResult;
+import { getValidToken } from "../../src/_shared/utils/googleAuth";
+jest.mock("../../src/_shared/utils/googleAuth");
+const mockToken = "mock-token";
 global.fetch = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
-  (getOAuthToken as jest.Mock).mockResolvedValue("mock-token");
+  (getValidToken as jest.Mock).mockResolvedValue(mockToken);
 });
 
 describe("trashMultipleSenders", () => {
@@ -26,11 +26,11 @@ describe("trashMultipleSenders", () => {
       .mockResolvedValueOnce(5);
 
     // Act
-    const result = await trashMultipleSenders(senders, mockTrashSender);
+    const result = await trashMultipleSenders(senders, "testemail@test.com", mockTrashSender);
 
     // Assert
     expect(result).toBe(8);
-    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(getValidToken).toHaveBeenCalledTimes(1);
     expect(mockTrashSender).toHaveBeenCalledTimes(2);
     expect(mockTrashSender).toHaveBeenCalledWith(
       mockToken,
@@ -50,7 +50,7 @@ describe("trashSender", () => {
     const mockResponse = {
       messages: [{ id: "123" }, { id: "456" }],
     };
-    (getOAuthToken as jest.Mock).mockResolvedValue(mockToken);
+    (getValidToken as jest.Mock).mockResolvedValue(mockToken);
     (fetch as jest.Mock).mockResolvedValueOnce({
       json: () => Promise.resolve(mockResponse),
     });

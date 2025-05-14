@@ -1,19 +1,40 @@
-import { getOAuthToken } from "../../_shared/utils/auth";
+import { getValidToken } from "../../_shared/utils/googleAuth";
 
+/**
+ * Trashes emails from multiple senders.
+ *
+ * @param senders - An array of sender email addresses whose emails should be trashed.
+ * @param emailAddress - The email address of the user wanting to trash the emails.
+ * @param trashSenderFunc - (Optional) A function to trash emails from a single sender. Defaults to `trashSender`.
+ * @returns The total number of emails trashed across all specified senders.
+ */
 export async function trashMultipleSenders(
   senders: string[],
+  emailAddress: string,
   trashSenderFunc = trashSender,
 ) {
-  let totalEmailsTrashed: number = 0;
-  const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
+  let totalEmailsTrashed = 0;
+  const token = await getValidToken(emailAddress);
   for (const sender of senders) {
     totalEmailsTrashed += await trashSenderFunc(token, sender);
   }
   return totalEmailsTrashed;
 }
 
+/**
+ * Moves all emails from a specified sender to the Trash in the user's Gmail account.
+ *
+ * @param token - The OAuth 2.0 access token for authenticating with the Gmail API.
+ * @param senderEmail - The email address of the sender whose messages should be trashed.
+ * @returns A promise that resolves to the number of emails moved to Trash.
+ *
+ * @remarks
+ * - Searches for up to 500 messages from the specified sender.
+ * - Each found message is moved to the Trash using the Gmail API.
+ * - If no messages are found, returns 0.
+ */
 async function trashSender(
-  token: chrome.identity.GetAuthTokenResult,
+  token: string,
   senderEmail: string,
 ) {
   const headers = {
