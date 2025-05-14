@@ -5,6 +5,35 @@ const SCOPES = [
   "https://www.googleapis.com/auth/gmail.settings.basic",
   "https://www.googleapis.com/auth/userinfo.email",
 ];
+const TOKEN_LIFESPAN = 3600 * 1000; // 1 hour
+
+/**
+ * Retrieves a valid OAuth token for the specified email address.
+ * 
+ * This function first attempts to retrieve a cached token. If a valid cached token exists,
+ * it verifies the token and returns it. If the cached token is missing, expired, or invalid,
+ * it initiates a new authentication flow to obtain a fresh token, caches it, and returns it.
+ *
+ * @param emailAddress - The email address for which to retrieve the token.
+ * @returns A promise that resolves to a valid OAuth token as a string.
+ */
+export async function getValidToken(emailAddress: string): Promise<string> {
+  const cached = await getCachedToken(emailAddress);
+
+  // If a cached token exists and is still valid, return it
+  if (cached && Date.now() < cached.expiresAt) {
+    const isValid = await verifyToken(cached.token);
+    if (isValid) {
+      return cached.token;
+    }
+  }
+
+  // If not, get a new token via WebAuthFlow
+  const { token: newToken } = await signInWithGoogle(emailAddress);
+
+  await cacheToken(emailAddress, newToken);
+  return newToken;
+}
 
 /**
  * Initiates the Google sign-in process for the specified email address.
@@ -100,4 +129,62 @@ async function fetchUserEmail(token: string): Promise<string> {
 
   const data = await res.json();
   return data.email;
+}
+
+/**
+ * Caches a Google authentication token for a specific email address in Chrome's local storage.
+ *
+ * @param emailAddress - The email address to associate with the cached token.
+ * @param token - The Google authentication token to cache.
+ * @returns A promise that resolves when the token has been cached.
+ */
+async function cacheToken(emailAddress: string, token: string): Promise<void> {
+  const existing = (await chrome.storage.local.get("googleAuth")).googleAuth || {};
+  await chrome.storage.local.set({
+    googleAuth: {
+      ...existing,
+      [emailAddress]: {
+        token,
+        expiresAt: Date.now() + TOKEN_LIFESPAN,
+      },
+    },
+  });
+}
+
+/**
+ * Retrieves a cached Google authentication token and its expiration time for a given email address from Chrome's local storage.
+ *
+ * @param email - The email address associated with the cached token.
+ * @returns A promise that resolves to an object containing the token and its expiration timestamp,
+ *          or `null` if no valid cached token is found for the specified email.
+ */
+async function getCachedToken(email: string): Promise<{ token: string; expiresAt: number } | null> {
+  const data = await chrome.storage.local.get("googleAuth");
+  const user = data.googleAuth?.[email];
+
+  if (!user || !user.token || !user.expiresAt) {
+    return null;
+  }
+
+  return {
+    token: user.token,
+    expiresAt: user.expiresAt,
+  };
+}
+
+/**
+ * Verifies the validity of a Google OAuth2 access token by making a request to the Google UserInfo API.
+ *
+ * @param token - The OAuth2 access token to verify.
+ * @returns A promise that resolves to `true` if the token is valid (response status 200), or `false` otherwise.
+ */
+async function verifyToken(token: string): Promise<boolean> {
+  try {
+    const res = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.status === 200;
+  } catch {
+    return false;
+  }
 }
