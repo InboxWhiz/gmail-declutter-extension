@@ -3,13 +3,17 @@ import {
   exportForTest,
 } from "../../src/sidebar/utils/fetchSenders";
 const {
-  fetchMessageIds,
+  fetchAllMessageIds,
+  fetchMessageIdsPage,
   fetchMessageSenderSingle,
   updateSenders,
   storeSenders,
 } = exportForTest;
 
 // Mock dependencies
+import { getValidToken } from "../../src/_shared/utils/googleAuth";
+jest.mock("../../src/_shared/utils/googleAuth");
+const mockToken = "mock-token";
 import { sleep } from "../../src/sidebar/utils/utils";
 jest.mock("../../src/sidebar/utils/utils", () => {
   const originalModule = jest.requireActual("../../src/sidebar/utils/utils");
@@ -27,6 +31,11 @@ jest.mock("../../src/sidebar/utils/utils", () => {
   },
 };
 global.fetch = jest.fn();
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  (getValidToken as jest.Mock).mockResolvedValue(mockToken);
+});
 
 describe("fetchAllSenders", () => {
   beforeEach(() => {
@@ -62,9 +71,10 @@ describe("fetchAllSenders", () => {
     });
 
     // Act
-    await fetchAllSenders("mock-token", "testemail@test.com");
+    await fetchAllSenders("testemail@test.com");
 
     // Assert
+    expect(getValidToken).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledTimes(3); // One for message ids, one for each message metadata
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
       "testemail@test.com": {
@@ -113,7 +123,7 @@ describe("fetchAllSenders", () => {
     });
 
     // Act
-    await fetchAllSenders("mock-token", "testemail@test.com");
+    await fetchAllSenders("testemail@test.com");
 
     // Assert
     expect(fetch).toHaveBeenCalledTimes(4);
@@ -150,7 +160,7 @@ describe("fetchAllSenders", () => {
     });
 
     // Act
-    await fetchAllSenders("mock-token", "testemail@test.com");
+    await fetchAllSenders("testemail@test.com");
 
     // Assert
     expect(sleep).toHaveBeenCalledWith(1000);
@@ -184,7 +194,7 @@ describe("fetchAllSenders", () => {
     }
 
     // Act
-    await fetchAllSenders("mock-token", "testemail@test.com");
+    await fetchAllSenders("testemail@test.com");
 
     // Assert
     // There should be 2 calls to chrome.storage.local.set with fetchProgress (one per batch)
@@ -201,7 +211,66 @@ describe("fetchAllSenders", () => {
   });
 });
 
-describe("fetchMessageIds", () => {
+describe("fetchAllMessageIds", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("fetches and combines message IDs across multiple pages", async () => {
+    // Arrange
+    const mockFetchPage = jest
+      .fn()
+      .mockResolvedValueOnce({
+        messageIds: ["id1", "id2"],
+        nextPage: "page2",
+      })
+      .mockResolvedValueOnce({
+        messageIds: ["id3", "id4"],
+        nextPage: null,
+      });
+
+    // Act
+    const result = await fetchAllMessageIds(mockToken, mockFetchPage);
+
+    // Assert
+    expect(result).toEqual(["id1", "id2", "id3", "id4"]);
+    expect(mockFetchPage).toHaveBeenCalledTimes(2);
+    expect(mockFetchPage).toHaveBeenNthCalledWith(1, mockToken, null);
+    expect(mockFetchPage).toHaveBeenNthCalledWith(2, mockToken, "page2");
+  });
+
+  it("works with a single page of message IDs", async () => {
+    // Arrange
+    const mockFetchPage = jest.fn().mockResolvedValueOnce({
+      messageIds: ["id1", "id2"],
+      nextPage: null,
+    });
+
+    // Act
+    const result = await fetchAllMessageIds(mockToken, mockFetchPage);
+
+    // Assert
+    expect(result).toEqual(["id1", "id2"]);
+    expect(mockFetchPage).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns an empty array if there are no messages", async () => {
+    // Arrange
+    const mockFetchPage = jest.fn().mockResolvedValueOnce({
+      messageIds: [],
+      nextPage: null,
+    });
+
+    // Act
+    const result = await fetchAllMessageIds(mockToken, mockFetchPage);
+
+    // Assert
+    expect(result).toEqual([]);
+    expect(mockFetchPage).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("fetchMessageIdsPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -214,7 +283,7 @@ describe("fetchMessageIds", () => {
       }),
     });
 
-    const result = await fetchMessageIds("mock-token", null);
+    const result = await fetchMessageIdsPage(mockToken, null);
 
     expect(result).toEqual({
       messageIds: ["abc123", "xyz456"],
@@ -233,7 +302,7 @@ describe("fetchMessageIds", () => {
     });
 
     // Act
-    const result = await fetchMessageIds("mock-token", null);
+    const result = await fetchMessageIdsPage(mockToken, null);
 
     // Assert
     expect(sleep).toHaveBeenCalledWith(1000);
@@ -255,7 +324,7 @@ describe("fetchMessageSenderSingle", () => {
       }),
     });
 
-    const sender = await fetchMessageSenderSingle("mock-token", "123");
+    const sender = await fetchMessageSenderSingle(mockToken, "123");
 
     expect(sender).toStrictEqual({
       senderEmail: "test@example.com",
@@ -273,7 +342,7 @@ describe("fetchMessageSenderSingle", () => {
       }),
     });
 
-    const sender = await fetchMessageSenderSingle("mock-token", "123");
+    const sender = await fetchMessageSenderSingle(mockToken, "123");
 
     expect(sender).toStrictEqual({
       senderEmail: "null",
