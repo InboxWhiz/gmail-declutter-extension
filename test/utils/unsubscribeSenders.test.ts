@@ -1,21 +1,23 @@
 import {
   getMultipleUnsubscribeData,
-  getUnsubscribeData,
-  getListUnsubscribeHeader,
-  getUnsubscribeLinkFromBody,
   unsubscribeUsingMailTo,
   unsubscribeUsingPostUrl,
+  exportForTest,
 } from "../../src/sidebar/utils/unsubscribeSenders";
+const {
+  getListUnsubscribeHeader,
+  getUnsubscribeLinkFromBody,
+  getUnsubscribeData,
+} = exportForTest;
 
 // Mock dependencies
-import { getOAuthToken } from "../../src/_shared/utils/auth";
+import { getValidToken } from "../../src/_shared/utils/googleAuth";
+jest.mock("../../src/_shared/utils/googleAuth");
+const mockToken = "mock-token";
 import {
   sleep,
   parseListUnsubscribeHeader,
 } from "../../src/sidebar/utils/utils";
-jest.mock("../../src/_shared/utils/auth", () => ({
-  getOAuthToken: jest.fn(),
-}));
 jest.mock("../../src/sidebar/utils/utils", () => ({
   sleep: jest.fn(),
   parseListUnsubscribeHeader: jest.fn().mockReturnValue({
@@ -30,24 +32,27 @@ global.fetch = jest.fn();
 
 describe("getMultipleUnsubscribeData", () => {
   const mockGetUnsubscribeData = jest.fn();
-  const dummyToken = "token-123";
 
   beforeEach(() => {
     // Always resolve the token
-    (getOAuthToken as jest.Mock).mockResolvedValue(dummyToken);
+    (getValidToken as jest.Mock).mockResolvedValue(mockToken);
   });
 
   afterEach(() => {
     mockGetUnsubscribeData.mockReset();
-    (getOAuthToken as jest.Mock).mockReset();
+    (getValidToken as jest.Mock).mockReset();
   });
 
   it("returns an empty array without calling getUnsubscribeData when given no IDs", async () => {
     // Act
-    const result = await getMultipleUnsubscribeData([], mockGetUnsubscribeData);
+    const result = await getMultipleUnsubscribeData(
+      [],
+      "testemail@test.com",
+      mockGetUnsubscribeData
+    );
 
     // Assert
-    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(getValidToken).toHaveBeenCalledTimes(1);
     expect(mockGetUnsubscribeData).not.toHaveBeenCalled();
     expect(result).toEqual([]);
   });
@@ -61,13 +66,14 @@ describe("getMultipleUnsubscribeData", () => {
     // Act
     const result = await getMultipleUnsubscribeData(
       [messageId],
-      mockGetUnsubscribeData,
+      "testemail@test.com",
+      mockGetUnsubscribeData
     );
 
     // Assert
-    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(getValidToken).toHaveBeenCalledTimes(1);
     expect(mockGetUnsubscribeData).toHaveBeenCalledTimes(1);
-    expect(mockGetUnsubscribeData).toHaveBeenCalledWith(messageId, dummyToken);
+    expect(mockGetUnsubscribeData).toHaveBeenCalledWith(messageId, mockToken);
     expect(result).toEqual([expectedData]);
   });
 
@@ -83,14 +89,15 @@ describe("getMultipleUnsubscribeData", () => {
     // Act
     const result = await getMultipleUnsubscribeData(
       ids,
-      mockGetUnsubscribeData,
+      "testemail@test.com",
+      mockGetUnsubscribeData
     );
 
     // Assert
-    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(getValidToken).toHaveBeenCalledTimes(1);
     expect(mockGetUnsubscribeData).toHaveBeenCalledTimes(2);
-    expect(mockGetUnsubscribeData.mock.calls[0]).toEqual(["idA", dummyToken]);
-    expect(mockGetUnsubscribeData.mock.calls[1]).toEqual(["idB", dummyToken]);
+    expect(mockGetUnsubscribeData.mock.calls[0]).toEqual(["idA", mockToken]);
+    expect(mockGetUnsubscribeData.mock.calls[1]).toEqual(["idB", mockToken]);
     expect(result).toEqual([dataA, dataB]);
   });
 });
@@ -116,7 +123,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock,
+      linkMock
     );
 
     // Assert
@@ -135,7 +142,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock,
+      linkMock
     );
 
     // Assert
@@ -153,7 +160,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock,
+      linkMock
     );
 
     expect(headerMock).toHaveBeenCalledWith(messageId, token);
@@ -170,7 +177,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock,
+      linkMock
     );
 
     expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
@@ -413,7 +420,7 @@ describe("unsubscribeUsingPostUrl", () => {
 
     // Expect the promise to reject with appropriate error message
     await expect(unsubscribeUsingPostUrl(testUrl)).rejects.toThrow(
-      "Failed to unsubscribe using POST URL: 400 Bad Request",
+      "Failed to unsubscribe using POST URL: 400 Bad Request"
     );
 
     // Verify fetch was called correctly
@@ -429,7 +436,7 @@ describe("unsubscribeUsingMailTo", () => {
   const token = "mock-token";
 
   beforeEach(() => {
-    (getOAuthToken as jest.Mock).mockResolvedValue(token);
+    (getValidToken as jest.Mock).mockResolvedValue(token);
     global.fetch = jest.fn().mockResolvedValue({ ok: true });
   });
 
@@ -438,17 +445,17 @@ describe("unsubscribeUsingMailTo", () => {
   });
 
   it("sends a correctly formatted raw message via Gmail API", async () => {
-    await expect(unsubscribeUsingMailTo(email)).resolves.toBeUndefined();
+    await expect(unsubscribeUsingMailTo(email, "testemail@test.com")).resolves.toBeUndefined();
 
     // Verify token retrieval
-    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(getValidToken).toHaveBeenCalledTimes(1);
 
     // Verify fetch call
     const fetchMock = (global.fetch as jest.Mock).mock;
     expect(fetchMock.calls.length).toBe(1);
     const [url, options] = fetchMock.calls[0];
     expect(url).toBe(
-      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
     );
     expect(options.method).toBe("POST");
     expect(options.headers.Authorization).toBe(`Bearer ${token}`);
@@ -479,10 +486,10 @@ describe("unsubscribeUsingMailTo", () => {
       statusText: "Server Error",
     });
 
-    await expect(unsubscribeUsingMailTo(email)).rejects.toThrow(
-      "Gmail API error: 500 Server Error",
+    await expect(unsubscribeUsingMailTo(email, "testemail@test.com")).rejects.toThrow(
+      "Gmail API error: 500 Server Error"
     );
-    expect(getOAuthToken).toHaveBeenCalledTimes(1);
+    expect(getValidToken).toHaveBeenCalledTimes(1);
     expect((global.fetch as jest.Mock).mock.calls.length).toBe(1);
   });
 });

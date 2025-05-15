@@ -1,12 +1,21 @@
-import { getOAuthToken } from "../../_shared/utils/auth";
+import { getValidToken } from "../../_shared/utils/googleAuth";
 import { sleep, parseListUnsubscribeHeader } from "./utils";
 import { UnsubscribeData } from "../types/types";
 
+/**
+ * Retrieves unsubscribe data from multiple email messages.
+ *
+ * @param messageIds - An array of Gmail message IDs to fetch unsubscribe data for.
+ * @param userEmail - The email address of the user whose token will be used for authentication.
+ * @param getUnsubscribeDataFunc - (Optional) A function to fetch unsubscribe data for a single message. Defaults to `getUnsubscribeData`.
+ * @returns A promise that resolves to an array of `UnsubscribeData` objects, each corresponding to a message ID.
+ */
 export async function getMultipleUnsubscribeData(
   messageIds: string[],
+  userEmail: string,
   getUnsubscribeDataFunc = getUnsubscribeData,
 ): Promise<UnsubscribeData[]> {
-  const token: chrome.identity.GetAuthTokenResult = await getOAuthToken();
+  const token = await getValidToken(userEmail);
   const unsubscribeData: UnsubscribeData[] = [];
 
   for (const messageId of messageIds) {
@@ -17,7 +26,74 @@ export async function getMultipleUnsubscribeData(
   return unsubscribeData;
 }
 
-export async function getUnsubscribeData(
+/**
+ * Sends a POST request to the specified URL to perform an unsubscribe action.
+ *
+ * @param url - The URL to which the POST request should be sent for unsubscribing.
+ * @throws Will throw an error if the response is not successful.
+ * @returns A promise that resolves when the unsubscribe action is completed successfully.
+ */
+export async function unsubscribeUsingPostUrl(url: string): Promise<void> {
+  const response = await fetch(url, { method: "POST" });
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to unsubscribe using POST URL: ${response.status} ${response.statusText}`,
+    );
+  }
+  console.log(`Unsubscribed using POST URL: ${url}`);
+}
+
+/**
+ * Sends an unsubscribe email using the Gmail API and a provided mailto email address.
+ *
+ * This function retrieves a valid OAuth token for the specified user, constructs an email message
+ * to the given mailto address, and sends it via the Gmail API to attempt to unsubscribe the user.
+ *
+ * @param mailtoEmail - The email address to send the unsubscribe request to (usually from a "mailto" unsubscribe link).
+ * @param userEmail - The email address of the user performing the unsubscribe action.
+ * @throws Will throw an error if the Gmail API request fails.
+ */
+export async function unsubscribeUsingMailTo(mailtoEmail: string, userEmail: string) {
+  // Get OAuth token
+  const token = await getValidToken(userEmail);
+
+  // Create message
+  const message: string = buildEmailMessage(mailtoEmail, );
+
+  // Send message using Gmail API
+  const response = await fetch(
+    "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ raw: message }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Gmail API error: ${response.status} ${response.statusText}`,
+    );
+  }
+  console.log(`Unsubscribed using mailto: ${mailtoEmail}`);
+}
+
+/**
+ * Retrieves unsubscribe information for a given email message by first checking the message headers
+ * for standard unsubscribe data (mailto or post URLs). If no mailto link is found in the headers,
+ * it attempts to extract a clickable unsubscribe link from the email body.
+ *
+ * @param messageId - The unique identifier of the email message to process.
+ * @param token - An authentication token required to access the email data.
+ * @param getHeader - (Optional) A function to extract unsubscribe data from the message headers. Defaults to `getListUnsubscribeHeader`.
+ * @param getClickLink - (Optional) A function to extract an unsubscribe link from the message body. Defaults to `getUnsubscribeLinkFromBody`.
+ * @returns A promise that resolves to an `UnsubscribeData` object containing available unsubscribe methods (mailto, posturl, clickurl).
+ */
+async function getUnsubscribeData(
   messageId: string,
   token: any,
   getHeader = getListUnsubscribeHeader,
@@ -39,7 +115,20 @@ export async function getUnsubscribeData(
   };
 }
 
-export async function getListUnsubscribeHeader(
+/**
+ * Retrieves and parses the "List-Unsubscribe" header from a specific Gmail message.
+ *
+ * @param messageId - The Gmail ID of the message to inspect.
+ * @param token - The OAuth2 access token used for authenticating the Gmail API request.
+ * @returns A promise that resolves to an `UnsubscribeData` object containing parsed unsubscribe information,
+ *          or empty values if the header is not found or an error occurs.
+ *
+ * @remarks
+ * - Handles Gmail API rate limiting by retrying the request after a delay if a 429 status is encountered.
+ * - Utilizes the Gmail API to fetch only the "List-Unsubscribe" header for efficiency.
+ * - Returns default empty unsubscribe data if the request fails.
+ */
+async function getListUnsubscribeHeader(
   messageId: string,
   token: any,
 ): Promise<UnsubscribeData> {
@@ -79,7 +168,18 @@ export async function getListUnsubscribeHeader(
   }
 }
 
-export async function getUnsubscribeLinkFromBody(
+/**
+ * Retrieves the clickable unsubscribe link from the HTML body of a Gmail message.
+ *
+ * This function fetches the full message using the Gmail API, decodes the HTML body,
+ * and attempts to extract an unsubscribe link from an anchor tag with the text "unsubscribe".
+ * If the Gmail API rate limit is hit (HTTP 429), the function waits and retries automatically.
+ *
+ * @param messageId - The The Gmail ID of the message to inspect.
+ * @param token - The OAuth 2.0 access token for authenticating with the Gmail API.
+ * @returns A promise that resolves to the unsubscribe link as a string, or `null` if not found or on error.
+ */
+async function getUnsubscribeLinkFromBody(
   messageId: string,
   token: any,
 ): Promise<string | null> {
@@ -126,47 +226,13 @@ export async function getUnsubscribeLinkFromBody(
   }
 }
 
-export async function unsubscribeUsingPostUrl(url: string) {
-  const response = await fetch(url, { method: "POST" });
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to unsubscribe using POST URL: ${response.status} ${response.statusText}`,
-    );
-  }
-  console.log(`Unsubscribed using POST URL: ${url}`);
-}
-
-export async function unsubscribeUsingMailTo(email: string) {
-  // Get OAuth token
-  const token = await getOAuthToken();
-
-  // Create message
-  const message: string = buildEmailMessage(email);
-
-  // Send message using Gmail API
-  const response = await fetch(
-    "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ raw: message }),
-    },
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Gmail API error: ${response.status} ${response.statusText}`,
-    );
-  }
-  console.log(`Unsubscribed using mailto: ${email}`);
-}
-
+/**
+ * Constructs and encodes an email message to send to the recipient for unsubscribing, formatted for Gmail API usage.
+ *
+ * @param recipient - The email address to which the unsubscribe message will be sent.
+ * @returns The base64url-encoded email message as a string.
+ */
 function buildEmailMessage(recipient: string) {
-  // Constructs and encodes an email message to send to the recipient for unsubscribing.
   const rawLines = [
     `To: ${recipient}`,
     "Subject: unsubscribe",
@@ -184,3 +250,9 @@ function buildEmailMessage(recipient: string) {
 
   return encoded;
 }
+
+export const exportForTest = {
+  getListUnsubscribeHeader,
+  getUnsubscribeLinkFromBody,
+  getUnsubscribeData,
+};
