@@ -177,27 +177,30 @@ export const realActions: Actions = {
 
   async unsubscribeSendersAuto(
     senderEmailAddresses: string[],
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
   ): Promise<ManualUnsubscribeData> {
-    // Attempts to automatically unsubscribes from the given email addresses.
+    const accountEmail = await getEmailAccount();
 
     // Get the latest message ids for each sender
     console.log(
       "Unsubscribing automatically from senders: ",
-      senderEmailAddresses,
+      senderEmailAddresses
     );
 
     // Get the latestMessageIds for the given emails from local storage
     const result = await chrome.storage.local.get(["senders"]);
     const messageIds: string[] = result.senders
       .filter((sender: [string, string, number, string]) =>
-        senderEmailAddresses.includes(sender[0]),
+        senderEmailAddresses.includes(sender[0])
       )
       .map((sender: [string, string, number, string]) => sender[3]);
 
     console.log("Message IDs for unsubscribe: ", messageIds);
     // Get the unsubscribe data for all the message ids
-    const unsubscribeData: UnsubscribeData[] =
-      await getMultipleUnsubscribeData(messageIds);
+    const unsubscribeData: UnsubscribeData[] = await getMultipleUnsubscribeData(
+      messageIds,
+      accountEmail
+    );
 
     console.log("Unsubscribe data: ", unsubscribeData);
 
@@ -209,7 +212,7 @@ export const realActions: Actions = {
       //   unsubscribeUsingPostUrl(sender.posturl);
       // } else if (sender.mailto !== null) {
       if (sender.mailto !== null) {
-        unsubscribeUsingMailTo(sender.mailto);
+        unsubscribeUsingMailTo(sender.mailto, accountEmail);
       } else if (sender.clickurl !== null) {
         // If only a click URL is available, store it for later use
         linkOnlySenders.push([senderEmailAddresses[index], sender.clickurl]);

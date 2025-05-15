@@ -98,6 +98,7 @@ export interface Actions {
    */
   unsubscribeSendersAuto(
     senderEmailAddresses: string[],
+    getEmailAccount?: () => Promise<string>
   ): Promise<ManualUnsubscribeData>;
 
   /**

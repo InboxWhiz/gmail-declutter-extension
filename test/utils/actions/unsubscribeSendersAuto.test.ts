@@ -44,6 +44,9 @@ describe("unsubscribeSendersAuto", () => {
     { posturl: null, mailto: null, clickurl: null },
   ];
 
+  const accountEmail = "test@example.com";
+  const mockGetEmailAccount = jest.fn().mockResolvedValue(accountEmail);
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -60,20 +63,18 @@ describe("unsubscribeSendersAuto", () => {
       senders: mockSenders,
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue(
-      mockUnsubscribeData,
+      mockUnsubscribeData
     );
 
     // Act
-    await unsubscribeSendersAuto(emails);
+    await unsubscribeSendersAuto(emails, mockGetEmailAccount);
 
     // Assert
     expect(getMultipleUnsubscribeData).toHaveBeenCalledTimes(1);
-    expect(getMultipleUnsubscribeData).toHaveBeenCalledWith([
-      "message-id-1",
-      "message-id-2",
-      "message-id-3",
-      "message-id-4",
-    ]);
+    expect(getMultipleUnsubscribeData).toHaveBeenCalledWith(
+      ["message-id-1", "message-id-2", "message-id-3", "message-id-4"],
+      accountEmail
+    );
   });
 
   it("should call unsubscribeUsingMailTo when mailto is present", async () => {
@@ -87,12 +88,13 @@ describe("unsubscribeSendersAuto", () => {
     ]);
 
     // Act
-    await unsubscribeSendersAuto(emails);
+    await unsubscribeSendersAuto(emails, mockGetEmailAccount);
 
     // Assert
     expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
     expect(unsubscribeUsingMailTo).toHaveBeenCalledWith(
       "mailto:unsubscribe@sender.com",
+      accountEmail
     );
   });
 
@@ -107,7 +109,7 @@ describe("unsubscribeSendersAuto", () => {
     ]);
 
     // Act
-    await unsubscribeSendersAuto(emails);
+    await unsubscribeSendersAuto(emails, mockGetEmailAccount);
 
     // Assert: Neither method should be called
     expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
