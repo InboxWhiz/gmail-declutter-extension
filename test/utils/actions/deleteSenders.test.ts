@@ -18,6 +18,7 @@ jest.mock("../../../src/sidebar/utils/trashSenders", () => ({
 
 describe("deleteSenders", () => {
   const accountEmail = "testuseraccount@example.com";
+  const mockGetEmailAccount = jest.fn().mockResolvedValue(accountEmail);
 
   test("should trash senders and update local storage", async () => {
     const emails = ["test@example.com", "user@example.com"];
@@ -46,7 +47,7 @@ describe("deleteSenders", () => {
     );
 
     // Call the function and wait for the promise to resolve
-    await deleteSenders(emails, accountEmail);
+    await deleteSenders(emails, mockGetEmailAccount);
 
     // We expect trashMultipleSenders to have been called with the emails
     expect(trashMultipleSenders).toHaveBeenCalledWith(emails, accountEmail);

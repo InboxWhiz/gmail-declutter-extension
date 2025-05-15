@@ -54,11 +54,12 @@ export interface Actions {
    * and then removes the corresponding senders from local storage.
    *
    * @param senderEmailAddresses - An array of sender email addresses to be deleted.
+   * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
    * @returns A Promise that resolves when the senders have been trashed and removed from local storage.
    */
   deleteSenders(
     senderEmailAddresses: string[],
-    accountEmail: string
+    getEmailAccount?: () => Promise<string>
   ): Promise<void>;
 
   /**
@@ -69,10 +70,14 @@ export interface Actions {
    * Filters out senders whose email addresses end with "@gmail.com".
    *
    * @param fetchNew - Whether to fetch new senders from the server before retrieving from local storage. Defaults to `false`.
+   * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
    * @returns A promise that resolves to an array of `Sender` objects.
    * @throws If there is an error accessing Chrome's storage API.
    */
-  getAllSenders(fetchNew?: boolean): Promise<Sender[]>;
+  getAllSenders(
+    fetchNew?: boolean,
+    getEmailAccount?: () => Promise<string>
+  ): Promise<Sender[]>;
 
   /**
    * Retrieves the current fetch progress from Chrome's local storage and invokes the provided callback with the progress value.
@@ -81,7 +86,7 @@ export interface Actions {
    * @returns A promise that resolves to the current fetch progress value. If no progress is found, resolves to 0.
    */
   checkFetchProgress(
-    setProgressCallback: (progress: number) => void,
+    setProgressCallback: (progress: number) => void
   ): Promise<number>;
 
   /**
@@ -92,6 +97,7 @@ export interface Actions {
    * information is found at all), the sender is added to the appropriate result list for further handling.
    *
    * @param senderEmailAddresses - An array of sender email addresses to attempt to unsubscribe from.
+   * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
    * @returns A promise that resolves to a `ManualUnsubscribeData` object containing:
    *   - `linkOnlySenders`: An array of tuples with sender email and click URL for senders that require manual action.
    *   - `noUnsubscribeSenders`: An array of sender emails for which no unsubscribe method was found.

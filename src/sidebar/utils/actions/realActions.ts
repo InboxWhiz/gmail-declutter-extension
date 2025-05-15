@@ -86,8 +86,9 @@ export const realActions: Actions = {
 
   async deleteSenders(
     senderEmailAddresses: string[],
-    accountEmail: string
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
   ): Promise<void> {
+    const accountEmail = await getEmailAccount();
     return new Promise((resolve) => {
       trashMultipleSenders(senderEmailAddresses, accountEmail).then(() => {
         // Remove senders from local storage
@@ -111,20 +112,22 @@ export const realActions: Actions = {
     });
   },
 
-  async getAllSenders(fetchNew: boolean = false): Promise<Sender[]> {
-    // Retrieves all senders from local storage, or fetches them if not available.
-    // fetchNew: boolean - whether to fetch new senders from the server
+  async getAllSenders(
+    fetchNew: boolean = false,
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+  ): Promise<Sender[]> {
+    const accountEmail = await getEmailAccount();
 
     if (fetchNew) {
-      await fetchAllSenders();
+      await fetchAllSenders(accountEmail);
     }
 
     return new Promise((resolve, reject) => {
-      chrome.storage.local.get(["senders"], async (result) => {
-        // If "senders" key does not exist, fetch all senders and retry
-        if (!result.senders) {
-          await fetchAllSenders();
-          const refreshed = await chrome.storage.local.get(["senders"]);
+      chrome.storage.local.get([accountEmail], async (result) => {
+        // If "senders" key does not exist on given email, fetch all senders and retry
+        if (!result[accountEmail].senders) {
+          await fetchAllSenders(accountEmail);
+          const refreshed = await chrome.storage.local.get([accountEmail]);
           result = refreshed;
         }
 
@@ -138,7 +141,7 @@ export const realActions: Actions = {
           const realSenders: Sender[] = senders
             .filter(
               (sender: [string, string, number]) =>
-                !sender[0].endsWith("@gmail.com"),
+                !sender[0].endsWith("@gmail.com")
             )
             .map((sender: [string, string, number]) => ({
               email: sender[0],
@@ -149,7 +152,7 @@ export const realActions: Actions = {
         } else {
           if (!fetchNew) {
             // Retry with fetching new senders if not found
-            await this.getAllSenders((fetchNew = true));
+            await this.getAllSenders((fetchNew = true), getEmailAccount);
           } else {
             // Already fetched - no senders found
             resolve([]);
@@ -160,7 +163,7 @@ export const realActions: Actions = {
   },
 
   async checkFetchProgress(
-    setProgressCallback: (progress: number) => void,
+    setProgressCallback: (progress: number) => void
   ): Promise<number> {
     return new Promise((resolve) => {
       chrome.storage.local.get("fetchProgress", (data) => {
@@ -228,13 +231,17 @@ export const realActions: Actions = {
     };
   },
 
-  async blockSender(senderEmailAddress: string): Promise<void> {
+  async blockSender(
+    senderEmailAddress: string,
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+  ): Promise<void> {
+    const accountEmail = await getEmailAccount();
+    const token = await getValidToken(accountEmail);
+
     const filter: gapi.client.gmail.Filter = {
       criteria: { from: senderEmailAddress },
       action: { addLabelIds: ["TRASH"] },
     };
-
-    const token = await getOAuthToken();
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -247,17 +254,17 @@ export const realActions: Actions = {
           method: "POST",
           headers: headers,
           body: JSON.stringify(filter),
-        },
+        }
       );
       if (!response.ok) {
         throw new Error(
-          `Failed to create block filter: ${response.statusText}`,
+          `Failed to create block filter: ${response.statusText}`
         );
       }
     } catch (err) {
       console.error(
         `Failed to create block filter for ${senderEmailAddress}:`,
-        err,
+        err
       );
       throw err;
     }
