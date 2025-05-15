@@ -88,10 +88,8 @@ export const realActions: Actions = {
     senderEmailAddresses: string[],
     accountEmail: string
   ): Promise<void> {
-    // Moves the senders to trash using Gmail API
-
     return new Promise((resolve) => {
-      trashMultipleSenders(senderEmailAddresses).then(() => {
+      trashMultipleSenders(senderEmailAddresses, accountEmail).then(() => {
         // Remove senders from local storage
         chrome.storage.local.get([accountEmail], (result) => {
           if (result[accountEmail].senders) {

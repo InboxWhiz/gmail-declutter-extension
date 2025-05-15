@@ -17,6 +17,8 @@ jest.mock("../../../src/sidebar/utils/trashSenders", () => ({
 };
 
 describe("deleteSenders", () => {
+  const accountEmail = "testuseraccount@example.com";
+
   test("should trash senders and update local storage", async () => {
     const emails = ["test@example.com", "user@example.com"];
     // Spy on console.log to check outputs
@@ -32,7 +34,7 @@ describe("deleteSenders", () => {
     // The get callback returns the initialSenders
     (chrome.storage.local.get as jest.Mock).mockImplementation(
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ "testemail@test.com": { senders: initialSenders } });
+        callback({ [accountEmail]: { senders: initialSenders } });
       }
     );
 
@@ -44,17 +46,17 @@ describe("deleteSenders", () => {
     );
 
     // Call the function and wait for the promise to resolve
-    await deleteSenders(emails, "testemail@test.com");
+    await deleteSenders(emails, accountEmail);
 
     // We expect trashMultipleSenders to have been called with the emails
-    expect(trashMultipleSenders).toHaveBeenCalledWith(emails);
+    expect(trashMultipleSenders).toHaveBeenCalledWith(emails, accountEmail);
 
     // After trashing, the local storage should have been updated to remove any senders with emails in the list.
     const expectedSenders = initialSenders.filter(
       (sender) => !emails.includes(sender[0])
     );
     expect(chrome.storage.local.set).toHaveBeenCalledWith(
-      { "testemail@test.com": { senders: expectedSenders } },
+      { [accountEmail]: { senders: expectedSenders } },
       expect.any(Function)
     );
 
