@@ -6,16 +6,16 @@ import { UnsubscribeData } from "../types/types";
  * Retrieves unsubscribe data from multiple email messages.
  *
  * @param messageIds - An array of Gmail message IDs to fetch unsubscribe data for.
- * @param userEmail - The email address of the user whose token will be used for authentication.
+ * @param accountEmail - The email address of the user whose token will be used for authentication.
  * @param getUnsubscribeDataFunc - (Optional) A function to fetch unsubscribe data for a single message. Defaults to `getUnsubscribeData`.
  * @returns A promise that resolves to an array of `UnsubscribeData` objects, each corresponding to a message ID.
  */
 export async function getMultipleUnsubscribeData(
   messageIds: string[],
-  userEmail: string,
+  accountEmail: string,
   getUnsubscribeDataFunc = getUnsubscribeData,
 ): Promise<UnsubscribeData[]> {
-  const token = await getValidToken(userEmail);
+  const token = await getValidToken(accountEmail);
   const unsubscribeData: UnsubscribeData[] = [];
 
   for (const messageId of messageIds) {
@@ -51,12 +51,12 @@ export async function unsubscribeUsingPostUrl(url: string): Promise<void> {
  * to the given mailto address, and sends it via the Gmail API to attempt to unsubscribe the user.
  *
  * @param mailtoEmail - The email address to send the unsubscribe request to (usually from a "mailto" unsubscribe link).
- * @param userEmail - The email address of the user performing the unsubscribe action.
+ * @param accountEmail - The email address of the user performing the unsubscribe action.
  * @throws Will throw an error if the Gmail API request fails.
  */
-export async function unsubscribeUsingMailTo(mailtoEmail: string, userEmail: string) {
+export async function unsubscribeUsingMailTo(mailtoEmail: string, accountEmail: string) {
   // Get OAuth token
-  const token = await getValidToken(userEmail);
+  const token = await getValidToken(accountEmail);
 
   // Create message
   const message: string = buildEmailMessage(mailtoEmail, );

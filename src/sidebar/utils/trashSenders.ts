@@ -4,17 +4,17 @@ import { getValidToken } from "../../_shared/utils/googleAuth";
  * Trashes emails from multiple senders.
  *
  * @param senders - An array of sender email addresses whose emails should be trashed.
- * @param emailAddress - The email address of the user wanting to trash the emails.
+ * @param accountEmail - The email address of the user wanting to trash the emails.
  * @param trashSenderFunc - (Optional) A function to trash emails from a single sender. Defaults to `trashSender`.
  * @returns The total number of emails trashed across all specified senders.
  */
 export async function trashMultipleSenders(
   senders: string[],
-  emailAddress: string,
+  accountEmail: string,
   trashSenderFunc = trashSender,
 ) {
   let totalEmailsTrashed = 0;
-  const token = await getValidToken(emailAddress);
+  const token = await getValidToken(accountEmail);
   for (const sender of senders) {
     totalEmailsTrashed += await trashSenderFunc(token, sender);
   }
