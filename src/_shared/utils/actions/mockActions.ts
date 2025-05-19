@@ -1,5 +1,5 @@
 import { ManualUnsubscribeData, Sender } from "../../types/types";
-import { Actions } from "./types";
+import { Actions } from "./actionsInterface";
 
 export const mockActions: Actions = {
   async isLoggedIn(): Promise<boolean> {

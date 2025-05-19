@@ -1,4 +1,4 @@
-import { realActions } from "../../../src/sidebar/utils/actions/realActions";
+import { realActions } from "../../../src/_shared/utils/actions/realActions";
 const { searchEmailSenders } = realActions;
 
 // Create global chrome object with stub implementations

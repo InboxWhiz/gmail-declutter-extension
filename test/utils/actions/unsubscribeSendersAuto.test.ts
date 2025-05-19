@@ -1,4 +1,4 @@
-import { realActions } from "../../../src/sidebar/utils/actions/realActions";
+import { realActions } from "../../../src/_shared/utils/actions/realActions";
 const { unsubscribeSendersAuto } = realActions;
 
 // Create mocks for dependent functions
@@ -6,8 +6,8 @@ import {
   getMultipleUnsubscribeData,
   unsubscribeUsingPostUrl,
   unsubscribeUsingMailTo,
-} from "../../../src/sidebar/utils/unsubscribeSenders";
-jest.mock("../../../src/sidebar/utils/unsubscribeSenders", () => ({
+} from "../../../src/_shared/utils/unsubscribeSenders";
+jest.mock("../../../src/_shared/utils/unsubscribeSenders", () => ({
   getMultipleUnsubscribeData: jest.fn(),
   unsubscribeUsingPostUrl: jest.fn(),
   unsubscribeUsingMailTo: jest.fn(),

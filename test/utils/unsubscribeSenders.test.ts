@@ -3,7 +3,7 @@ import {
   unsubscribeUsingMailTo,
   unsubscribeUsingPostUrl,
   exportForTest,
-} from "../../src/sidebar/utils/unsubscribeSenders";
+} from "../../src/_shared/utils/unsubscribeSenders";
 const {
   getListUnsubscribeHeader,
   getUnsubscribeLinkFromBody,
@@ -17,8 +17,8 @@ const mockToken = "mock-token";
 import {
   sleep,
   parseListUnsubscribeHeader,
-} from "../../src/sidebar/utils/utils";
-jest.mock("../../src/sidebar/utils/utils", () => ({
+} from "../../src/_shared/utils/utils";
+jest.mock("../../src/_shared/utils/utils", () => ({
   sleep: jest.fn(),
   parseListUnsubscribeHeader: jest.fn().mockReturnValue({
     posturl: "https://example.com/posturl",

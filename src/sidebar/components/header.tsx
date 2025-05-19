@@ -1,7 +1,7 @@
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./header.css";
-import { useActions } from "../providers/actionsContext";
+import { useActions } from "../../_shared/providers/actionsContext";
 import { useEffect, useState } from "react";
 
 export function DeclutterHeader() {

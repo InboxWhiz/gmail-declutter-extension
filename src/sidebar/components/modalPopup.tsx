@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useModal } from "../providers/modalContext";
 import { useSelectedSenders } from "../providers/selectedSendersContext";
 import { useSenders } from "../providers/sendersContext";
-import { useActions } from "../providers/actionsContext";
+import { useActions } from "../../_shared/providers/actionsContext";
 import { ToggleOption } from "./toggleOption";
-import { ManualUnsubscribeData } from "../types/types";
+import { ManualUnsubscribeData } from "../../_shared/types/types";
 
 function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
   const { deleteSenders, blockSender, unsubscribeSendersAuto } = useActions();

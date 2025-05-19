@@ -1,10 +1,10 @@
-import { realActions } from "../../../src/sidebar/utils/actions/realActions";
+import { realActions } from "../../../src/_shared/utils/actions/realActions";
 const { getAllSenders } = realActions;
-import { Sender } from "../../../src/sidebar/types/types";
+import { Sender } from "../../../src/_shared/types/types";
 
 // Create mocks for dependent functions
-import { fetchAllSenders } from "../../../src/sidebar/utils/fetchSenders";
-jest.mock("../../../src/sidebar/utils/fetchSenders", () => ({
+import { fetchAllSenders } from "../../../src/_shared/utils/fetchSenders";
+jest.mock("../../../src/_shared/utils/fetchSenders", () => ({
   fetchAllSenders: jest.fn(() => Promise.resolve()),
 }));
 

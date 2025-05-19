@@ -1,4 +1,4 @@
-import { getValidToken } from "../../_shared/utils/googleAuth";
+import { getValidToken } from "./googleAuth";
 import { parseSender, sleep } from "./utils";
 
 interface SenderData {
@@ -70,10 +70,7 @@ async function fetchAllMessageIds(
   const allMessageIds: string[] = [];
 
   do {
-    const { messageIds, nextPage } = await fetchPage(
-      authToken,
-      nextPageToken
-    );
+    const { messageIds, nextPage } = await fetchPage(authToken, nextPageToken);
     allMessageIds.push(...messageIds);
     nextPageToken = nextPage;
   } while (nextPageToken);

@@ -5,8 +5,8 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import { Sender } from "../types/types";
-import { useActions } from "./actionsContext";
+import { Sender } from "../../_shared/types/types";
+import { useActions } from "../../_shared/providers/actionsContext";
 
 interface SendersContextType {
   senders: Sender[];

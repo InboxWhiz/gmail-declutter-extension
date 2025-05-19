@@ -1,6 +1,6 @@
 import "./senderLine.css";
 import { useSelectedSenders } from "../providers/selectedSendersContext";
-import { useActions } from "../providers/actionsContext";
+import { useActions } from "../../_shared/providers/actionsContext";
 
 interface SenderLineProps {
   senderName: string;

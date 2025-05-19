@@ -1,7 +1,7 @@
 import {
   trashMultipleSenders,
   exportForTest,
-} from "../../src/sidebar/utils/trashSenders";
+} from "../../src/_shared/utils/trashSenders";
 const { trashSender } = exportForTest;
 
 

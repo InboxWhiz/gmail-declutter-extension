@@ -1,9 +1,9 @@
-import { realActions } from "../../../src/sidebar/utils/actions/realActions";
+import { realActions } from "../../../src/_shared/utils/actions/realActions";
 const { deleteSenders } = realActions;
 
 // Create mocks for dependent functions
-import { trashMultipleSenders } from "../../../src/sidebar/utils/trashSenders";
-jest.mock("../../../src/sidebar/utils/trashSenders", () => ({
+import { trashMultipleSenders } from "../../../src/_shared/utils/trashSenders";
+jest.mock("../../../src/_shared/utils/trashSenders", () => ({
   trashMultipleSenders: jest.fn(() => Promise.resolve()),
 }));
 

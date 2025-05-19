@@ -1,7 +1,7 @@
 import {
   fetchAllSenders,
   exportForTest,
-} from "../../src/sidebar/utils/fetchSenders";
+} from "../../src/_shared/utils/fetchSenders";
 const {
   fetchAllMessageIds,
   fetchMessageIdsPage,
@@ -14,9 +14,9 @@ const {
 import { getValidToken } from "../../src/_shared/utils/googleAuth";
 jest.mock("../../src/_shared/utils/googleAuth");
 const mockToken = "mock-token";
-import { sleep } from "../../src/sidebar/utils/utils";
-jest.mock("../../src/sidebar/utils/utils", () => {
-  const originalModule = jest.requireActual("../../src/sidebar/utils/utils");
+import { sleep } from "../../src/_shared/utils/utils";
+jest.mock("../../src/_shared/utils/utils", () => {
+  const originalModule = jest.requireActual("../../src/_shared/utils/utils");
   return {
     ...originalModule,
     sleep: jest.fn(),

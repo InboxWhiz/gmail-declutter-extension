@@ -1,6 +1,6 @@
 import { GoogleAuthButton } from "./googleAuthButton.tsx";
 import { getAssetUrl } from "../../../_shared/utils/utils";
-import { useActions } from "../../providers/actionsContext.tsx";
+import { useActions } from "../../../_shared/providers/actionsContext.tsx";
 import { useEffect, useState } from "react";
 
 export function LoginPage() {
@@ -25,7 +25,7 @@ export function LoginPage() {
         to use InboxWhiz.
       </span>
       <div style={{ height: "30px" }}></div>
-      <GoogleAuthButton expectedEmailAddress={email ?? ""}/>
+      <GoogleAuthButton expectedEmailAddress={email ?? ""} />
       <span id="email-account">{email}</span>
     </div>
   );

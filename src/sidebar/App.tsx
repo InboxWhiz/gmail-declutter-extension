@@ -5,7 +5,7 @@ import { ReloadButton } from "./components/reloadButton.tsx";
 import { ModalPopup } from "./components/modalPopup.tsx";
 import { SendersContainer } from "./components/sendersContainer.tsx";
 import { DeclutterHeader } from "./components/header.tsx";
-import { useActions } from "./providers/actionsContext.tsx";
+import { useActions } from "../_shared/providers/actionsContext.tsx";
 import { LoginPage } from "./components/login-page/loginPage.tsx";
 import { useLoggedIn } from "./providers/loggedInContext.tsx";
 

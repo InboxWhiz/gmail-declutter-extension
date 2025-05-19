@@ -10,31 +10,20 @@ import {
   unsubscribeUsingMailTo,
   // unsubscribeUsingPostUrl,
 } from "../unsubscribeSenders";
-import {
-  getOAuthToken,
-  getAuthenticatedEmail,
-} from "../../../_shared/utils/auth";
-import { Actions } from "./types";
-import { signInWithGoogle } from "../../../_shared/utils/googleAuth";
+import { Actions } from "./actionsInterface";
+import { getCachedToken, getValidToken, signInWithGoogle } from "../googleAuth";
 
 export const realActions: Actions = {
   async isLoggedIn(
     getEmailAccount: () => Promise<string> = realActions.getEmailAccount
   ): Promise<boolean> {
-    let token: chrome.identity.GetAuthTokenResult;
-    try {
-      token = await getOAuthToken(false);
-    } catch {
-      return false; // If getOAuthToken rejects, user needs to sign in
+    const accountEmail = await getEmailAccount();
+    const token = await getCachedToken(accountEmail);
+    if (token) {
+      return true;
+    } else {
+      return false;
     }
-    const authEmail = await getAuthenticatedEmail(token);
-    const gmailEmail = await getEmailAccount();
-
-    if (authEmail !== gmailEmail) {
-      return false; // User is not logged in to the correct account
-    }
-
-    return true; // User is logged in, and into the correct account
   },
 
   signInWithGoogle,
