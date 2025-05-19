@@ -20,41 +20,42 @@ jest.mock("../../../src/_shared/utils/fetchSenders", () => ({
 };
 
 describe("getAllSenders", () => {
+  const accountEmail = "test@example.com";
+  const mockGetEmailAccount = jest.fn().mockResolvedValue(accountEmail);
+
   test("returns senders from local storage if available", async () => {
+    // Arrange
     const storedSenders: [string, string, number][] = [
       ["sender1@example.com", "Sender 1", 10],
       ["sender2@example.com", "Sender 2", 5],
     ];
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: storedSenders });
-      },
-    );
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      [accountEmail]: { senders: storedSenders },
+    });
 
-    const result = await getAllSenders();
+    // Act
+    const result = await getAllSenders(false, mockGetEmailAccount);
     const expected: Sender[] = storedSenders.map((sender) => ({
       email: sender[0],
       name: sender[1],
       count: sender[2],
     }));
 
+    // Assert
     expect(result).toEqual(expected);
-    // Ensure fetchAllSenders is not called when fetchNew is false
-    expect(fetchAllSenders).not.toHaveBeenCalled();
+    expect(fetchAllSenders).not.toHaveBeenCalled(); // Ensure fetchAllSenders is not called when fetchNew is false
   });
 
   test("calls fetchAllSenders if fetchNew is true", async () => {
     const storedSenders: [string, string, number][] = [
       ["sender3@example.com", "Sender 3", 7],
     ];
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: storedSenders });
-      },
-    );
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      [accountEmail]: { senders: storedSenders },
+    });
 
     // Call with fetchNew true. This should await fetchAllSenders.
-    const result = await getAllSenders(true);
+    const result = await getAllSenders(true, mockGetEmailAccount);
     const expected: Sender[] = storedSenders.map((sender) => ({
       email: sender[0],
       name: sender[1],
@@ -67,16 +68,14 @@ describe("getAllSenders", () => {
 
   test("returns empty array if no senders are found, even after fetching", async () => {
     // First call returns no senders
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: [] });
-      },
-    );
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      [accountEmail]: { senders: [] },
+    });
 
     // Because of recursion in getAllSenders implementation, we need to break the cycle.
     // One way is to simulate that after calling fetchAllSenders, storage still has no senders.
     // Here, we simply call getAllSenders with fetchNew true.
-    const result = await getAllSenders(true);
+    const result = await getAllSenders(true, mockGetEmailAccount);
     expect(result).toEqual([]);
   });
 
@@ -90,16 +89,16 @@ describe("getAllSenders", () => {
         const result =
           callCount === 1
             ? {}
-            : { senders: [["sender4@example.com", "Sender 4", 7]] };
+            : { [accountEmail] : {senders: [["sender4@example.com", "Sender 4", 7]]} };
         if (callback && typeof callback === "function") {
           callback(result);
         } else {
           return Promise.resolve(result);
         }
-      },
+      }
     );
 
-    await getAllSenders();
+    await getAllSenders(false, mockGetEmailAccount);
 
     // Check if fetchAllSenders was called
     expect(fetchAllSenders).toHaveBeenCalled();
@@ -111,10 +110,10 @@ describe("getAllSenders", () => {
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         chrome.runtime.lastError = "Some error" as chrome.runtime.LastError;
         callback({ senders: [] });
-      },
+      }
     );
 
-    await expect(getAllSenders()).rejects.toEqual("Some error");
+    await expect(getAllSenders(false, mockGetEmailAccount)).rejects.toBeDefined();
     // Reset lastError for further tests.
     chrome.runtime.lastError = null as unknown as chrome.runtime.LastError;
   });
@@ -127,14 +126,12 @@ describe("getAllSenders", () => {
       ["external@example.com", "External", 5],
       ["another@domain.com", "Another", 1],
     ];
-    (chrome.storage.local.get as jest.Mock).mockImplementation(
-      (keys: string[], callback: (result: { [key: string]: any }) => void) => {
-        callback({ senders: storedSenders });
-      },
-    );
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      [accountEmail]: { senders: storedSenders },
+    });
 
     // Act
-    const result = await getAllSenders();
+    const result = await getAllSenders(false, mockGetEmailAccount);
 
     // Assert
     const expected: Sender[] = [

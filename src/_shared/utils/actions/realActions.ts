@@ -112,9 +112,9 @@ export const realActions: Actions = {
     }
 
     return new Promise((resolve, reject) => {
-      chrome.storage.local.get([accountEmail], async (result) => {
+      chrome.storage.local.get(accountEmail).then(async (result) => {
         // If "senders" key does not exist on given email, fetch all senders and retry
-        if (!result[accountEmail].senders) {
+        if (!result[accountEmail] || !result[accountEmail].senders) {
           await fetchAllSenders(accountEmail);
           const refreshed = await chrome.storage.local.get([accountEmail]);
           result = refreshed;
@@ -125,8 +125,9 @@ export const realActions: Actions = {
           return;
         }
 
-        const senders = result.senders;
+        const senders = result[accountEmail].senders;
         if (senders) {
+          console.log("Senders: ", senders);
           const realSenders: Sender[] = senders
             .filter(
               (sender: [string, string, number]) =>
@@ -141,7 +142,7 @@ export const realActions: Actions = {
         } else {
           if (!fetchNew) {
             // Retry with fetching new senders if not found
-            await this.getAllSenders((fetchNew = true), getEmailAccount);
+            await realActions.getAllSenders(true, getEmailAccount);
           } else {
             // Already fetched - no senders found
             resolve([]);
