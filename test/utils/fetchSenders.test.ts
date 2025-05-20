@@ -199,14 +199,14 @@ describe("fetchAllSenders", () => {
     // Assert
     // There should be 2 calls to chrome.storage.local.set with fetchProgress (one per batch)
     const setCalls = (chrome.storage.local.set as jest.Mock).mock.calls.filter(
-      ([arg]) => arg && typeof arg.fetchProgress === "number"
+      ([arg]) => arg && typeof arg === "object" && "fetchProgress" in arg
     );
-    expect(setCalls.length).toBeGreaterThanOrEqual(2);
+    expect(setCalls.length).toBe(2);
 
-    // The progress should increase and be <= 1
+    // The progress should increase and be between 0 and 1
     setCalls.forEach(([arg]) => {
-      expect(arg.fetchProgress).toBeGreaterThan(0);
-      expect(arg.fetchProgress).toBeLessThanOrEqual(1);
+      expect(arg.fetchProgress["testemail@test.com"]).toBeGreaterThan(0);
+      expect(arg.fetchProgress["testemail@test.com"]).toBeLessThanOrEqual(1);
     });
   });
 });

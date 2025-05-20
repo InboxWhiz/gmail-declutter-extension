@@ -21,7 +21,8 @@ interface MessageData {
  * @returns A Promise that resolves when all senders have been fetched and stored.
  *
  * @remarks
- * - Progress is tracked and updated in Chrome's local storage under the key `fetchProgress`.
+ * - Progress is tracked and updated in Chrome's local storage under the key `fetchProgress`,
+ * with the account email as the sub-key.
  * - Sender data is stored in Chrome's local storage using the `storeSenders` utility.
  */
 export async function fetchAllSenders(accountEmail: string): Promise<void> {
@@ -43,7 +44,9 @@ export async function fetchAllSenders(accountEmail: string): Promise<void> {
 
       // Send a message about progress
       percentageComplete += 40 / allMessageIds.length;
-      chrome.storage.local.set({ fetchProgress: percentageComplete });
+      chrome.storage.local.set({
+        fetchProgress: { [accountEmail]: percentageComplete },
+      });
     }
 
     console.log(

@@ -153,13 +153,15 @@ export const realActions: Actions = {
   },
 
   async checkFetchProgress(
-    setProgressCallback: (progress: number) => void
+    setProgressCallback: (progress: number) => void,
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
   ): Promise<number> {
+    const accountEmail = await getEmailAccount();
     return new Promise((resolve) => {
-      chrome.storage.local.get("fetchProgress", (data) => {
-        if (data.fetchProgress !== undefined) {
-          setProgressCallback(data.fetchProgress);
-          resolve(data.fetchProgress);
+      chrome.storage.local.get("fetchProgress").then((data) => {
+        if (data.fetchProgress !== undefined && data.fetchProgress[accountEmail]) {
+          setProgressCallback(data.fetchProgress[accountEmail]);
+          resolve(data.fetchProgress[accountEmail]);
         } else {
           setProgressCallback(0);
           resolve(0);

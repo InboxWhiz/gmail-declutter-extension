@@ -76,10 +76,12 @@ export interface Actions {
    * Retrieves the current fetch progress from Chrome's local storage and invokes the provided callback with the progress value.
    *
    * @param setProgressCallback - A callback function that receives the current progress as a number (decimals 0-1).
+   * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
    * @returns A promise that resolves to the current fetch progress value. If no progress is found, resolves to 0.
    */
   checkFetchProgress(
-    setProgressCallback: (progress: number) => void
+    setProgressCallback: (progress: number) => void,
+    getEmailAccount?: () => Promise<string>
   ): Promise<number>;
 
   /**
