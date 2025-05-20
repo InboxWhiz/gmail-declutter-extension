@@ -16,7 +16,7 @@ export const SendersContainer = () => {
       {loading ? (
         <>
           <LoadingBar />
-          {Array.from({ length: 8 }).map(() => (
+          {Array.from({ length: 7 }).map(() => (
             <SenderLineSkeleton />
           ))}
         </>
