@@ -4,7 +4,7 @@ import { Actions } from "./actionsInterface";
 export const mockActions: Actions = {
   async isLoggedIn(): Promise<boolean> {
     return new Promise((resolve) => {
-      resolve(false); // Simulate that the user is not logged in
+      resolve(true); // Simulate that the user is logged in
     });
   },
 
