@@ -127,7 +127,6 @@ export const realActions: Actions = {
 
         const senders = result[accountEmail].senders;
         if (senders) {
-          console.log("Senders: ", senders);
           const realSenders: Sender[] = senders
             .filter(
               (sender: [string, string, number]) =>
@@ -183,8 +182,8 @@ export const realActions: Actions = {
     );
 
     // Get the latestMessageIds for the given emails from local storage
-    const result = await chrome.storage.local.get(["senders"]);
-    const messageIds: string[] = result.senders
+    const result = await chrome.storage.local.get([accountEmail]);
+    const messageIds: string[] = result[accountEmail].senders
       .filter((sender: [string, string, number, string]) =>
         senderEmailAddresses.includes(sender[0])
       )

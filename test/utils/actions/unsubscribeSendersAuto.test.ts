@@ -60,7 +60,7 @@ describe("unsubscribeSendersAuto", () => {
       "sender4@example.com",
     ];
     (chrome.storage.local.get as jest.Mock).mockResolvedValue({
-      senders: mockSenders,
+      [accountEmail]: { senders: mockSenders },
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue(
       mockUnsubscribeData
@@ -81,7 +81,7 @@ describe("unsubscribeSendersAuto", () => {
     // Arrange
     const emails = ["sender2@example.com"];
     (chrome.storage.local.get as jest.Mock).mockResolvedValue({
-      senders: [mockSenders[1]],
+      [accountEmail]: { senders: [mockSenders[1]] },
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
       mockUnsubscribeData[1],
@@ -102,7 +102,7 @@ describe("unsubscribeSendersAuto", () => {
     // Arrange
     const emails = ["sender3@example.com"];
     (chrome.storage.local.get as jest.Mock).mockResolvedValue({
-      senders: [mockSenders[2]],
+      [accountEmail]: {senders: [mockSenders[2]]},
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
       mockUnsubscribeData[2],
