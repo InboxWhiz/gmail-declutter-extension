@@ -15,7 +15,7 @@ import { getCachedToken, getValidToken, signInWithGoogle } from "../googleAuth";
 
 export const realActions: Actions = {
   async isLoggedIn(
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
   ): Promise<boolean> {
     const accountEmail = await getEmailAccount();
     const token = await getCachedToken(accountEmail);
@@ -44,13 +44,13 @@ export const realActions: Actions = {
             if (chrome.runtime.lastError) {
               console.error(
                 "Could not get email account:",
-                chrome.runtime.lastError
+                chrome.runtime.lastError,
               );
               reject(chrome.runtime.lastError.message);
             } else {
               resolve(response.result);
             }
-          }
+          },
         );
       });
     });
@@ -75,7 +75,7 @@ export const realActions: Actions = {
 
   async deleteSenders(
     senderEmailAddresses: string[],
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
   ): Promise<void> {
     const accountEmail = await getEmailAccount();
     return new Promise((resolve) => {
@@ -85,13 +85,13 @@ export const realActions: Actions = {
           if (result[accountEmail].senders) {
             const updatedSenders = result[accountEmail].senders.filter(
               (sender: [string, string, number]) =>
-                !senderEmailAddresses.includes(sender[0])
+                !senderEmailAddresses.includes(sender[0]),
             );
             chrome.storage.local.set(
               { [accountEmail]: { senders: updatedSenders } },
               () => {
                 console.log("Updated senders in local storage.");
-              }
+              },
             );
           }
         });
@@ -103,7 +103,7 @@ export const realActions: Actions = {
 
   async getAllSenders(
     fetchNew: boolean = false,
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
   ): Promise<Sender[]> {
     const accountEmail = await getEmailAccount();
 
@@ -130,7 +130,7 @@ export const realActions: Actions = {
           const realSenders: Sender[] = senders
             .filter(
               (sender: [string, string, number]) =>
-                !sender[0].endsWith("@gmail.com")
+                !sender[0].endsWith("@gmail.com"),
             )
             .map((sender: [string, string, number]) => ({
               email: sender[0],
@@ -153,12 +153,15 @@ export const realActions: Actions = {
 
   async checkFetchProgress(
     setProgressCallback: (progress: number) => void,
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
   ): Promise<number> {
     const accountEmail = await getEmailAccount();
     return new Promise((resolve) => {
       chrome.storage.local.get("fetchProgress").then((data) => {
-        if (data.fetchProgress !== undefined && data.fetchProgress[accountEmail]) {
+        if (
+          data.fetchProgress !== undefined &&
+          data.fetchProgress[accountEmail]
+        ) {
           setProgressCallback(data.fetchProgress[accountEmail]);
           resolve(data.fetchProgress[accountEmail]);
         } else {
@@ -171,21 +174,21 @@ export const realActions: Actions = {
 
   async unsubscribeSendersAuto(
     senderEmailAddresses: string[],
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
   ): Promise<ManualUnsubscribeData> {
     const accountEmail = await getEmailAccount();
 
     // Get the latest message ids for each sender
     console.log(
       "Unsubscribing automatically from senders: ",
-      senderEmailAddresses
+      senderEmailAddresses,
     );
 
     // Get the latestMessageIds for the given emails from local storage
     const result = await chrome.storage.local.get([accountEmail]);
     const messageIds: string[] = result[accountEmail].senders
       .filter((sender: [string, string, number, string]) =>
-        senderEmailAddresses.includes(sender[0])
+        senderEmailAddresses.includes(sender[0]),
       )
       .map((sender: [string, string, number, string]) => sender[3]);
 
@@ -193,7 +196,7 @@ export const realActions: Actions = {
     // Get the unsubscribe data for all the message ids
     const unsubscribeData: UnsubscribeData[] = await getMultipleUnsubscribeData(
       messageIds,
-      accountEmail
+      accountEmail,
     );
 
     console.log("Unsubscribe data: ", unsubscribeData);
@@ -224,7 +227,7 @@ export const realActions: Actions = {
 
   async blockSender(
     senderEmailAddress: string,
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount
+    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
   ): Promise<void> {
     const accountEmail = await getEmailAccount();
     const token = await getValidToken(accountEmail);
@@ -245,17 +248,17 @@ export const realActions: Actions = {
           method: "POST",
           headers: headers,
           body: JSON.stringify(filter),
-        }
+        },
       );
       if (!response.ok) {
         throw new Error(
-          `Failed to create block filter: ${response.statusText}`
+          `Failed to create block filter: ${response.statusText}`,
         );
       }
     } catch (err) {
       console.error(
         `Failed to create block filter for ${senderEmailAddress}:`,
-        err
+        err,
       );
       throw err;
     }

@@ -48,7 +48,7 @@ describe("getMultipleUnsubscribeData", () => {
     const result = await getMultipleUnsubscribeData(
       [],
       "testemail@test.com",
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -67,7 +67,7 @@ describe("getMultipleUnsubscribeData", () => {
     const result = await getMultipleUnsubscribeData(
       [messageId],
       "testemail@test.com",
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -90,7 +90,7 @@ describe("getMultipleUnsubscribeData", () => {
     const result = await getMultipleUnsubscribeData(
       ids,
       "testemail@test.com",
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -123,7 +123,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     // Assert
@@ -142,7 +142,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     // Assert
@@ -160,7 +160,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     expect(headerMock).toHaveBeenCalledWith(messageId, token);
@@ -177,7 +177,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
@@ -420,7 +420,7 @@ describe("unsubscribeUsingPostUrl", () => {
 
     // Expect the promise to reject with appropriate error message
     await expect(unsubscribeUsingPostUrl(testUrl)).rejects.toThrow(
-      "Failed to unsubscribe using POST URL: 400 Bad Request"
+      "Failed to unsubscribe using POST URL: 400 Bad Request",
     );
 
     // Verify fetch was called correctly
@@ -445,7 +445,9 @@ describe("unsubscribeUsingMailTo", () => {
   });
 
   it("sends a correctly formatted raw message via Gmail API", async () => {
-    await expect(unsubscribeUsingMailTo(email, "testemail@test.com")).resolves.toBeUndefined();
+    await expect(
+      unsubscribeUsingMailTo(email, "testemail@test.com"),
+    ).resolves.toBeUndefined();
 
     // Verify token retrieval
     expect(getValidToken).toHaveBeenCalledTimes(1);
@@ -455,7 +457,7 @@ describe("unsubscribeUsingMailTo", () => {
     expect(fetchMock.calls.length).toBe(1);
     const [url, options] = fetchMock.calls[0];
     expect(url).toBe(
-      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
+      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
     );
     expect(options.method).toBe("POST");
     expect(options.headers.Authorization).toBe(`Bearer ${token}`);
@@ -486,9 +488,9 @@ describe("unsubscribeUsingMailTo", () => {
       statusText: "Server Error",
     });
 
-    await expect(unsubscribeUsingMailTo(email, "testemail@test.com")).rejects.toThrow(
-      "Gmail API error: 500 Server Error"
-    );
+    await expect(
+      unsubscribeUsingMailTo(email, "testemail@test.com"),
+    ).rejects.toThrow("Gmail API error: 500 Server Error");
     expect(getValidToken).toHaveBeenCalledTimes(1);
     expect((global.fetch as jest.Mock).mock.calls.length).toBe(1);
   });

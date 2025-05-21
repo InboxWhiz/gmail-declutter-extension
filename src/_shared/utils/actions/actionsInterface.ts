@@ -21,7 +21,7 @@ export interface Actions {
    * @returns {Promise<{ token: string; email: string }>} A promise that resolves to an object containing the user's OAuth token and email address upon successful authentication.
    */
   signInWithGoogle(
-    expectedEmailAddress: string
+    expectedEmailAddress: string,
   ): Promise<{ token: string; email: string }>;
 
   /**
@@ -52,7 +52,7 @@ export interface Actions {
    */
   deleteSenders(
     senderEmailAddresses: string[],
-    getEmailAccount?: () => Promise<string>
+    getEmailAccount?: () => Promise<string>,
   ): Promise<void>;
 
   /**
@@ -69,7 +69,7 @@ export interface Actions {
    */
   getAllSenders(
     fetchNew?: boolean,
-    getEmailAccount?: () => Promise<string>
+    getEmailAccount?: () => Promise<string>,
   ): Promise<Sender[]>;
 
   /**
@@ -81,7 +81,7 @@ export interface Actions {
    */
   checkFetchProgress(
     setProgressCallback: (progress: number) => void,
-    getEmailAccount?: () => Promise<string>
+    getEmailAccount?: () => Promise<string>,
   ): Promise<number>;
 
   /**
@@ -99,7 +99,7 @@ export interface Actions {
    */
   unsubscribeSendersAuto(
     senderEmailAddresses: string[],
-    getEmailAccount?: () => Promise<string>
+    getEmailAccount?: () => Promise<string>,
   ): Promise<ManualUnsubscribeData>;
 
   /**

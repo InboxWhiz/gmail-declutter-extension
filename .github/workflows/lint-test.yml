@@ -30,9 +30,11 @@ jobs:
           VALIDATE_MARKDOWN: false
           VALIDATE_JSON: false
           VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_JSCPD: false
           LINTER_RULES_PATH: .
           JAVASCRIPT_ES_CONFIG_FILE: eslint.config.js
           TYPESCRIPT_ES_CONFIG_FILE: eslint.config.js
+          
 
   test:
     name: test

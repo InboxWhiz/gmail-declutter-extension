@@ -23,7 +23,7 @@ describe("checkFetchProgress", () => {
     // Act
     const result = await checkFetchProgress(
       mockSetProgress,
-      mockGetEmailAccount
+      mockGetEmailAccount,
     );
 
     // Assert
@@ -39,7 +39,7 @@ describe("checkFetchProgress", () => {
     // Act
     const result = await checkFetchProgress(
       mockSetProgress,
-      mockGetEmailAccount
+      mockGetEmailAccount,
     );
 
     // Assert
@@ -56,7 +56,7 @@ describe("checkFetchProgress", () => {
     // Act
     const result = await checkFetchProgress(
       mockSetProgress,
-      mockGetEmailAccount
+      mockGetEmailAccount,
     );
 
     // Assert

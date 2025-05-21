@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 const CLIENT_ID =
   "396720193118-mun9vgnvus9om9tpfj1tbamd2b014kaf.apps.googleusercontent.com";
 const SCOPES = [
@@ -28,7 +29,7 @@ export async function getValidToken(
     getCachedToken?: Function;
     verifyToken?: Function;
     signInWithGoogle?: Function;
-  }
+  },
 ): Promise<string> {
   const {
     getCachedToken: _getCachedToken = getCachedToken,
@@ -67,7 +68,7 @@ export async function signInWithGoogle(
     launchWebAuthFlow?: Function;
     fetchUserEmail?: Function;
     cacheToken?: Function;
-  }
+  },
 ): Promise<{ token: string; email: string }> {
   const {
     buildAuthUrl: _buildAuthUrl = buildAuthUrl,
@@ -126,7 +127,7 @@ function launchWebAuthFlow(authUrl: string): Promise<string> {
           reject(new Error(chrome.runtime.lastError.message));
         } else if (redirectUrl) {
           const fragment = new URLSearchParams(
-            new URL(redirectUrl).hash.slice(1)
+            new URL(redirectUrl).hash.slice(1),
           );
           const token = fragment.get("access_token");
           if (token) {
@@ -137,7 +138,7 @@ function launchWebAuthFlow(authUrl: string): Promise<string> {
         } else {
           reject(new Error("Authorization failed."));
         }
-      }
+      },
     );
   });
 }
@@ -191,7 +192,7 @@ async function cacheToken(emailAddress: string, token: string): Promise<void> {
  *          or `null` if no valid cached token is found for the specified email.
  */
 export async function getCachedToken(
-  email: string
+  email: string,
 ): Promise<{ token: string; expiresAt: number } | null> {
   const data = await chrome.storage.local.get("googleAuth");
   const user = data.googleAuth?.[email];

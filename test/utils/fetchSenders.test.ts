@@ -199,7 +199,7 @@ describe("fetchAllSenders", () => {
     // Assert
     // There should be 2 calls to chrome.storage.local.set with fetchProgress (one per batch)
     const setCalls = (chrome.storage.local.set as jest.Mock).mock.calls.filter(
-      ([arg]) => arg && typeof arg === "object" && "fetchProgress" in arg
+      ([arg]) => arg && typeof arg === "object" && "fetchProgress" in arg,
     );
     expect(setCalls.length).toBe(2);
 
@@ -365,7 +365,7 @@ describe("updateSenders", () => {
         { senderEmail: "b@example.com", senderName: "Bob", messageId: "2" },
         { senderEmail: "a@example.com", senderName: "Alice", messageId: "3" },
       ],
-      senders
+      senders,
     );
 
     // Assert
@@ -398,7 +398,7 @@ describe("updateSenders", () => {
           messageId: "3",
         },
       ],
-      senders
+      senders,
     );
 
     // Assert
@@ -438,7 +438,7 @@ describe("storeSenders", () => {
           latestMessageId: "2",
         },
       },
-      "testemail@test.com"
+      "testemail@test.com",
     );
 
     // Assert
@@ -467,7 +467,7 @@ describe("storeSenders", () => {
           latestMessageId: "2",
         },
       },
-      "testemail@test.com"
+      "testemail@test.com",
     );
 
     // Assert

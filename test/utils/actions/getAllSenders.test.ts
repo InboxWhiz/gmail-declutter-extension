@@ -89,13 +89,17 @@ describe("getAllSenders", () => {
         const result =
           callCount === 1
             ? {}
-            : { [accountEmail] : {senders: [["sender4@example.com", "Sender 4", 7]]} };
+            : {
+                [accountEmail]: {
+                  senders: [["sender4@example.com", "Sender 4", 7]],
+                },
+              };
         if (callback && typeof callback === "function") {
           callback(result);
         } else {
           return Promise.resolve(result);
         }
-      }
+      },
     );
 
     await getAllSenders(false, mockGetEmailAccount);
@@ -110,10 +114,12 @@ describe("getAllSenders", () => {
       (keys: string[], callback: (result: { [key: string]: any }) => void) => {
         chrome.runtime.lastError = "Some error" as chrome.runtime.LastError;
         callback({ senders: [] });
-      }
+      },
     );
 
-    await expect(getAllSenders(false, mockGetEmailAccount)).rejects.toBeDefined();
+    await expect(
+      getAllSenders(false, mockGetEmailAccount),
+    ).rejects.toBeDefined();
     // Reset lastError for further tests.
     chrome.runtime.lastError = null as unknown as chrome.runtime.LastError;
   });

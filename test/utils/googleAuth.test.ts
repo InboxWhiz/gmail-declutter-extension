@@ -40,7 +40,7 @@ describe("getValidToken", () => {
       getValidToken(email, {
         getCachedToken: mockGetCachedToken,
         verifyToken: mockVerifyToken,
-      })
+      }),
     ).resolves.toBe(token);
   });
 
@@ -172,7 +172,7 @@ describe("signInWithGoogle", () => {
         launchWebAuthFlow: mockLaunchWebAuthFlow,
         fetchUserEmail: mockFetchUserEmail,
         cacheToken: mockCacheToken,
-      })
+      }),
     ).rejects.toThrow("Wrong email: other@example.com");
   });
 });
@@ -193,7 +193,7 @@ describe("buildAuthUrl", () => {
     const url = buildAuthUrl(email);
     expect(url).toContain("https://accounts.google.com/o/oauth2/v2/auth");
     expect(url).toContain(
-      "client_id=396720193118-mun9vgnvus9om9tpfj1tbamd2b014kaf.apps.googleusercontent.com"
+      "client_id=396720193118-mun9vgnvus9om9tpfj1tbamd2b014kaf.apps.googleusercontent.com",
     );
     expect(url).toContain("redirect_uri=https%3A%2F%2Fredirect.example.com");
     expect(url).toContain("scope=");
@@ -217,7 +217,7 @@ describe("launchWebAuthFlow", () => {
     const token = "abc123";
     const redirectUrl = `https://redirect.example.com#access_token=${token}&token_type=Bearer`;
     (chrome.identity.launchWebAuthFlow as jest.Mock).mockImplementation(
-      (opts, cb) => cb(redirectUrl)
+      (opts, cb) => cb(redirectUrl),
     );
     await expect(launchWebAuthFlow("http://auth")).resolves.toBe(token);
   });
@@ -225,29 +225,29 @@ describe("launchWebAuthFlow", () => {
   it("rejects if chrome.runtime.lastError is set", async () => {
     chrome.runtime.lastError = { message: "Auth error" };
     (chrome.identity.launchWebAuthFlow as jest.Mock).mockImplementation(
-      (opts, cb) => cb(null)
+      (opts, cb) => cb(null),
     );
     await expect(launchWebAuthFlow("http://auth")).rejects.toThrow(
-      "Auth error"
+      "Auth error",
     );
     chrome.runtime.lastError = undefined;
   });
 
   it("rejects if access token is not found in redirect URL", async () => {
     (chrome.identity.launchWebAuthFlow as jest.Mock).mockImplementation(
-      (opts, cb) => cb("https://redirect.example.com#notoken=1")
+      (opts, cb) => cb("https://redirect.example.com#notoken=1"),
     );
     await expect(launchWebAuthFlow("http://auth")).rejects.toThrow(
-      "Access token not found in redirect URL."
+      "Access token not found in redirect URL.",
     );
   });
 
   it("rejects if redirectUrl is null", async () => {
     (chrome.identity.launchWebAuthFlow as jest.Mock).mockImplementation(
-      (opts, cb) => cb(null)
+      (opts, cb) => cb(null),
     );
     await expect(launchWebAuthFlow("http://auth")).rejects.toThrow(
-      "Authorization failed."
+      "Authorization failed.",
     );
   });
 });
@@ -271,7 +271,7 @@ describe("fetchUserEmail", () => {
       json: async () => ({}),
     });
     await expect(fetchUserEmail("token")).rejects.toThrow(
-      "Failed to fetch user info"
+      "Failed to fetch user info",
     );
   });
 });
@@ -306,7 +306,7 @@ describe("cacheToken and getCachedToken", () => {
             expiresAt: expect.any(Number),
           }),
         }),
-      })
+      }),
     );
   });
 
@@ -335,7 +335,7 @@ describe("cacheToken and getCachedToken", () => {
             expiresAt: 2,
           }),
         }),
-      })
+      }),
     );
   });
 

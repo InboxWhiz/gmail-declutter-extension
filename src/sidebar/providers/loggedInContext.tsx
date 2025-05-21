@@ -5,9 +5,13 @@ interface LoggedInContextType {
   setLoggedIn: (value: boolean) => void;
 }
 
-const LoggedInContext = createContext<LoggedInContextType | undefined>(undefined);
+const LoggedInContext = createContext<LoggedInContextType | undefined>(
+  undefined,
+);
 
-export const LoggedInProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LoggedInProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
   return (

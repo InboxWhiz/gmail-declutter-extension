@@ -23,7 +23,7 @@ const Tutorial = () => {
     <ActionsProvider>
       <Modal
         isOpen={isModalOpen}
-        onClose={step === 5 ? () => setIsModalOpen(false) : () => { }}
+        onClose={step === 5 ? () => setIsModalOpen(false) : () => {}}
       >
         <div className="tutorial-popup">
           {step === 0 ? (

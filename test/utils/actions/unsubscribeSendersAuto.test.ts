@@ -63,7 +63,7 @@ describe("unsubscribeSendersAuto", () => {
       [accountEmail]: { senders: mockSenders },
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue(
-      mockUnsubscribeData
+      mockUnsubscribeData,
     );
 
     // Act
@@ -73,7 +73,7 @@ describe("unsubscribeSendersAuto", () => {
     expect(getMultipleUnsubscribeData).toHaveBeenCalledTimes(1);
     expect(getMultipleUnsubscribeData).toHaveBeenCalledWith(
       ["message-id-1", "message-id-2", "message-id-3", "message-id-4"],
-      accountEmail
+      accountEmail,
     );
   });
 
@@ -94,7 +94,7 @@ describe("unsubscribeSendersAuto", () => {
     expect(unsubscribeUsingPostUrl).not.toHaveBeenCalled();
     expect(unsubscribeUsingMailTo).toHaveBeenCalledWith(
       "mailto:unsubscribe@sender.com",
-      accountEmail
+      accountEmail,
     );
   });
 
@@ -102,7 +102,7 @@ describe("unsubscribeSendersAuto", () => {
     // Arrange
     const emails = ["sender3@example.com"];
     (chrome.storage.local.get as jest.Mock).mockResolvedValue({
-      [accountEmail]: {senders: [mockSenders[2]]},
+      [accountEmail]: { senders: [mockSenders[2]] },
     });
     (getMultipleUnsubscribeData as jest.Mock).mockResolvedValue([
       mockUnsubscribeData[2],

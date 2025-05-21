@@ -9,7 +9,7 @@ export const mockActions: Actions = {
   },
 
   async signInWithGoogle(
-    expectedEmailAddress: string
+    expectedEmailAddress: string,
   ): Promise<{ token: string; email: string }> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -75,7 +75,7 @@ export const mockActions: Actions = {
   },
 
   async checkFetchProgress(
-    setProgressCallback: (progress: number) => void
+    setProgressCallback: (progress: number) => void,
   ): Promise<number> {
     // Mock fetch progress by incrementing a static variable
     if (!("mockProgress" in globalThis)) {
@@ -83,7 +83,7 @@ export const mockActions: Actions = {
     }
     (globalThis as any).mockProgress = Math.min(
       (globalThis as any).mockProgress + 0.05,
-      1
+      1,
     );
     const progress = (globalThis as any).mockProgress;
     setProgressCallback(progress);
@@ -91,7 +91,7 @@ export const mockActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    senderEmailAddresses: string[]
+    senderEmailAddresses: string[],
   ): Promise<ManualUnsubscribeData> {
     // Simulates unsubscribing senders automatically.
     console.log("[MOCK] Automatically unsubscribing:", senderEmailAddresses);
@@ -135,7 +135,7 @@ export const mockActions: Actions = {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(
-          console.log(`[MOCK] Blocked ${senderEmailAddress} successfully`)
+          console.log(`[MOCK] Blocked ${senderEmailAddress} successfully`),
         );
       }, 1000);
     });

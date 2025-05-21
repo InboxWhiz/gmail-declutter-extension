@@ -9,9 +9,7 @@ export const AllGlobalProviders: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   return (
     <LoggedInProvider>
-      <ActionsProvider>
-        {children}
-      </ActionsProvider>
+      <ActionsProvider>{children}</ActionsProvider>
     </LoggedInProvider>
   );
 };

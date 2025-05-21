@@ -4,7 +4,6 @@ import {
 } from "../../src/_shared/utils/trashSenders";
 const { trashSender } = exportForTest;
 
-
 // Mock dependencies
 import { getValidToken } from "../../src/_shared/utils/googleAuth";
 jest.mock("../../src/_shared/utils/googleAuth");
@@ -26,7 +25,11 @@ describe("trashMultipleSenders", () => {
       .mockResolvedValueOnce(5);
 
     // Act
-    const result = await trashMultipleSenders(senders, "testemail@test.com", mockTrashSender);
+    const result = await trashMultipleSenders(
+      senders,
+      "testemail@test.com",
+      mockTrashSender,
+    );
 
     // Assert
     expect(result).toBe(8);
