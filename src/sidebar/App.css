@@ -1,19 +1,23 @@
 #declutter-body {
-  background-color: white;
   font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
   height: 97vh;
   display: flex;
   flex-direction: column;
+  margin: 5px;
 }
 
-.declutter-body-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.declutter-body-title {
+#declutter-body.login {
+  height: 100vh;
+  color: white;
+  background-color: #233b86;
+  align-items: center;
   font-size: 1rem;
-  padding-left: 20px;
+  margin: 0;
+}
+
+#declutter-body.login #email-account {
+  margin-top: 7px;
+  font-size: 0.75rem;
 }
 
 .button-bar {

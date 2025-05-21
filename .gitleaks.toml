@@ -1,2 +1,2 @@
 [allowlist]
-files = ["manifest.json"]
+paths = ["manifest.json"]

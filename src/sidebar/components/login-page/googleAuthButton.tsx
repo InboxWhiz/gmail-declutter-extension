@@ -1,19 +1,18 @@
-import { useActions } from "../../_shared/providers/actionsContext";
-import { signInWithGoogle } from "../../_shared/utils/googleAuth";
+import { useActions } from "../../../_shared/providers/actionsContext";
+import { useLoggedIn } from "../../providers/loggedInContext";
 import "./googleAuthButton.css";
 
 export const GoogleAuthButton = ({
-  onAuthSuccess,
+  expectedEmailAddress,
 }: {
-  onAuthSuccess: () => void;
+  expectedEmailAddress: string;
 }) => {
-  const { getEmailAccount } = useActions();
-
+  const { setLoggedIn } = useLoggedIn();
+  const { signInWithGoogle } = useActions();
   const handleClick = async () => {
     try {
-      const email = await getEmailAccount();
-      await signInWithGoogle(email);
-      onAuthSuccess();
+      await signInWithGoogle(expectedEmailAddress);
+      setLoggedIn(true);
     } catch {
       // Do nothing on rejection
     }

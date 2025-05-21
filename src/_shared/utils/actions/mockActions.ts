@@ -1,7 +1,37 @@
 import { ManualUnsubscribeData, Sender } from "../../types/types";
-import { Actions } from "./types";
+import { Actions } from "./actionsInterface";
 
 export const mockActions: Actions = {
+  async isLoggedIn(): Promise<boolean> {
+    return new Promise((resolve) => {
+      resolve(true); // Simulate that the user is logged in
+    });
+  },
+
+  async signInWithGoogle(
+    expectedEmailAddress: string,
+  ): Promise<{ token: string; email: string }> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (expectedEmailAddress === "usertest@gmail.com") {
+          console.log("[MOCK] User authenticated successfully");
+          resolve({
+            token: "mock-oauth-token-123456",
+            email: "usertest@gmail.com",
+          });
+        } else {
+          reject("Authentication failed: Email address does not match.");
+        }
+      }, 500);
+    });
+  },
+
+  async getEmailAccount(): Promise<string> {
+    return new Promise((resolve) => {
+      resolve("usertest@gmail.com");
+    });
+  },
+
   searchEmailSenders(emails: string[]): void {
     console.log("[MOCK] Searching for emails:", emails);
   },
@@ -61,23 +91,23 @@ export const mockActions: Actions = {
   },
 
   async unsubscribeSendersAuto(
-    emails: string[],
+    senderEmailAddresses: string[],
   ): Promise<ManualUnsubscribeData> {
     // Simulates unsubscribing senders automatically.
-    console.log("[MOCK] Automatically unsubscribing:", emails);
+    console.log("[MOCK] Automatically unsubscribing:", senderEmailAddresses);
     return new Promise((resolve) => {
       setTimeout(() => {
         const linkOnlySenders: [string, string][] = [];
         const noUnsubscribeSenders: string[] = [];
 
         // Carol & Dave: Mock that they have a click-link-only unsubscribe option
-        if (emails.includes("carol@email.com")) {
+        if (senderEmailAddresses.includes("carol@email.com")) {
           linkOnlySenders.push([
             "carol@email.com",
             "https://example.com/unsubscribe/carol",
           ]);
         }
-        if (emails.includes("dave@email.com")) {
+        if (senderEmailAddresses.includes("dave@email.com")) {
           linkOnlySenders.push([
             "dave@email.com",
             "https://example.com/unsubscribe/dave",
@@ -85,10 +115,10 @@ export const mockActions: Actions = {
         }
 
         // Eve & Frank: Mock that they have no unsubscribe option
-        if (emails.includes("eve@email.com")) {
+        if (senderEmailAddresses.includes("eve@email.com")) {
           noUnsubscribeSenders.push("eve@email.com");
         }
-        if (emails.includes("frank@email.com")) {
+        if (senderEmailAddresses.includes("frank@email.com")) {
           noUnsubscribeSenders.push("frank@email.com");
         }
 
@@ -101,10 +131,12 @@ export const mockActions: Actions = {
     });
   },
 
-  async blockSender(email: string): Promise<void> {
+  async blockSender(senderEmailAddress: string): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(console.log(`[MOCK] Blocked ${email} successfully`));
+        resolve(
+          console.log(`[MOCK] Blocked ${senderEmailAddress} successfully`),
+        );
       }, 1000);
     });
   },

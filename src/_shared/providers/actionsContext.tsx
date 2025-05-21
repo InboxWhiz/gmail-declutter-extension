@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { Actions } from "../utils/actions/types";
+import { Actions } from "../utils/actions/actionsInterface";
 import { realActions } from "../utils/actions/realActions";
 import { mockActions } from "../utils/actions/mockActions";
 

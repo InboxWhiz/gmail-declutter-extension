@@ -33,6 +33,12 @@ function displayTutorial() {
   document.body.appendChild(iframe);
 }
 
+function getEmailAccount() {
+  // Get the email account from the page
+  const title = document.querySelector("title").textContent;
+  return title.split(" - ")[1].trim();
+}
+
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "SEARCH_EMAIL_SENDERS") {
     console.log("Received message to search email senders:", message.emails);
@@ -44,5 +50,12 @@ chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "SHOW_TUTORIAL") {
     console.log("Received message to show tutorial");
     displayTutorial();
+  }
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "GET_EMAIL_ACCOUNT") {
+    const value = getEmailAccount();
+    sendResponse({ result: value });
   }
 });
