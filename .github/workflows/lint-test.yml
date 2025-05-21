@@ -34,7 +34,6 @@ jobs:
           LINTER_RULES_PATH: .
           JAVASCRIPT_ES_CONFIG_FILE: eslint.config.js
           TYPESCRIPT_ES_CONFIG_FILE: eslint.config.js
-          
 
   test:
     name: test
