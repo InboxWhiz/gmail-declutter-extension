@@ -1,6 +1,6 @@
 import "./Popup.css";
 
-const supportLink = "mailto:inboxwhiz.help@gmail.com";
+const supportLink = "https://www.inboxwhiz.net/support.html";
 const donateLink = "https://buymeacoffee.com/inboxwhiz";
 const feedbackLink =
   "https://chromewebstore.google.com/detail/inboxwhiz/bjcegpgebdbhkkhngbahpfjfolcmkpma/reviews";
@@ -31,7 +31,7 @@ const PopupApp = () => {
       <div className="popupLinks">
         <p>
           <strong>Need help? Have suggestions?</strong>{" "}
-          <a href={supportLink}>Contact Us</a>
+          <a href={supportLink} target="_blank" rel="noopener noreferrer">Contact Us</a>
         </p>
         <p>
           <strong>Support Development:</strong>{" "}
