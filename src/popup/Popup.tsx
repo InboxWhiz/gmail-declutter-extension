@@ -1,6 +1,6 @@
 import "./Popup.css";
 
-const supportLink = "mailto:inboxwhiz.help@gmail.com";
+const supportLink = "https://www.inboxwhiz.net/support.html";
 const donateLink = "https://buymeacoffee.com/inboxwhiz";
 const feedbackLink =
   "https://chromewebstore.google.com/detail/inboxwhiz/bjcegpgebdbhkkhngbahpfjfolcmkpma/reviews";
