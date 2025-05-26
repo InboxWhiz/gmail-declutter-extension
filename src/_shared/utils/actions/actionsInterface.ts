@@ -95,7 +95,7 @@ export interface Actions {
    * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
    * @returns A promise that resolves to a `ManualUnsubscribeData` object containing:
    *   - `linkOnlySenders`: An array of tuples with sender email and click URL for senders that require manual action.
-   *   - `noUnsubscribeSenders`: An array of sender emails for which no unsubscribe method was found.
+   *   - `noUnsubscribeOptionSenders`: An array of sender emails for which no unsubscribe method was found.
    */
   unsubscribeSendersAuto(
     senderEmailAddresses: string[],

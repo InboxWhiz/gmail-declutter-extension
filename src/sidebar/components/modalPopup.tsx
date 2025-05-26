@@ -14,7 +14,7 @@ function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
   const { selectedSenders, clearSelectedSenders } = useSelectedSenders();
 
   let linkOnlySenders: [string, string][] = []; // List of senders that require manual unsubscribe via link, and their links to click
-  let noUnsubscribeSenders: string[] = []; // List of senders with no unsubscribe option
+  let noUnsubscribeOptionSenders: string[] = []; // List of senders with no unsubscribe option
 
   // Kick off the flow
   const startUnsubscribeFlow = async () => {
@@ -29,7 +29,7 @@ function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
     const unsubscribeResults: ManualUnsubscribeData =
       await unsubscribeSendersAuto(Object.keys(selectedSenders));
     linkOnlySenders = unsubscribeResults.linkOnlySenders;
-    noUnsubscribeSenders = unsubscribeResults.noUnsubscribeSenders;
+    noUnsubscribeOptionSenders = unsubscribeResults.noUnsubscribeOptionSenders;
 
     // Start processing link-only senders
     processNextLink(0);
@@ -83,12 +83,12 @@ function useUnsubscribeFlow(deleteEmails: boolean, blockSenders: boolean) {
 
   // Process one block-only sender at `i`
   const processNextBlock = async (i: number) => {
-    if (i >= noUnsubscribeSenders.length) {
+    if (i >= noUnsubscribeOptionSenders.length) {
       endUnsubscribeFlow();
       return;
     }
 
-    const email = noUnsubscribeSenders[i];
+    const email = noUnsubscribeOptionSenders[i];
 
     setModal({
       action: "unsubscribe",
