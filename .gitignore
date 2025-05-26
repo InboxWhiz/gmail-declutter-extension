@@ -29,3 +29,6 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Video files
+*.mp4
