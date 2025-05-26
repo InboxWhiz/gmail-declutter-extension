@@ -1,15 +1,7 @@
-import {
-  ManualUnsubscribeData,
-  Sender,
-  UnsubscribeData,
-} from "../../types/types";
+import { Sender } from "../../types/types";
 import { fetchAllSenders } from "../fetchSenders";
 import { trashMultipleSenders } from "../trashSenders";
-import {
-  getMultipleUnsubscribeData,
-  unsubscribeUsingMailTo,
-  // unsubscribeUsingPostUrl,
-} from "../unsubscribeSenders";
+import { unsubscribeSendersAuto } from "../unsubscribeSenders";
 import { Actions } from "./actionsInterface";
 import { getCachedToken, getValidToken, signInWithGoogle } from "../googleAuth";
 import { getEmailAccount } from "../utils";
@@ -147,58 +139,7 @@ export const realActions: Actions = {
     });
   },
 
-  async unsubscribeSendersAuto(
-    senderEmailAddresses: string[],
-    getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
-  ): Promise<ManualUnsubscribeData> {
-    const accountEmail = await getEmailAccount();
-
-    // Get the latest message ids for each sender
-    console.log(
-      "Unsubscribing automatically from senders: ",
-      senderEmailAddresses,
-    );
-
-    // Get the latestMessageIds for the given emails from local storage
-    const result = await chrome.storage.local.get([accountEmail]);
-    const messageIds: string[] = result[accountEmail].senders
-      .filter((sender: [string, string, number, string]) =>
-        senderEmailAddresses.includes(sender[0]),
-      )
-      .map((sender: [string, string, number, string]) => sender[3]);
-
-    console.log("Message IDs for unsubscribe: ", messageIds);
-    // Get the unsubscribe data for all the message ids
-    const unsubscribeData: UnsubscribeData[] = await getMultipleUnsubscribeData(
-      messageIds,
-      accountEmail,
-    );
-
-    console.log("Unsubscribe data: ", unsubscribeData);
-
-    // Attempt to automatically unsubscribe from each.
-    const linkOnlySenders: [string, string][] = [];
-    const noUnsubscribeSenders: string[] = [];
-    unsubscribeData.forEach((sender, index) => {
-      // if (sender.posturl !== null) {
-      //   unsubscribeUsingPostUrl(sender.posturl);
-      // } else if (sender.mailto !== null) {
-      if (sender.mailto !== null) {
-        unsubscribeUsingMailTo(sender.mailto, accountEmail);
-      } else if (sender.clickurl !== null) {
-        // If only a click URL is available, store it for later use
-        linkOnlySenders.push([senderEmailAddresses[index], sender.clickurl]);
-      } else {
-        // No unsubscribe data found, so can only block
-        noUnsubscribeSenders.push(senderEmailAddresses[index]);
-      }
-    });
-
-    return {
-      linkOnlySenders: linkOnlySenders,
-      noUnsubscribeSenders: noUnsubscribeSenders,
-    };
-  },
+  unsubscribeSendersAuto,
 
   async blockSender(
     senderEmailAddress: string,
