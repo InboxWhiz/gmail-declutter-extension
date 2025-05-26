@@ -5,6 +5,7 @@ import {
   exportForTest,
 } from "../../src/_shared/utils/unsubscribeSenders";
 const {
+  getLatestMessageIds,
   getListUnsubscribeHeader,
   getUnsubscribeLinkFromBody,
   getUnsubscribeData,
@@ -29,6 +30,94 @@ jest.mock("../../src/_shared/utils/utils", () => ({
 global.fetch = jest.fn();
 
 // Test suites
+
+describe("getLatestMessageIds", () => {
+  const accountEmail = "testuser@example.com";
+  (global as any).chrome = {
+    storage: {
+      local: {
+        get: jest.fn(),
+      },
+    },
+  };
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("throws when no data for the account key", async () => {
+    // Arrange
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({});
+
+    // Act & Assert
+    await expect(
+      getLatestMessageIds(accountEmail, ["a@example.com"]),
+    ).rejects.toThrow(TypeError);
+  });
+
+  it("returns empty array when senders array is empty", async () => {
+    // Arrange
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      [accountEmail]: { senders: [] },
+    });
+
+    // Act & Assert
+    await expect(
+      getLatestMessageIds(accountEmail, ["alice@example.com"]),
+    ).resolves.toEqual([]);
+  });
+
+  it("filters and returns IDs for matching senders", async () => {
+    // Arrange
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      [accountEmail]: {
+        senders: [
+          ["alice@example.com", "Alice", 5, "id-A"],
+          ["bob@example.com", "Bob", 2, "id-B"],
+          ["carol@example.com", "Carol", 1, "id-C"],
+        ],
+      },
+    });
+
+    // Act & Assert
+    await expect(
+      getLatestMessageIds(accountEmail, [
+        "bob@example.com",
+        "carol@example.com",
+      ]),
+    ).resolves.toEqual(["id-B", "id-C"]);
+  });
+
+  it("returns empty array when input senderEmailAddresses is empty", async () => {
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      [accountEmail]: {
+        senders: [["alice@example.com", "Alice", 1, "id-A"]],
+      },
+    });
+
+    await expect(getLatestMessageIds(accountEmail, [])).resolves.toEqual([]);
+  });
+
+  it("rejects when the storage API itself errors", async () => {
+    (chrome.storage.local.get as jest.Mock).mockRejectedValueOnce(
+      new Error("Storage failure"),
+    );
+
+    await expect(
+      getLatestMessageIds("any@acct.com", ["a@example.com"]),
+    ).rejects.toThrow("Storage failure");
+  });
+
+  it("throws when stored data is malformed (no senders array)", async () => {
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      "bad@data.com": { notSenders: [] },
+    });
+
+    await expect(
+      getLatestMessageIds("bad@data.com", ["x@example.com"]),
+    ).rejects.toThrow();
+  });
+});
 
 describe("getMultipleUnsubscribeData", () => {
   const mockGetUnsubscribeData = jest.fn();

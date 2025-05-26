@@ -3,6 +3,26 @@ import { sleep, parseListUnsubscribeHeader } from "./utils";
 import { UnsubscribeData } from "../types/types";
 
 /**
+ * Retrieves the latest message IDs from Chrome's local storage for a given account and a list of sender email addresses.
+ *
+ * @param accountEmail - The email address of the account whose senders are being queried.
+ * @param senderEmailAddresses - An array of sender email addresses to filter and retrieve message IDs for.
+ * @returns A promise that resolves to an array of message IDs (as strings) corresponding to the latest messages from the specified senders.
+ */
+async function getLatestMessageIds(
+  accountEmail: string,
+  senderEmailAddresses: string[],
+) {
+  const result = await chrome.storage.local.get([accountEmail]);
+  const messageIds: string[] = result[accountEmail].senders
+    .filter((sender: [string, string, number, string]) =>
+      senderEmailAddresses.includes(sender[0]),
+    )
+    .map((sender: [string, string, number, string]) => sender[3]);
+  return messageIds;
+}
+
+/**
  * Retrieves unsubscribe data from multiple email messages.
  *
  * @param messageIds - An array of Gmail message IDs to fetch unsubscribe data for.
