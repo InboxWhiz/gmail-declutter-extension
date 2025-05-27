@@ -1,6 +1,5 @@
 import { getValidToken } from "./googleAuth";
-import { sleep, parseListUnsubscribeHeader } from "./utils";
-import { getEmailAccount as _getEmailAccount } from "./utils";
+import { sleep, parseListUnsubscribeHeader, getEmailAccount } from "./utils";
 import { ManualUnsubscribeData, UnsubscribeData } from "../types/types";
 
 /**
@@ -11,16 +10,31 @@ import { ManualUnsubscribeData, UnsubscribeData } from "../types/types";
  * information is found at all), the sender is added to the appropriate result list for further handling.
  *
  * @param senderEmailAddresses - An array of sender email addresses to attempt to unsubscribe from.
- * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
+ * @param deps - Optional dependency overrides for testing.
  * @returns A promise that resolves to a `ManualUnsubscribeData` object containing:
  *   - `linkOnlySenders`: An array of tuples with sender email and click URL for senders that require manual action.
  *   - `noUnsubscribeOptionSenders`: An array of sender emails for which no unsubscribe method was found.
  */
 export async function unsubscribeSendersAuto(
   senderEmailAddresses: string[],
-  getEmailAccount: () => Promise<string> = _getEmailAccount,
+  deps?: {
+    getEmailAccount?: Function;
+    getLatestMessageIds?: Function;
+    getMultipleUnsubscribeData?: Function;
+    unsubscribeUsingMailTo?: Function;
+    unsubscribeUsingPostUrl?: Function;
+  },
 ): Promise<ManualUnsubscribeData> {
-  const accountEmail = await getEmailAccount();
+  const {
+    getEmailAccount: _getEmailAccount = getEmailAccount,
+    getLatestMessageIds: _getLatestMessageIds = getLatestMessageIds,
+    getMultipleUnsubscribeData:
+      _getMultipleUnsubscribeData = getMultipleUnsubscribeData,
+    unsubscribeUsingMailTo: _unsubscribeUsingMailTo = unsubscribeUsingMailTo,
+    unsubscribeUsingPostUrl: _unsubscribeUsingPostUrl = unsubscribeUsingPostUrl,
+  } = deps || {};
+
+  const accountEmail = await _getEmailAccount();
 
   console.log(
     "Unsubscribing automatically from senders: ",
@@ -28,13 +42,13 @@ export async function unsubscribeSendersAuto(
   );
 
   // Get the latest message IDs for the specified sender email addresses
-  const messageIds: string[] = await getLatestMessageIds(
+  const messageIds: string[] = await _getLatestMessageIds(
     accountEmail,
     senderEmailAddresses,
   );
 
   // Get the unsubscribe data for all the message ids
-  const unsubscribeData: UnsubscribeData[] = await getMultipleUnsubscribeData(
+  const unsubscribeData: UnsubscribeData[] = await _getMultipleUnsubscribeData(
     messageIds,
     accountEmail,
   );
@@ -49,7 +63,7 @@ export async function unsubscribeSendersAuto(
       if (sender.mailto !== null) {
         // If a mailto link is available, unsubscribe using it
         try {
-          await unsubscribeUsingMailTo(sender.mailto, accountEmail);
+          await _unsubscribeUsingMailTo(sender.mailto, accountEmail);
         } catch (error) {
           console.log(
             `Failed to unsubscribe using mailto for ${senderEmailAddresses[index]}: ${error}`,
@@ -323,7 +337,7 @@ async function getUnsubscribeLinkFromBody(
  * Constructs and encodes an email message to send to the recipient for unsubscribing, formatted for Gmail API usage.
  *
  * @param recipient - The email address to which the unsubscribe message will be sent.
- * @returns The base64url-encoded email message as a string.
+ * @returns The email message as an RFC 2822 formatted and base64url encoded string.
  */
 function buildEmailMessage(recipient: string) {
   const rawLines = [
@@ -345,6 +359,7 @@ function buildEmailMessage(recipient: string) {
 }
 
 export const exportForTest = {
+  unsubscribeUsingMailTo,
   getLatestMessageIds,
   getListUnsubscribeHeader,
   getUnsubscribeLinkFromBody,

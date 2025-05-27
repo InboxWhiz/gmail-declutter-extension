@@ -21,7 +21,7 @@ export interface Actions {
    * @returns {Promise<{ token: string; email: string }>} A promise that resolves to an object containing the user's OAuth token and email address upon successful authentication.
    */
   signInWithGoogle(
-    expectedEmailAddress: string,
+    expectedEmailAddress: string
   ): Promise<{ token: string; email: string }>;
 
   /**
@@ -52,7 +52,7 @@ export interface Actions {
    */
   deleteSenders(
     senderEmailAddresses: string[],
-    getEmailAccount?: () => Promise<string>,
+    getEmailAccount?: () => Promise<string>
   ): Promise<void>;
 
   /**
@@ -69,7 +69,7 @@ export interface Actions {
    */
   getAllSenders(
     fetchNew?: boolean,
-    getEmailAccount?: () => Promise<string>,
+    getEmailAccount?: () => Promise<string>
   ): Promise<Sender[]>;
 
   /**
@@ -81,25 +81,31 @@ export interface Actions {
    */
   checkFetchProgress(
     setProgressCallback: (progress: number) => void,
-    getEmailAccount?: () => Promise<string>,
+    getEmailAccount?: () => Promise<string>
   ): Promise<number>;
 
-  /**
-   * Attempts to automatically unsubscribe from the given list of email addresses.
-   *
-   * This function reads the last email message from each sender and tries to perform an automatic unsubscribe action.
-   * If an automatic unsubscribe is not possible (e.g., only a click URL is available or no unsubscribe
-   * information is found at all), the sender is added to the appropriate result list for further handling.
-   *
-   * @param senderEmailAddresses - An array of sender email addresses to attempt to unsubscribe from.
-   * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
-   * @returns A promise that resolves to a `ManualUnsubscribeData` object containing:
-   *   - `linkOnlySenders`: An array of tuples with sender email and click URL for senders that require manual action.
-   *   - `noUnsubscribeOptionSenders`: An array of sender emails for which no unsubscribe method was found.
-   */
+/**
+ * Attempts to automatically unsubscribe from the given list of email addresses.
+ *
+ * This function reads the last email message from each sender and tries to perform an automatic unsubscribe action.
+ * If an automatic unsubscribe is not possible (e.g., only a click URL is available or no unsubscribe
+ * information is found at all), the sender is added to the appropriate result list for further handling.
+ *
+ * @param senderEmailAddresses - An array of sender email addresses to attempt to unsubscribe from.
+ * @param deps - Optional dependency overrides for testing.
+ * @returns A promise that resolves to a `ManualUnsubscribeData` object containing:
+ *   - `linkOnlySenders`: An array of tuples with sender email and click URL for senders that require manual action.
+ *   - `noUnsubscribeOptionSenders`: An array of sender emails for which no unsubscribe method was found.
+ */
   unsubscribeSendersAuto(
     senderEmailAddresses: string[],
-    getEmailAccount?: () => Promise<string>,
+    deps?: {
+      getEmailAccount?: Function;
+      getLatestMessageIds?: Function;
+      getMultipleUnsubscribeData?: Function;
+      unsubscribeUsingMailTo?: Function;
+      unsubscribeUsingPostUrl?: Function;
+    }
   ): Promise<ManualUnsubscribeData>;
 
   /**
