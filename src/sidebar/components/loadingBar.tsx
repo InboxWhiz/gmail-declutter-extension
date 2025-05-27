@@ -20,7 +20,7 @@ const LoadingBar = () => {
         <div
           id="progress-bar"
           style={{
-            width: `${progress * 100}%`, // Only width is dynamic now
+            width: `${progress * 100}%`,
           }}
         />
       </div>

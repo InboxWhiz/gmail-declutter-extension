@@ -54,6 +54,11 @@ export async function fetchAllSenders(accountEmail: string): Promise<void> {
     );
 
     storeSenders(senders, accountEmail);
+
+    // Reset progress after completion
+    chrome.storage.local.set({
+      fetchProgress: { [accountEmail]: 0 },
+    });
   } catch (err) {
     console.error("Error fetching senders:", err);
   }
