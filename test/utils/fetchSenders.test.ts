@@ -167,7 +167,7 @@ describe("fetchAllSenders", () => {
     expect(fetch).toHaveBeenCalledTimes(3);
   });
 
-  test("periodically updates fetchProgress in chrome.storage.local during batch processing", async () => {
+  test("periodically updates fetchProgress in chrome.storage.local during batch processing and resets at the end", async () => {
     // Arrange
 
     // Simulate 80 message IDs (2 batches of 40)
@@ -201,13 +201,17 @@ describe("fetchAllSenders", () => {
     const setCalls = (chrome.storage.local.set as jest.Mock).mock.calls.filter(
       ([arg]) => arg && typeof arg === "object" && "fetchProgress" in arg,
     );
-    expect(setCalls.length).toBe(2);
+    expect(setCalls.length).toBe(3);
 
     // The progress should increase and be between 0 and 1
     setCalls.forEach(([arg]) => {
-      expect(arg.fetchProgress["testemail@test.com"]).toBeGreaterThan(0);
+      expect(arg.fetchProgress["testemail@test.com"]).toBeGreaterThanOrEqual(0);
       expect(arg.fetchProgress["testemail@test.com"]).toBeLessThanOrEqual(1);
     });
+
+    // The final call should reset fetchProgress to 0
+    const finalCall = setCalls[setCalls.length - 1][0];
+    expect(finalCall.fetchProgress["testemail@test.com"]).toBe(0);
   });
 });
 
