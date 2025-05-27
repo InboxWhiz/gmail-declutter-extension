@@ -97,7 +97,7 @@ export const realActions: Actions = {
           const realSenders: Sender[] = senders
             .filter(
               (sender: [string, string, number]) =>
-                !sender[0].endsWith("@gmail.com"),
+                sender[0] !== "null" && !sender[0].endsWith("@gmail.com"),
             )
             .map((sender: [string, string, number]) => ({
               email: sender[0],
