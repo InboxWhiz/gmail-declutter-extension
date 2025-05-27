@@ -31,7 +31,9 @@ const PopupApp = () => {
       <div className="popupLinks">
         <p>
           <strong>Need help? Have suggestions?</strong>{" "}
-          <a href={supportLink} target="_blank" rel="noopener noreferrer">Contact Us</a>
+          <a href={supportLink} target="_blank" rel="noopener noreferrer">
+            Contact Us
+          </a>
         </p>
         <p>
           <strong>Support Development:</strong>{" "}

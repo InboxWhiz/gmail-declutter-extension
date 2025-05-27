@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { getValidToken } from "./googleAuth";
 import { sleep, parseListUnsubscribeHeader, getEmailAccount } from "./utils";
 import { ManualUnsubscribeData, UnsubscribeData } from "../types/types";
@@ -31,7 +32,7 @@ export async function unsubscribeSendersAuto(
     getMultipleUnsubscribeData:
       _getMultipleUnsubscribeData = getMultipleUnsubscribeData,
     unsubscribeUsingMailTo: _unsubscribeUsingMailTo = unsubscribeUsingMailTo,
-    unsubscribeUsingPostUrl: _unsubscribeUsingPostUrl = unsubscribeUsingPostUrl,
+    // unsubscribeUsingPostUrl: _unsubscribeUsingPostUrl = unsubscribeUsingPostUrl,
   } = deps || {};
 
   const accountEmail = await _getEmailAccount();

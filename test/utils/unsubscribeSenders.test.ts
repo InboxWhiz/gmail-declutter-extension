@@ -20,7 +20,6 @@ import {
   sleep,
   parseListUnsubscribeHeader,
 } from "../../src/_shared/utils/utils";
-import { mock } from "node:test";
 jest.mock("../../src/_shared/utils/utils", () => ({
   sleep: jest.fn(),
   parseListUnsubscribeHeader: jest.fn().mockReturnValue({
@@ -196,7 +195,7 @@ describe("unsubscribeSendersAuto", () => {
     expect(mockGetMultipleUnsubscribeData).toHaveBeenCalledTimes(1);
     expect(mockGetMultipleUnsubscribeData).toHaveBeenCalledWith(
       ["message-id-1", "message-id-2", "message-id-3", "message-id-4"],
-      accountEmail
+      accountEmail,
     );
   });
 
@@ -219,7 +218,7 @@ describe("unsubscribeSendersAuto", () => {
     expect(mockUnsubscribeUsingPostUrl).not.toHaveBeenCalled();
     expect(mockUnsubscribeUsingMailTo).toHaveBeenCalledWith(
       "mailto:unsubscribe@sender.com",
-      accountEmail
+      accountEmail,
     );
   });
 
@@ -264,7 +263,7 @@ describe("getLatestMessageIds", () => {
 
     // Act & Assert
     await expect(
-      getLatestMessageIds(accountEmail, ["a@example.com"])
+      getLatestMessageIds(accountEmail, ["a@example.com"]),
     ).rejects.toThrow(TypeError);
   });
 
@@ -276,7 +275,7 @@ describe("getLatestMessageIds", () => {
 
     // Act & Assert
     await expect(
-      getLatestMessageIds(accountEmail, ["alice@example.com"])
+      getLatestMessageIds(accountEmail, ["alice@example.com"]),
     ).resolves.toEqual([]);
   });
 
@@ -297,7 +296,7 @@ describe("getLatestMessageIds", () => {
       getLatestMessageIds(accountEmail, [
         "bob@example.com",
         "carol@example.com",
-      ])
+      ]),
     ).resolves.toEqual(["id-B", "id-C"]);
   });
 
@@ -313,11 +312,11 @@ describe("getLatestMessageIds", () => {
 
   it("rejects when the storage API itself errors", async () => {
     (chrome.storage.local.get as jest.Mock).mockRejectedValueOnce(
-      new Error("Storage failure")
+      new Error("Storage failure"),
     );
 
     await expect(
-      getLatestMessageIds("any@acct.com", ["a@example.com"])
+      getLatestMessageIds("any@acct.com", ["a@example.com"]),
     ).rejects.toThrow("Storage failure");
   });
 
@@ -327,7 +326,7 @@ describe("getLatestMessageIds", () => {
     });
 
     await expect(
-      getLatestMessageIds("bad@data.com", ["x@example.com"])
+      getLatestMessageIds("bad@data.com", ["x@example.com"]),
     ).rejects.toThrow();
   });
 });
@@ -350,7 +349,7 @@ describe("getMultipleUnsubscribeData", () => {
     const result = await getMultipleUnsubscribeData(
       [],
       "testemail@test.com",
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -369,7 +368,7 @@ describe("getMultipleUnsubscribeData", () => {
     const result = await getMultipleUnsubscribeData(
       [messageId],
       "testemail@test.com",
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -392,7 +391,7 @@ describe("getMultipleUnsubscribeData", () => {
     const result = await getMultipleUnsubscribeData(
       ids,
       "testemail@test.com",
-      mockGetUnsubscribeData
+      mockGetUnsubscribeData,
     );
 
     // Assert
@@ -425,7 +424,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     // Assert
@@ -444,7 +443,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     // Assert
@@ -462,7 +461,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     expect(headerMock).toHaveBeenCalledWith(messageId, token);
@@ -479,7 +478,7 @@ describe("getUnsubscribeData", () => {
       messageId,
       token,
       headerMock,
-      linkMock
+      linkMock,
     );
 
     expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
@@ -619,7 +618,7 @@ describe("unsubscribeUsingPostUrl", () => {
 
     // Expect the promise to reject with appropriate error message
     await expect(unsubscribeUsingPostUrl(testUrl)).rejects.toThrow(
-      "Failed to unsubscribe using POST URL: 400 Bad Request"
+      "Failed to unsubscribe using POST URL: 400 Bad Request",
     );
 
     // Verify fetch was called correctly
@@ -645,7 +644,7 @@ describe("unsubscribeUsingMailTo", () => {
 
   it("sends a correctly formatted raw message via Gmail API", async () => {
     await expect(
-      unsubscribeUsingMailTo(email, "testemail@test.com")
+      unsubscribeUsingMailTo(email, "testemail@test.com"),
     ).resolves.toBeUndefined();
 
     // Verify token retrieval
@@ -656,7 +655,7 @@ describe("unsubscribeUsingMailTo", () => {
     expect(fetchMock.calls.length).toBe(1);
     const [url, options] = fetchMock.calls[0];
     expect(url).toBe(
-      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
+      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
     );
     expect(options.method).toBe("POST");
     expect(options.headers.Authorization).toBe(`Bearer ${token}`);
@@ -688,7 +687,7 @@ describe("unsubscribeUsingMailTo", () => {
     });
 
     await expect(
-      unsubscribeUsingMailTo(email, "testemail@test.com")
+      unsubscribeUsingMailTo(email, "testemail@test.com"),
     ).rejects.toThrow("Gmail API error: 500 Server Error");
     expect(getValidToken).toHaveBeenCalledTimes(1);
     expect((global.fetch as jest.Mock).mock.calls.length).toBe(1);
