@@ -89,6 +89,54 @@ export function parseListUnsubscribeHeader(
 }
 
 /**
+ * Helper function to convert a UTF-8 string into a binary string where each character represents a byte.
+ *
+ * @param str - The input string to convert.
+ * @returns A binary string representation of the UTF-8 encoded input.
+ */
+export function utf8ToBinary(str: string): string {
+  return new TextEncoder()
+    .encode(str)
+    .reduce((s, byte) => s + String.fromCharCode(byte), "");
+}
+
+/**
+ * Retrieves the Gmail account associated with the currently active browser tab.
+ *
+ * This function sends a message to the content script of the active tab to request the current email account.
+ *
+ * @returns {Promise<string>} A promise that resolves to the email address string.
+ * @throws Will reject the promise if there is no active tab or if a messaging error occurs.
+ */
+export async function getEmailAccount(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tabId = tabs[0]?.id;
+      if (tabId === undefined) {
+        reject("No active tab.");
+        return;
+      }
+
+      chrome.tabs.sendMessage(
+        tabId,
+        { action: "GET_EMAIL_ACCOUNT" },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.error(
+              "Could not get email account:",
+              chrome.runtime.lastError,
+            );
+            reject(chrome.runtime.lastError.message);
+          } else {
+            resolve(response.result);
+          }
+        },
+      );
+    });
+  });
+}
+
+/**
  * Pauses execution for a specified number of milliseconds.
  *
  * @param ms - The number of milliseconds to sleep.

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { ManualUnsubscribeData, Sender } from "../../types/types";
 
 export interface Actions {
@@ -92,14 +93,20 @@ export interface Actions {
    * information is found at all), the sender is added to the appropriate result list for further handling.
    *
    * @param senderEmailAddresses - An array of sender email addresses to attempt to unsubscribe from.
-   * @param getEmailAccount - Optional function to retrieve the current Gmail account email address.
+   * @param deps - Optional dependency overrides for testing.
    * @returns A promise that resolves to a `ManualUnsubscribeData` object containing:
    *   - `linkOnlySenders`: An array of tuples with sender email and click URL for senders that require manual action.
-   *   - `noUnsubscribeSenders`: An array of sender emails for which no unsubscribe method was found.
+   *   - `noUnsubscribeOptionSenders`: An array of sender emails for which no unsubscribe method was found.
    */
   unsubscribeSendersAuto(
     senderEmailAddresses: string[],
-    getEmailAccount?: () => Promise<string>,
+    deps?: {
+      getEmailAccount?: Function;
+      getLatestMessageIds?: Function;
+      getMultipleUnsubscribeData?: Function;
+      unsubscribeUsingMailTo?: Function;
+      unsubscribeUsingPostUrl?: Function;
+    },
   ): Promise<ManualUnsubscribeData>;
 
   /**

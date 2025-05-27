@@ -1,10 +1,12 @@
 import {
+  unsubscribeSendersAuto,
   getMultipleUnsubscribeData,
-  unsubscribeUsingMailTo,
   unsubscribeUsingPostUrl,
   exportForTest,
 } from "../../src/_shared/utils/unsubscribeSenders";
 const {
+  unsubscribeUsingMailTo,
+  getLatestMessageIds,
   getListUnsubscribeHeader,
   getUnsubscribeLinkFromBody,
   getUnsubscribeData,
@@ -29,6 +31,305 @@ jest.mock("../../src/_shared/utils/utils", () => ({
 global.fetch = jest.fn();
 
 // Test suites
+
+describe("getListUnsubscribeHeader", () => {
+  const messageId = "msg123";
+  const token = "mock-token";
+  const expectedUrl =
+    `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}` +
+    "?format=metadata&metadataHeaders=List-Unsubscribe";
+  const mockParsed = {
+    posturl: "https://example.com/posturl",
+    mailto: "unsubscribe@example.com",
+    clickurl: "https://example.com/clickurl",
+  };
+
+  beforeEach(() => {
+    (fetch as jest.Mock).mockReset();
+  });
+
+  it("calls fetch with correct URL and headers and returns parsed data", async () => {
+    // Arrange: valid header
+    const rawValue =
+      "<https://example.com/posturl>,<mailto:unsubscribe@example.com>";
+    const response = {
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          payload: { headers: [{ name: "List-Unsubscribe", value: rawValue }] },
+        }),
+    };
+    (fetch as jest.Mock).mockResolvedValueOnce(response);
+
+    // Act
+    const result = await getListUnsubscribeHeader(messageId, token);
+
+    // Assert fetch call
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith(expectedUrl, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Assert parsing
+    expect(parseListUnsubscribeHeader).toHaveBeenCalledWith(rawValue);
+    expect(result).toEqual(mockParsed);
+  });
+
+  it("handles missing List-Unsubscribe header gracefully", async () => {
+    // Arrange: no matching header
+    const response = {
+      status: 200,
+      json: () => Promise.resolve({ payload: { headers: [] } }),
+    };
+    (fetch as jest.Mock).mockResolvedValueOnce(response);
+
+    // Act
+    const result = await getListUnsubscribeHeader(messageId, token);
+
+    // parseListUnsubscribeHeader should be called with undefined
+    expect(parseListUnsubscribeHeader).toHaveBeenCalledWith(undefined);
+    expect(result).toStrictEqual(mockParsed);
+  });
+
+  it("retries after HTTP 429 and then returns parsed data", async () => {
+    // Arrange: first rate limit, then success
+    const rawValue = "<https://retry/unsub>";
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({ status: 429 })
+      .mockResolvedValueOnce({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            payload: {
+              headers: [{ name: "List-Unsubscribe", value: rawValue }],
+            },
+          }),
+      });
+
+    // Act
+    const result = await getListUnsubscribeHeader(messageId, token);
+
+    // Assert retry logic
+    expect(sleep).toHaveBeenCalledWith(1000);
+    expect(fetch as jest.Mock).toHaveBeenCalledTimes(2);
+    expect(parseListUnsubscribeHeader).toHaveBeenCalledWith(rawValue);
+    expect(result).toStrictEqual(mockParsed);
+  });
+
+  it("return null values on error", async () => {
+    // Arrange: invalid JSON
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      status: 200,
+      json: () => Promise.reject(new Error("json-error")),
+    });
+
+    // Act
+    const result = await getListUnsubscribeHeader(messageId, token);
+
+    // Assert
+    expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
+  });
+});
+
+describe("unsubscribeSendersAuto", () => {
+  const mockIds = [
+    "message-id-1",
+    "message-id-2",
+    "message-id-3",
+    "message-id-4",
+  ];
+
+  const mockUnsubscribeData = [
+    {
+      posturl: "http://unsubscribe-url.com/post",
+      mailto: null,
+      clickurl: null,
+    },
+    { posturl: null, mailto: "mailto:unsubscribe@sender.com", clickurl: null },
+    {
+      posturl: null,
+      mailto: null,
+      clickurl: "http://unsubscribe-url.com/click",
+    },
+    { posturl: null, mailto: null, clickurl: null },
+  ];
+
+  const accountEmail = "test@example.com";
+
+  const mockGetLatestMessageIds = jest.fn();
+  const mockGetMultipleUnsubscribeData = jest.fn();
+  const mockGetEmailAccount = jest.fn();
+  const mockUnsubscribeUsingMailTo = jest.fn();
+  const mockUnsubscribeUsingPostUrl = jest.fn();
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+    mockGetMultipleUnsubscribeData.mockResolvedValue(mockUnsubscribeData);
+    mockGetEmailAccount.mockResolvedValue(accountEmail);
+  });
+
+  it("should call getMultipleUnsubscribeData with correct message ids", async () => {
+    // Arrange
+    const emails = [
+      "sender1@example.com",
+      "sender2@example.com",
+      "sender3@example.com",
+      "sender4@example.com",
+    ];
+    mockGetLatestMessageIds.mockResolvedValue(mockIds);
+
+    // Act
+    await unsubscribeSendersAuto(emails, {
+      getEmailAccount: mockGetEmailAccount,
+      getLatestMessageIds: mockGetLatestMessageIds,
+      getMultipleUnsubscribeData: mockGetMultipleUnsubscribeData,
+      unsubscribeUsingMailTo: mockUnsubscribeUsingMailTo,
+      unsubscribeUsingPostUrl: mockUnsubscribeUsingPostUrl,
+    });
+
+    // Assert
+    expect(mockGetMultipleUnsubscribeData).toHaveBeenCalledTimes(1);
+    expect(mockGetMultipleUnsubscribeData).toHaveBeenCalledWith(
+      ["message-id-1", "message-id-2", "message-id-3", "message-id-4"],
+      accountEmail,
+    );
+  });
+
+  it("should call unsubscribeUsingMailTo when mailto is present", async () => {
+    // Arrange
+    const emails = ["sender2@example.com"];
+    mockGetLatestMessageIds.mockResolvedValue([mockIds[1]]);
+    mockGetMultipleUnsubscribeData.mockResolvedValue([mockUnsubscribeData[1]]);
+
+    // Act
+    await unsubscribeSendersAuto(emails, {
+      getEmailAccount: mockGetEmailAccount,
+      getLatestMessageIds: mockGetLatestMessageIds,
+      getMultipleUnsubscribeData: mockGetMultipleUnsubscribeData,
+      unsubscribeUsingMailTo: mockUnsubscribeUsingMailTo,
+      unsubscribeUsingPostUrl: mockUnsubscribeUsingPostUrl,
+    });
+
+    // Assert
+    expect(mockUnsubscribeUsingPostUrl).not.toHaveBeenCalled();
+    expect(mockUnsubscribeUsingMailTo).toHaveBeenCalledWith(
+      "mailto:unsubscribe@sender.com",
+      accountEmail,
+    );
+  });
+
+  it("should not call unsubscribeUsingPostUrl or unsubscribeUsingMailTo if no auto-unsubscribe method is available", async () => {
+    // Arrange
+    const emails = ["sender3@example.com"];
+    mockGetLatestMessageIds.mockResolvedValue([mockIds[2]]);
+    mockGetMultipleUnsubscribeData.mockResolvedValue([mockUnsubscribeData[2]]);
+
+    // Act
+    await unsubscribeSendersAuto(emails, {
+      getEmailAccount: mockGetEmailAccount,
+      getLatestMessageIds: mockGetLatestMessageIds,
+      getMultipleUnsubscribeData: mockGetMultipleUnsubscribeData,
+      unsubscribeUsingMailTo: mockUnsubscribeUsingMailTo,
+      unsubscribeUsingPostUrl: mockUnsubscribeUsingPostUrl,
+    });
+
+    // Assert: Neither method should be called
+    expect(mockUnsubscribeUsingPostUrl).not.toHaveBeenCalled();
+    expect(mockUnsubscribeUsingMailTo).not.toHaveBeenCalled();
+  });
+});
+
+describe("getLatestMessageIds", () => {
+  const accountEmail = "testuser@example.com";
+  (global as any).chrome = {
+    storage: {
+      local: {
+        get: jest.fn(),
+      },
+    },
+  };
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("throws when no data for the account key", async () => {
+    // Arrange
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({});
+
+    // Act & Assert
+    await expect(
+      getLatestMessageIds(accountEmail, ["a@example.com"]),
+    ).rejects.toThrow(TypeError);
+  });
+
+  it("returns empty array when senders array is empty", async () => {
+    // Arrange
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      [accountEmail]: { senders: [] },
+    });
+
+    // Act & Assert
+    await expect(
+      getLatestMessageIds(accountEmail, ["alice@example.com"]),
+    ).resolves.toEqual([]);
+  });
+
+  it("filters and returns IDs for matching senders", async () => {
+    // Arrange
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      [accountEmail]: {
+        senders: [
+          ["alice@example.com", "Alice", 5, "id-A"],
+          ["bob@example.com", "Bob", 2, "id-B"],
+          ["carol@example.com", "Carol", 1, "id-C"],
+        ],
+      },
+    });
+
+    // Act & Assert
+    await expect(
+      getLatestMessageIds(accountEmail, [
+        "bob@example.com",
+        "carol@example.com",
+      ]),
+    ).resolves.toEqual(["id-B", "id-C"]);
+  });
+
+  it("returns empty array when input senderEmailAddresses is empty", async () => {
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      [accountEmail]: {
+        senders: [["alice@example.com", "Alice", 1, "id-A"]],
+      },
+    });
+
+    await expect(getLatestMessageIds(accountEmail, [])).resolves.toEqual([]);
+  });
+
+  it("rejects when the storage API itself errors", async () => {
+    (chrome.storage.local.get as jest.Mock).mockRejectedValueOnce(
+      new Error("Storage failure"),
+    );
+
+    await expect(
+      getLatestMessageIds("any@acct.com", ["a@example.com"]),
+    ).rejects.toThrow("Storage failure");
+  });
+
+  it("throws when stored data is malformed (no senders array)", async () => {
+    (chrome.storage.local.get as jest.Mock).mockResolvedValueOnce({
+      "bad@data.com": { notSenders: [] },
+    });
+
+    await expect(
+      getLatestMessageIds("bad@data.com", ["x@example.com"]),
+    ).rejects.toThrow();
+  });
+});
 
 describe("getMultipleUnsubscribeData", () => {
   const mockGetUnsubscribeData = jest.fn();
@@ -180,109 +481,6 @@ describe("getUnsubscribeData", () => {
       linkMock,
     );
 
-    expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
-  });
-});
-
-describe("getListUnsubscribeHeader", () => {
-  const messageId = "msg123";
-  const token = "mock-token";
-  const expectedUrl =
-    `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}` +
-    "?format=metadata&metadataHeaders=List-Unsubscribe";
-  const mockParsed = {
-    posturl: "https://example.com/posturl",
-    mailto: "unsubscribe@example.com",
-    clickurl: "https://example.com/clickurl",
-  };
-
-  beforeEach(() => {
-    (fetch as jest.Mock).mockReset();
-  });
-
-  it("calls fetch with correct URL and headers and returns parsed data", async () => {
-    // Arrange: valid header
-    const rawValue =
-      "<https://example.com/posturl>,<mailto:unsubscribe@example.com>";
-    const response = {
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          payload: { headers: [{ name: "List-Unsubscribe", value: rawValue }] },
-        }),
-    };
-    (fetch as jest.Mock).mockResolvedValueOnce(response);
-
-    // Act
-    const result = await getListUnsubscribeHeader(messageId, token);
-
-    // Assert fetch call
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(expectedUrl, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    // Assert parsing
-    expect(parseListUnsubscribeHeader).toHaveBeenCalledWith(rawValue);
-    expect(result).toEqual(mockParsed);
-  });
-
-  it("handles missing List-Unsubscribe header gracefully", async () => {
-    // Arrange: no matching header
-    const response = {
-      status: 200,
-      json: () => Promise.resolve({ payload: { headers: [] } }),
-    };
-    (fetch as jest.Mock).mockResolvedValueOnce(response);
-
-    // Act
-    const result = await getListUnsubscribeHeader(messageId, token);
-
-    // parseListUnsubscribeHeader should be called with undefined
-    expect(parseListUnsubscribeHeader).toHaveBeenCalledWith(undefined);
-    expect(result).toStrictEqual(mockParsed);
-  });
-
-  it("retries after HTTP 429 and then returns parsed data", async () => {
-    // Arrange: first rate limit, then success
-    const rawValue = "<https://retry/unsub>";
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({ status: 429 })
-      .mockResolvedValueOnce({
-        status: 200,
-        json: () =>
-          Promise.resolve({
-            payload: {
-              headers: [{ name: "List-Unsubscribe", value: rawValue }],
-            },
-          }),
-      });
-
-    // Act
-    const result = await getListUnsubscribeHeader(messageId, token);
-
-    // Assert retry logic
-    expect(sleep).toHaveBeenCalledWith(1000);
-    expect(fetch as jest.Mock).toHaveBeenCalledTimes(2);
-    expect(parseListUnsubscribeHeader).toHaveBeenCalledWith(rawValue);
-    expect(result).toStrictEqual(mockParsed);
-  });
-
-  it("return null values on error", async () => {
-    // Arrange: invalid JSON
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      status: 200,
-      json: () => Promise.reject(new Error("json-error")),
-    });
-
-    // Act
-    const result = await getListUnsubscribeHeader(messageId, token);
-
-    // Assert
     expect(result).toEqual({ posturl: null, mailto: null, clickurl: null });
   });
 });

@@ -1,6 +1,111 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { getValidToken } from "./googleAuth";
-import { sleep, parseListUnsubscribeHeader } from "./utils";
-import { UnsubscribeData } from "../types/types";
+import { sleep, parseListUnsubscribeHeader, getEmailAccount } from "./utils";
+import { ManualUnsubscribeData, UnsubscribeData } from "../types/types";
+
+/**
+ * Attempts to automatically unsubscribe from the given list of email addresses.
+ *
+ * This function reads the last email message from each sender and tries to perform an automatic unsubscribe action.
+ * If an automatic unsubscribe is not possible (e.g., only a click URL is available or no unsubscribe
+ * information is found at all), the sender is added to the appropriate result list for further handling.
+ *
+ * @param senderEmailAddresses - An array of sender email addresses to attempt to unsubscribe from.
+ * @param deps - Optional dependency overrides for testing.
+ * @returns A promise that resolves to a `ManualUnsubscribeData` object containing:
+ *   - `linkOnlySenders`: An array of tuples with sender email and click URL for senders that require manual action.
+ *   - `noUnsubscribeOptionSenders`: An array of sender emails for which no unsubscribe method was found.
+ */
+export async function unsubscribeSendersAuto(
+  senderEmailAddresses: string[],
+  deps?: {
+    getEmailAccount?: Function;
+    getLatestMessageIds?: Function;
+    getMultipleUnsubscribeData?: Function;
+    unsubscribeUsingMailTo?: Function;
+    unsubscribeUsingPostUrl?: Function;
+  },
+): Promise<ManualUnsubscribeData> {
+  const {
+    getEmailAccount: _getEmailAccount = getEmailAccount,
+    getLatestMessageIds: _getLatestMessageIds = getLatestMessageIds,
+    getMultipleUnsubscribeData:
+      _getMultipleUnsubscribeData = getMultipleUnsubscribeData,
+    unsubscribeUsingMailTo: _unsubscribeUsingMailTo = unsubscribeUsingMailTo,
+    // unsubscribeUsingPostUrl: _unsubscribeUsingPostUrl = unsubscribeUsingPostUrl,
+  } = deps || {};
+
+  const accountEmail = await _getEmailAccount();
+
+  console.log(
+    "Unsubscribing automatically from senders: ",
+    senderEmailAddresses,
+  );
+
+  // Get the latest message IDs for the specified sender email addresses
+  const messageIds: string[] = await _getLatestMessageIds(
+    accountEmail,
+    senderEmailAddresses,
+  );
+
+  // Get the unsubscribe data for all the message ids
+  const unsubscribeData: UnsubscribeData[] = await _getMultipleUnsubscribeData(
+    messageIds,
+    accountEmail,
+  );
+
+  console.log("Unsubscribe data: ", unsubscribeData);
+
+  // Attempt to automatically unsubscribe from each.
+  const linkOnlySenders: [string, string][] = [];
+  const noUnsubscribeOptionSenders: string[] = [];
+  await Promise.all(
+    unsubscribeData.map(async (sender, index) => {
+      if (sender.mailto !== null) {
+        // If a mailto link is available, unsubscribe using it
+        try {
+          await _unsubscribeUsingMailTo(sender.mailto, accountEmail);
+        } catch (error) {
+          console.log(
+            `Failed to unsubscribe using mailto for ${senderEmailAddresses[index]}: ${error}`,
+          );
+          noUnsubscribeOptionSenders.push(senderEmailAddresses[index]);
+        }
+      } else if (sender.clickurl !== null) {
+        // If only a click URL is available, store it for later use
+        linkOnlySenders.push([senderEmailAddresses[index], sender.clickurl]);
+      } else {
+        // No unsubscribe data found, so can only block
+        noUnsubscribeOptionSenders.push(senderEmailAddresses[index]);
+      }
+    }),
+  );
+
+  return {
+    linkOnlySenders: linkOnlySenders,
+    noUnsubscribeOptionSenders: noUnsubscribeOptionSenders,
+  };
+}
+
+/**
+ * Retrieves the latest message IDs from Chrome's local storage for a given account and a list of sender email addresses.
+ *
+ * @param accountEmail - The email address of the account whose senders are being queried.
+ * @param senderEmailAddresses - An array of sender email addresses to filter and retrieve message IDs for.
+ * @returns A promise that resolves to an array of message IDs (as strings) corresponding to the latest messages from the specified senders.
+ */
+async function getLatestMessageIds(
+  accountEmail: string,
+  senderEmailAddresses: string[],
+) {
+  const result = await chrome.storage.local.get([accountEmail]);
+  const messageIds: string[] = result[accountEmail].senders
+    .filter((sender: [string, string, number, string]) =>
+      senderEmailAddresses.includes(sender[0]),
+    )
+    .map((sender: [string, string, number, string]) => sender[3]);
+  return messageIds;
+}
 
 /**
  * Retrieves unsubscribe data from multiple email messages.
@@ -54,7 +159,7 @@ export async function unsubscribeUsingPostUrl(url: string): Promise<void> {
  * @param accountEmail - The email address of the user performing the unsubscribe action.
  * @throws Will throw an error if the Gmail API request fails.
  */
-export async function unsubscribeUsingMailTo(
+async function unsubscribeUsingMailTo(
   mailtoEmail: string,
   accountEmail: string,
 ) {
@@ -233,7 +338,7 @@ async function getUnsubscribeLinkFromBody(
  * Constructs and encodes an email message to send to the recipient for unsubscribing, formatted for Gmail API usage.
  *
  * @param recipient - The email address to which the unsubscribe message will be sent.
- * @returns The base64url-encoded email message as a string.
+ * @returns The email message as an RFC 2822 formatted and base64url encoded string.
  */
 function buildEmailMessage(recipient: string) {
   const rawLines = [
@@ -255,6 +360,8 @@ function buildEmailMessage(recipient: string) {
 }
 
 export const exportForTest = {
+  unsubscribeUsingMailTo,
+  getLatestMessageIds,
   getListUnsubscribeHeader,
   getUnsubscribeLinkFromBody,
   getUnsubscribeData,

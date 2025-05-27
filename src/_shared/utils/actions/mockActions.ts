@@ -98,7 +98,7 @@ export const mockActions: Actions = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const linkOnlySenders: [string, string][] = [];
-        const noUnsubscribeSenders: string[] = [];
+        const noUnsubscribeOptionSenders: string[] = [];
 
         // Carol & Dave: Mock that they have a click-link-only unsubscribe option
         if (senderEmailAddresses.includes("carol@email.com")) {
@@ -116,16 +116,16 @@ export const mockActions: Actions = {
 
         // Eve & Frank: Mock that they have no unsubscribe option
         if (senderEmailAddresses.includes("eve@email.com")) {
-          noUnsubscribeSenders.push("eve@email.com");
+          noUnsubscribeOptionSenders.push("eve@email.com");
         }
         if (senderEmailAddresses.includes("frank@email.com")) {
-          noUnsubscribeSenders.push("frank@email.com");
+          noUnsubscribeOptionSenders.push("frank@email.com");
         }
 
         // All other emails: Mock that they have automatically been unsubscribed
         resolve({
           linkOnlySenders: linkOnlySenders,
-          noUnsubscribeSenders: noUnsubscribeSenders,
+          noUnsubscribeOptionSenders: noUnsubscribeOptionSenders,
         });
       }, 1000);
     });
