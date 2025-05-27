@@ -146,4 +146,26 @@ describe("getAllSenders", () => {
     ];
     expect(result).toEqual(expected);
   });
+
+  test("filters out Unknown Sender from the result", async () => {
+    // Arrange
+    const storedSenders: [string, string, number][] = [
+      ["user1@email.com", "User 1", 2],
+      ["null", "Unknown Sender", 5],
+      ["user2@email.com", "User 2", 3],
+    ];
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      [accountEmail]: { senders: storedSenders },
+    });
+
+    // Act
+    const result = await getAllSenders(false, mockGetEmailAccount);
+
+    // Assert
+    const expected: Sender[] = [
+      { email: "user1@email.com", name: "User 1", count: 2 },
+      { email: "user2@email.com", name: "User 2", count: 3 },
+    ];
+    expect(result).toEqual(expected);
+  });
 });
