@@ -1,5 +1,6 @@
 import { getValidToken } from "./googleAuth";
 import { parseSender, sleep } from "./utils";
+import { fetchMessageIds } from "./fetchMessageIds";
 
 interface SenderData {
   name: Set<string>;
@@ -31,7 +32,7 @@ export async function fetchAllSenders(accountEmail: string): Promise<void> {
   let percentageComplete: number = 0;
 
   try {
-    const allMessageIds = await fetchAllMessageIds(authToken);
+    const allMessageIds = await fetchMessageIds(authToken);
 
     // Process messages in batches of 40
     for (let i = 0; i < allMessageIds.length; i += 40) {
@@ -62,74 +63,6 @@ export async function fetchAllSenders(accountEmail: string): Promise<void> {
   } catch (err) {
     console.error("Error fetching senders:", err);
   }
-}
-
-/**
- * Fetches all message IDs from the user's mailbox by iteratively retrieving paginated results.
- *
- * @param authToken - The authentication token used to authorize API requests.
- * @returns A promise that resolves to an array of all message IDs as strings.
- */
-async function fetchAllMessageIds(
-  authToken: string,
-  fetchPage = fetchMessageIdsPage,
-): Promise<string[]> {
-  let nextPageToken = null;
-  const allMessageIds: string[] = [];
-
-  do {
-    const { messageIds, nextPage } = await fetchPage(authToken, nextPageToken);
-    allMessageIds.push(...messageIds);
-    nextPageToken = nextPage;
-  } while (nextPageToken);
-
-  console.log(`Fetched ${allMessageIds.length} email IDs.`);
-  return allMessageIds;
-}
-
-/**
- * Fetches a list of message IDs from the user's mailbox for a given page, handling rate limiting.
- *
- * @param token - The OAuth 2.0 access token used for authenticating the request.
- * @param pageToken - The token for the results page to retrieve, or `null` to fetch the first page.
- * @returns A promise that resolves to an object containing an array of message IDs and the next page token (or `null` if there are no more pages).
- *
- * @remarks
- * If the Gmail API rate limit is exceeded (HTTP 429), the function waits for 1 second and retries the request.
- */
-async function fetchMessageIdsPage(
-  token: string,
-  pageToken: string | null,
-): Promise<{ messageIds: string[]; nextPage: string | null }> {
-  let url =
-    "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=500";
-  if (pageToken) {
-    url += `&pageToken=${pageToken}`;
-  }
-
-  // Fetch emails for the page
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  // Handle rate limiting
-  if (response.status === 429) {
-    console.warn("Rate limit exceeded. Retrying...");
-    await sleep(1000);
-    return fetchMessageIdsPage(token, pageToken); // Retry
-  }
-
-  // Parse response
-  const data = await response.json();
-  return {
-    messageIds:
-      data.messages?.map((m: gapi.client.gmail.Message) => m.id) || [],
-    nextPage: data.nextPageToken || null,
-  };
 }
 
 /**
@@ -251,8 +184,6 @@ function storeSenders(
 }
 
 export const exportForTest = {
-  fetchAllMessageIds,
-  fetchMessageIdsPage,
   fetchMessageSenderSingle,
   updateSenders,
   storeSenders,

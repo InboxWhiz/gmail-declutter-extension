@@ -2,13 +2,7 @@ import {
   fetchAllSenders,
   exportForTest,
 } from "../../src/_shared/utils/fetchSenders";
-const {
-  fetchAllMessageIds,
-  fetchMessageIdsPage,
-  fetchMessageSenderSingle,
-  updateSenders,
-  storeSenders,
-} = exportForTest;
+const { fetchMessageSenderSingle, updateSenders, storeSenders } = exportForTest;
 
 // Mock dependencies
 import { getValidToken } from "../../src/_shared/utils/googleAuth";
@@ -212,109 +206,6 @@ describe("fetchAllSenders", () => {
     // The final call should reset fetchProgress to 0
     const finalCall = setCalls[setCalls.length - 1][0];
     expect(finalCall.fetchProgress["testemail@test.com"]).toBe(0);
-  });
-});
-
-describe("fetchAllMessageIds", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("fetches and combines message IDs across multiple pages", async () => {
-    // Arrange
-    const mockFetchPage = jest
-      .fn()
-      .mockResolvedValueOnce({
-        messageIds: ["id1", "id2"],
-        nextPage: "page2",
-      })
-      .mockResolvedValueOnce({
-        messageIds: ["id3", "id4"],
-        nextPage: null,
-      });
-
-    // Act
-    const result = await fetchAllMessageIds(mockToken, mockFetchPage);
-
-    // Assert
-    expect(result).toEqual(["id1", "id2", "id3", "id4"]);
-    expect(mockFetchPage).toHaveBeenCalledTimes(2);
-    expect(mockFetchPage).toHaveBeenNthCalledWith(1, mockToken, null);
-    expect(mockFetchPage).toHaveBeenNthCalledWith(2, mockToken, "page2");
-  });
-
-  it("works with a single page of message IDs", async () => {
-    // Arrange
-    const mockFetchPage = jest.fn().mockResolvedValueOnce({
-      messageIds: ["id1", "id2"],
-      nextPage: null,
-    });
-
-    // Act
-    const result = await fetchAllMessageIds(mockToken, mockFetchPage);
-
-    // Assert
-    expect(result).toEqual(["id1", "id2"]);
-    expect(mockFetchPage).toHaveBeenCalledTimes(1);
-  });
-
-  it("returns an empty array if there are no messages", async () => {
-    // Arrange
-    const mockFetchPage = jest.fn().mockResolvedValueOnce({
-      messageIds: [],
-      nextPage: null,
-    });
-
-    // Act
-    const result = await fetchAllMessageIds(mockToken, mockFetchPage);
-
-    // Assert
-    expect(result).toEqual([]);
-    expect(mockFetchPage).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("fetchMessageIdsPage", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test("fetches email IDs and handles pagination", async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      json: async () => ({
-        messages: [{ id: "abc123" }, { id: "xyz456" }],
-        nextPageToken: "next-page-token",
-      }),
-    });
-
-    const result = await fetchMessageIdsPage(mockToken, null);
-
-    expect(result).toEqual({
-      messageIds: ["abc123", "xyz456"],
-      nextPage: "next-page-token",
-    });
-  });
-
-  test("handles rate limiting (429 Too Many Requests)", async () => {
-    // Arrange
-    (fetch as jest.Mock).mockResolvedValueOnce({ status: 429 });
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      json: async () => ({
-        messages: [{ id: "abc123" }, { id: "xyz456" }],
-        nextPageToken: "next-page-token",
-      }),
-    });
-
-    // Act
-    const result = await fetchMessageIdsPage(mockToken, null);
-
-    // Assert
-    expect(sleep).toHaveBeenCalledWith(1000);
-    expect(fetch as jest.Mock).toHaveBeenCalledTimes(2);
-    expect(result).toEqual({
-      messageIds: ["abc123", "xyz456"],
-      nextPage: "next-page-token",
-    });
   });
 });
 
