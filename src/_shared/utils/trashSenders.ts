@@ -1,4 +1,5 @@
 import { getValidToken } from "./googleAuth";
+import { fetchMessageIds } from "./fetchMessageIds";
 
 /**
  * Trashes emails from multiple senders.
@@ -33,29 +34,13 @@ export async function trashMultipleSenders(
  * - Each found message is moved to the Trash using the Gmail API.
  * - If no messages are found, returns 0.
  */
-async function trashSender(token: string, senderEmail: string) {
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-
-  // Step 1: Search for messages
-  const searchUrl = `https://www.googleapis.com/gmail/v1/users/me/messages?q=from:${encodeURIComponent(senderEmail)}&maxResults=500`;
-  const searchRes = await fetch(searchUrl, { headers });
-  const searchData = await searchRes.json();
-
-  if (!searchData.messages || searchData.messages.length === 0) {
-    console.log("No messages found.");
-    return 0; // To indicate no emails were found;
-  } else {
-    console.log(
-      `Found ${searchData.messages.length} messages from ${senderEmail}`,
-    );
-  }
-
-  const messageIds = searchData.messages.map(
-    (msg: gapi.client.gmail.Message) => msg.id,
-  );
+async function trashSender(
+  token: string,
+  senderEmail: string,
+): Promise<number> {
+  // Step 1: Get all message IDs of the sender
+  const messageIds = await fetchMessageIds(token, senderEmail);
+  if (messageIds.length === 0) return 0; // No emails to trash
 
   // Step 2: Move each message to Trash
   for (const id of messageIds) {
@@ -63,7 +48,10 @@ async function trashSender(token: string, senderEmail: string) {
       `https://www.googleapis.com/gmail/v1/users/me/messages/${id}/trash`,
       {
         method: "POST",
-        headers,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       },
     );
   }

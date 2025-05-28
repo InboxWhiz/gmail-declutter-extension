@@ -63,12 +63,13 @@ describe("trashSender", () => {
 
     // Assert: Check that search request is correct
     expect(fetch).toHaveBeenCalledWith(
-      `https://www.googleapis.com/gmail/v1/users/me/messages?q=from:${encodeURIComponent(senderEmail)}&maxResults=500`,
+      `https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=500&q=from:${encodeURIComponent(senderEmail)}`,
       expect.objectContaining({
         headers: {
           Authorization: `Bearer ${mockToken}`,
           "Content-Type": "application/json",
         },
+        method: "GET",
       }),
     );
 
