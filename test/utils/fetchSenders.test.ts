@@ -2,11 +2,7 @@ import {
   fetchAllSenders,
   exportForTest,
 } from "../../src/_shared/utils/fetchSenders";
-const {
-  fetchMessageSenderSingle,
-  updateSenders,
-  storeSenders,
-} = exportForTest;
+const { fetchMessageSenderSingle, updateSenders, storeSenders } = exportForTest;
 
 // Mock dependencies
 import { getValidToken } from "../../src/_shared/utils/googleAuth";

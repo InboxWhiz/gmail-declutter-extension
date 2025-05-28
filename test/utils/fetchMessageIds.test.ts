@@ -42,8 +42,18 @@ describe("fetchMessageIds", () => {
     // Assert
     expect(result).toEqual(["id1", "id2", "id3", "id4"]);
     expect(mockFetchPage).toHaveBeenCalledTimes(2);
-    expect(mockFetchPage).toHaveBeenNthCalledWith(1, mockToken, null, undefined);
-    expect(mockFetchPage).toHaveBeenNthCalledWith(2, mockToken, "page2", undefined);
+    expect(mockFetchPage).toHaveBeenNthCalledWith(
+      1,
+      mockToken,
+      null,
+      undefined,
+    );
+    expect(mockFetchPage).toHaveBeenNthCalledWith(
+      2,
+      mockToken,
+      "page2",
+      undefined,
+    );
   });
 
   it("works with a single page of message IDs", async () => {
@@ -78,7 +88,11 @@ describe("fetchMessageIds", () => {
     // Assert
     expect(result).toEqual(["id1", "id2"]);
     expect(mockFetchPage).toHaveBeenCalledTimes(1);
-    expect(mockFetchPage).toHaveBeenCalledWith(mockToken, null, "sender@example.com");
+    expect(mockFetchPage).toHaveBeenCalledWith(
+      mockToken,
+      null,
+      "sender@example.com",
+    );
   });
 
   it("returns an empty array if there are no messages", async () => {
@@ -130,7 +144,11 @@ describe("fetchMessageIdsPage", () => {
     });
 
     // Act
-    const result = await fetchMessageIdsPage(mockToken, null, "sender@example.com");
+    const result = await fetchMessageIdsPage(
+      mockToken,
+      null,
+      "sender@example.com",
+    );
 
     // Assert
     expect(fetch).toHaveBeenCalledWith(
