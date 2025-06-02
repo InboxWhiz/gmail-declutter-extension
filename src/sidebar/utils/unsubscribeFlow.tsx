@@ -32,7 +32,8 @@ export function useUnsubscribeFlow(
       const unsubscribeResults: ManualUnsubscribeData =
         await unsubscribeSendersAuto(Object.keys(selectedSenders));
       linkOnlySenders = unsubscribeResults.linkOnlySenders;
-      noUnsubscribeOptionSenders = unsubscribeResults.noUnsubscribeOptionSenders;
+      noUnsubscribeOptionSenders =
+        unsubscribeResults.noUnsubscribeOptionSenders;
 
       // Start processing link-only senders
       processNextLink(0);
