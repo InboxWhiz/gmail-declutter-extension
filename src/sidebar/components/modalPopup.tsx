@@ -6,6 +6,7 @@ import { useSenders } from "../providers/sendersContext";
 import { useActions } from "../../_shared/providers/actionsContext";
 import { ToggleOption } from "./toggleOption";
 import { useUnsubscribeFlow } from "../utils/unsubscribeFlow";
+import { useLoggedIn } from "../../_shared/providers/loggedInContext";
 
 interface ConfirmProps {
   emailsNum: number;
@@ -169,32 +170,40 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const { selectedSenders, setSelectedSenders } = useSelectedSenders();
   const { reloadSenders } = useSenders();
   const { setModal } = useModal();
+  const { setLoggedIn } = useLoggedIn();
 
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
   };
 
   const deleteEmails = async () => {
-    // Set modal to pending state
-    setModal({ action: "delete", type: "pending" });
+    try {
+      // Set modal to pending state
+      setModal({ action: "delete", type: "pending" });
 
-    // Delete senders and remove them from selectedSenders
-    await deleteSenders(Object.keys(selectedSenders));
-    for (const senderEmail in selectedSenders) {
-      setSelectedSenders((prev) => {
-        const newSelected = { ...prev };
-        delete newSelected[senderEmail];
-        return newSelected;
-      });
+      // Delete senders and remove them from selectedSenders
+      await deleteSenders(Object.keys(selectedSenders));
+      for (const senderEmail in selectedSenders) {
+        setSelectedSenders((prev) => {
+          const newSelected = { ...prev };
+          delete newSelected[senderEmail];
+          return newSelected;
+        });
+      }
+
+      // Set modal to success state
+      setModal({ action: "delete", type: "success" });
+
+      // Wait 1 sec then reload senders
+      setTimeout(() => {
+        reloadSenders();
+      }, 1000);
+    } catch (error: Error | any) {
+      // If the user fails to go through the OAuth flow, we set loggedIn to false
+      if (error.message == "The user did not approve access.") {
+        setLoggedIn(false);
+      }
     }
-
-    // Set modal to success state
-    setModal({ action: "delete", type: "success" });
-
-    // Wait 1 sec then reload senders
-    setTimeout(() => {
-      reloadSenders();
-    }, 1000);
   };
 
   return (

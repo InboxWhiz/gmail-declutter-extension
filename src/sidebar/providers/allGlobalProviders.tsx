@@ -1,5 +1,5 @@
 import { ActionsProvider } from "../../_shared/providers/actionsContext";
-import { LoggedInProvider } from "./loggedInContext";
+import { LoggedInProvider } from "../../_shared/providers/loggedInContext";
 // import { ModalProvider } from "./modalContext";
 // import { SelectedSendersProvider } from "./selectedSendersContext";
 // import { SendersProvider } from "./sendersContext";

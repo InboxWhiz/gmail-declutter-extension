@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { Sender } from "../../_shared/types/types";
 import { useActions } from "../../_shared/providers/actionsContext";
+import { useLoggedIn } from "../../_shared/providers/loggedInContext";
 
 interface SendersContextType {
   senders: Sender[];
@@ -22,12 +23,21 @@ export const SendersProvider: React.FC<{ children: React.ReactNode }> = ({
   const [senders, setSenders] = useState<Sender[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { getAllSenders } = useActions();
+  const { setLoggedIn } = useLoggedIn();
 
   const reloadSenders = useCallback(async (fetchNew = false) => {
-    setLoading(true);
-    const data = await getAllSenders(fetchNew);
-    setSenders(data);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const data = await getAllSenders(fetchNew);
+      setSenders(data);
+      setLoading(false);
+    } catch (error: Error | any) {
+      // If the user fails to go through the OAuth flow, we set loggedIn to false
+      if (error.message == "The user did not approve access.") {
+        setLoggedIn(false);
+      }
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
