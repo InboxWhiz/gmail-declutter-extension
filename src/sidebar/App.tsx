@@ -7,7 +7,7 @@ import { SendersContainer } from "./components/sendersContainer.tsx";
 import { DeclutterHeader } from "./components/header.tsx";
 import { useActions } from "../_shared/providers/actionsContext.tsx";
 import { LoginPage } from "./components/login-page/loginPage.tsx";
-import { useLoggedIn } from "./providers/loggedInContext.tsx";
+import { useLoggedIn } from "../_shared/providers/loggedInContext.tsx";
 import { SelectedSendersProvider } from "./providers/selectedSendersContext.tsx";
 import { SendersProvider } from "./providers/sendersContext.tsx";
 import { ModalProvider } from "./providers/modalContext.tsx";

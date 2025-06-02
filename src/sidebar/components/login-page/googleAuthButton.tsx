@@ -1,5 +1,5 @@
 import { useActions } from "../../../_shared/providers/actionsContext";
-import { useLoggedIn } from "../../providers/loggedInContext";
+import { useLoggedIn } from "../../../_shared/providers/loggedInContext";
 import "./googleAuthButton.css";
 
 export const GoogleAuthButton = ({
