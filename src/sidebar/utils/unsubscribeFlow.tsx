@@ -1,4 +1,5 @@
 import { useActions } from "../../_shared/providers/actionsContext";
+import { useLoggedIn } from "../../_shared/providers/loggedInContext";
 import { ManualUnsubscribeData } from "../../_shared/types/types";
 import { useModal } from "../providers/modalContext";
 import { useSelectedSenders } from "../providers/selectedSendersContext";
@@ -12,27 +13,35 @@ export function useUnsubscribeFlow(
   const { setModal } = useModal();
   const { reloadSenders } = useSenders();
   const { selectedSenders, clearSelectedSenders } = useSelectedSenders();
+  const { setLoggedIn } = useLoggedIn();
 
   let linkOnlySenders: [string, string][] = []; // List of senders that require manual unsubscribe via link, and their links to click
   let noUnsubscribeOptionSenders: string[] = []; // List of senders with no unsubscribe option
 
   // Kick off the flow
   const startUnsubscribeFlow = async () => {
-    // Set modal to pending state
-    setModal({
-      action: "unsubscribe",
-      type: "pending",
-      subtype: "working",
-    });
+    try {
+      // Set modal to pending state
+      setModal({
+        action: "unsubscribe",
+        type: "pending",
+        subtype: "working",
+      });
 
-    // Attempt to unsubscribe all senders automatically
-    const unsubscribeResults: ManualUnsubscribeData =
-      await unsubscribeSendersAuto(Object.keys(selectedSenders));
-    linkOnlySenders = unsubscribeResults.linkOnlySenders;
-    noUnsubscribeOptionSenders = unsubscribeResults.noUnsubscribeOptionSenders;
+      // Attempt to unsubscribe all senders automatically
+      const unsubscribeResults: ManualUnsubscribeData =
+        await unsubscribeSendersAuto(Object.keys(selectedSenders));
+      linkOnlySenders = unsubscribeResults.linkOnlySenders;
+      noUnsubscribeOptionSenders = unsubscribeResults.noUnsubscribeOptionSenders;
 
-    // Start processing link-only senders
-    processNextLink(0);
+      // Start processing link-only senders
+      processNextLink(0);
+    } catch (error: Error | any) {
+      // If the user fails to go through the OAuth flow, we set loggedIn to false
+      if (error.message == "The user did not approve access.") {
+        setLoggedIn(false);
+      }
+    }
   };
 
   // End the flow
