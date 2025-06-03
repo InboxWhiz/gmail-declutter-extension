@@ -1,4 +1,4 @@
-import { getValidToken } from "./googleAuth";
+import { getValidToken } from "./chromeAuth";
 import { parseSender, sleep } from "./utils";
 import { fetchMessageIds } from "./fetchMessageIds";
 
@@ -74,7 +74,7 @@ export async function fetchAllSenders(accountEmail: string): Promise<void> {
  *          sender information for the corresponding message ID.
  */
 async function fetchMessageSendersBatch(
-  token: string,
+  token: chrome.identity.GetAuthTokenResult,
   messageIds: string[],
 ): Promise<MessageData[]> {
   return Promise.all(
@@ -90,7 +90,7 @@ async function fetchMessageSendersBatch(
  * @returns A promise that resolves to a `MessageData` object containing the sender's email, name, and message ID.
  */
 async function fetchMessageSenderSingle(
-  token: string,
+  token: chrome.identity.GetAuthTokenResult,
   messageId: string,
 ): Promise<MessageData> {
   // Fetch message metadata

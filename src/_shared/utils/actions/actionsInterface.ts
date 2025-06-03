@@ -12,18 +12,14 @@ export interface Actions {
   isLoggedIn(getEmailAccount?: () => Promise<string>): Promise<boolean>;
 
   /**
-   * Initiates the OAuth flow to sign in the user with their Google account.
+   * Initiates the Google sign-in process for the specified email address.
+   * This function forces interactive authentication by removing any old token from the cache.
    *
-   * This method opens a new window for the user to authenticate with their Google account.
-   * If the authentication is successful, it resolves with the user's email address and OAuth token.
-   * If the authentication fails, it rejects with an error message.
-   *
-   * @param expectedEmailAddress - The expected email address of the user.
-   * @returns {Promise<{ token: string; email: string }>} A promise that resolves to an object containing the user's OAuth token and email address upon successful authentication.
+   * @param expectedEmailAddress - The email address that the authenticated user is expected to have.
+   * @param deps - Optional dependency overrides for testing.
+   * @throws {Error} If the authenticated user's email does not match the expected email address.
    */
-  signInWithGoogle(
-    expectedEmailAddress: string,
-  ): Promise<{ token: string; email: string }>;
+  signInWithGoogle(expectedEmailAddress: string): Promise<void>;
 
   /**
    * Retrieves the Gmail account associated with the currently active browser tab.

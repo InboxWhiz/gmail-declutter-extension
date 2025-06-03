@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { getValidToken } from "./googleAuth";
+import { getValidToken } from "./chromeAuth";
 import { sleep, parseListUnsubscribeHeader, getEmailAccount } from "./utils";
 import { ManualUnsubscribeData, UnsubscribeData } from "../types/types";
 

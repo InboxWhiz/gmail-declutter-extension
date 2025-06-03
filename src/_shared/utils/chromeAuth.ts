@@ -4,10 +4,9 @@
  *
  * @param expectedEmailAddress - The email address that the authenticated user is expected to have.
  * @param deps - Optional dependency overrides for testing.
- * @returns A promise that resolves to an object containing the authentication token and the user's email address.
  * @throws {Error} If the authenticated user's email does not match the expected email address.
  */
-export async function signInWithGoogle(expectedEmailAddress: string) {
+export async function signInWithGoogle(expectedEmailAddress: string): Promise<void> {
   // Remove any old token from the cache to force re-authentication
   await chrome.identity.clearAllCachedAuthTokens();
 
