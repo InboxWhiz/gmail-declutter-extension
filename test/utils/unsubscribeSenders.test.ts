@@ -13,9 +13,9 @@ const {
 } = exportForTest;
 
 // Mock dependencies
-import { getValidToken } from "../../src/_shared/utils/googleAuth";
-jest.mock("../../src/_shared/utils/googleAuth");
-const mockToken = "mock-token";
+import { getValidToken } from "../../src/_shared/utils/chromeAuth";
+jest.mock("../../src/_shared/utils/chromeAuth");
+const mockToken = "mock-token" as chrome.identity.GetAuthTokenResult;;
 import {
   sleep,
   parseListUnsubscribeHeader,
