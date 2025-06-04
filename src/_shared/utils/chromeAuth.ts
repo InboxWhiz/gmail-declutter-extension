@@ -6,7 +6,9 @@
  * @param deps - Optional dependency overrides for testing.
  * @throws {Error} If the authenticated user's email does not match the expected email address.
  */
-export async function signInWithGoogle(expectedEmailAddress: string): Promise<void> {
+export async function signInWithGoogle(
+  expectedEmailAddress: string,
+): Promise<void> {
   // Remove any old token from the cache to force re-authentication
   await chrome.identity.clearAllCachedAuthTokens();
 
@@ -27,8 +29,8 @@ export async function getValidToken(
   expectedEmailAddress: string,
   interactive = false,
   deps?: {
-    verifyToken?: Function;
-  }
+    verifyToken?: Function; //eslint-disable-line @typescript-eslint/no-unsafe-function-type
+  },
 ): Promise<chrome.identity.GetAuthTokenResult> {
   const _verifyToken = deps?.verifyToken || verifyToken;
   return new Promise((resolve, reject) => {
@@ -55,37 +57,27 @@ export async function getValidToken(
  *
  * @param token - The OAuth2 access token to verify.
  * @param expectedEmailAddress - The email address that the authenticated user is expected to have.
- * @returns A promise that resolves to `true` if the token is valid (response status 200), or `false` otherwise.
+ * @returns A promise that resolves if the token is valid and matches the expected email, or rejects otherwise.
  */
 async function verifyToken(
   token: chrome.identity.GetAuthTokenResult,
   expectedEmailAddress: string,
 ): Promise<void> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const res = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.status === 200) {
-        const userInfo = await res.json();
-        if (userInfo.email === expectedEmailAddress) {
-          resolve();
-        } else {
-          reject(
-            new Error(
-              `Authenticated user email (${userInfo.email}) does not match expected email (${expectedEmailAddress}).`,
-            ),
-          );
-        }
-      } else {
-        reject(
-          new Error(`Token verification failed with status ${res.status}.`),
-        );
-      }
-    } catch (err) {
-      reject(err);
-    }
+  const res = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+    headers: { Authorization: `Bearer ${token}` },
   });
+  if (res.status === 200) {
+    const userInfo = await res.json();
+    if (userInfo.email === expectedEmailAddress) {
+      return;
+    } else {
+      throw new Error(
+        `Authenticated user email (${userInfo.email}) does not match expected email (${expectedEmailAddress}).`,
+      );
+    }
+  } else {
+    throw new Error(`Token verification failed with status ${res.status}.`);
+  }
 }
 
 export const exportForTest = {

@@ -8,16 +8,16 @@ export const mockActions: Actions = {
     });
   },
 
-  async signInWithGoogle(
-    expectedEmailAddress: string,
-  ): Promise<void> {
+  async signInWithGoogle(expectedEmailAddress: string): Promise<void> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (expectedEmailAddress === "usertest@gmail.com") {
           console.log("[MOCK] User authenticated successfully");
           resolve();
         } else {
-          reject(new Error("Authentication failed: Email address does not match."));
+          reject(
+            new Error("Authentication failed: Email address does not match."),
+          );
         }
       }, 500);
     });

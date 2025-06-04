@@ -14,7 +14,7 @@ export const realActions: Actions = {
       const accountEmail = await getEmailAccount();
       await getValidToken(accountEmail);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   },
