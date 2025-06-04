@@ -15,6 +15,7 @@ function searchEmailSenders(emails) {
 function displayTutorial() {
   // Create an iframe element
   const iframe = document.createElement("iframe");
+  iframe.id = "inboxwhiz-tutorial";
   iframe.src = chrome.runtime.getURL("tutorial/index.html");
 
   // Style the iframe as a modal
@@ -31,6 +32,11 @@ function displayTutorial() {
 
   // Append the iframe to the document body
   document.body.appendChild(iframe);
+}
+
+function closeTutorial() {
+  const iframe = document.getElementById("inboxwhiz-tutorial");
+  iframe?.remove();
 }
 
 function getEmailAccount() {
@@ -50,6 +56,13 @@ chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "SHOW_TUTORIAL") {
     console.log("Received message to show tutorial");
     displayTutorial();
+  }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "CLOSE_TUTORIAL") {
+    console.log("Received message to close tutorial");
+    closeTutorial();
   }
 });
 

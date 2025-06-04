@@ -13,7 +13,6 @@ import { ActionsProvider } from "../_shared/providers/actionsContext";
 
 const Tutorial = () => {
   const [step, setStep] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const handleNext = () => {
     setStep(step + 1);
@@ -22,8 +21,16 @@ const Tutorial = () => {
   return (
     <ActionsProvider>
       <Modal
-        isOpen={isModalOpen}
-        onClose={step === 5 ? () => setIsModalOpen(false) : () => {}}
+        onClose={step === 5
+          ? () => {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              const tab = tabs[0];
+              if (tab && tab.id !== undefined) {
+                chrome.tabs.sendMessage(tab.id, { action: "CLOSE_TUTORIAL" });
+              }
+            });
+          }
+          : () => { }}
       >
         <div className="tutorial-popup">
           {step === 0 ? (
