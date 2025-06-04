@@ -76,6 +76,13 @@ export const Step3 = ({ onNext }: { onNext: () => void }) => {
 };
 
 export const Step4 = ({ onNext }: { onNext: () => void }) => {
+  const onAuthSuccess = () => {
+    // Open the side panel after successful authentication
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.sidePanel.open({tabId: tabs[0]?.id} as chrome.sidePanel.OpenOptions);
+    });
+    onNext();
+  }
   return (
     <div className="step">
       <img
@@ -85,7 +92,7 @@ export const Step4 = ({ onNext }: { onNext: () => void }) => {
         height="100"
       />
       <h2 className="tutorial-header">Sign in to get started</h2>
-      <GoogleAuthButton onAuthSuccess={onNext} />
+      <GoogleAuthButton onAuthSuccess={onAuthSuccess} />
     </div>
   );
 };
