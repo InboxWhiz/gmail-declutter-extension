@@ -1,4 +1,4 @@
-import { getValidToken } from "./googleAuth";
+import { getValidToken } from "./chromeAuth";
 import { fetchMessageIds } from "./fetchMessageIds";
 
 /**
@@ -35,7 +35,7 @@ export async function trashMultipleSenders(
  * - If no messages are found, returns 0.
  */
 async function trashSender(
-  token: string,
+  token: chrome.identity.GetAuthTokenResult,
   senderEmail: string,
 ): Promise<number> {
   // Step 1: Get all message IDs of the sender

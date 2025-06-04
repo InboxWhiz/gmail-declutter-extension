@@ -9,7 +9,7 @@ import { sleep } from "./utils";
  * @returns A promise that resolves to an array of message IDs (as strings).
  */
 export async function fetchMessageIds(
-  token: string,
+  token: chrome.identity.GetAuthTokenResult,
   senderEmail?: string,
   deps?: {
     fetchMessageIdsPage?: () => Promise<{
@@ -50,7 +50,7 @@ export async function fetchMessageIds(
  * If the Gmail API rate limit is exceeded (HTTP 429), the function waits for 1 second and retries the request.
  */
 async function fetchMessageIdsPage(
-  token: string,
+  token: chrome.identity.GetAuthTokenResult,
   pageToken: string | null,
   senderEmail?: string,
 ): Promise<{ messageIds: string[]; nextPage: string | null }> {
