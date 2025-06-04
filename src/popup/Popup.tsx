@@ -4,7 +4,7 @@ const supportLink = "https://www.inboxwhiz.net/support.html";
 const donateLink = "https://buymeacoffee.com/inboxwhiz";
 const feedbackLink =
   "https://chromewebstore.google.com/detail/inboxwhiz/bjcegpgebdbhkkhngbahpfjfolcmkpma/reviews";
-const version = "1.0.0";
+const version = "1.0.1";
 
 const PopupApp = () => {
   const openGmail = () => {
