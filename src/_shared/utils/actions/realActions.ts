@@ -3,18 +3,18 @@ import { fetchAllSenders } from "../fetchSenders";
 import { trashMultipleSenders } from "../trashSenders";
 import { unsubscribeSendersAuto } from "../unsubscribeSenders";
 import { Actions } from "./actionsInterface";
-import { getCachedToken, getValidToken, signInWithGoogle } from "../googleAuth";
+import { getValidToken, signInWithGoogle } from "../chromeAuth";
 import { getEmailAccount } from "../utils";
 
 export const realActions: Actions = {
   async isLoggedIn(
     getEmailAccount: () => Promise<string> = realActions.getEmailAccount,
   ): Promise<boolean> {
-    const accountEmail = await getEmailAccount();
-    const token = await getCachedToken(accountEmail);
-    if (token) {
+    try {
+      const accountEmail = await getEmailAccount();
+      await getValidToken(accountEmail);
       return true;
-    } else {
+    } catch {
       return false;
     }
   },

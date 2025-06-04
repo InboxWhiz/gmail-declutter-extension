@@ -11,6 +11,7 @@
   color: white;
   background-color: #233b86;
   align-items: center;
+  justify-content: center;
   font-size: 1rem;
   margin: 0;
 }

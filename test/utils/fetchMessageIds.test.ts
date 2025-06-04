@@ -4,7 +4,7 @@ import {
 } from "../../src/_shared/utils/fetchMessageIds";
 const { fetchMessageIdsPage } = exportForTest;
 
-const mockToken = "mock-token";
+const mockToken = "mock-token" as chrome.identity.GetAuthTokenResult;
 
 import { sleep } from "../../src/_shared/utils/utils";
 jest.mock("../../src/_shared/utils/utils", () => {
