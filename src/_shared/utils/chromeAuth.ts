@@ -31,10 +31,8 @@ export async function getValidToken(
   }
 ): Promise<chrome.identity.GetAuthTokenResult> {
   const _verifyToken = deps?.verifyToken || verifyToken;
-  console.log("Running...")
   return new Promise((resolve, reject) => {
     chrome.identity.getAuthToken({ interactive }, async (token) => {
-      console.log("Token received:", token);
       // Check for errors and make sure the token matches the expected email address
       if (chrome.runtime.lastError || !token) {
         reject(
