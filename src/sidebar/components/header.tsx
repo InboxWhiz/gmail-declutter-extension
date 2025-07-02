@@ -10,7 +10,7 @@ export function DeclutterHeader() {
 
   useEffect(() => {
     getEmailAccount().then(setEmail);
-  }, []);
+  });
 
   return (
     <div className="declutter-header">

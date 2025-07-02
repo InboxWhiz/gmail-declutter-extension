@@ -23,7 +23,7 @@ function App() {
     };
 
     updateSignInStatus();
-  }, []);
+  });
 
   if (!loggedIn) {
     return <LoginPage />;
