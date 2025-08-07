@@ -57,7 +57,9 @@ export function useUnsubscribeFlow(
     if (blockSenders) {
       setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
       for (const email of Object.keys(selectedSenders)) {
-        await blockSender(email);
+        if (!noUnsubscribeOptionSenders.includes(email)) {
+          await blockSender(email);
+        }
       }
     }
 
