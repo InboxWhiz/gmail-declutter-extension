@@ -78,7 +78,7 @@
 
 .gsi-material-button:not(:disabled):active .gsi-material-button-state,
 .gsi-material-button:not(:disabled):focus .gsi-material-button-state {
-  background-color: #001d35;
+  background-color: var(--bg-primary);
   opacity: 0.12;
 }
 
@@ -89,6 +89,6 @@
 }
 
 .gsi-material-button:not(:disabled):hover .gsi-material-button-state {
-  background-color: #001d35;
+ background-color: var(--bg-primary);
   opacity: 0.08;
 }

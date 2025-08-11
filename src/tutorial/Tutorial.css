@@ -1,6 +1,6 @@
 .tutorial-popup {
   z-index: 75;
-  background: #fff;
+    background-color: var(--bg-primary);
   border-radius: 12px;
   width: 400px;
   padding: 0;
@@ -23,11 +23,16 @@
   padding: 0;
   margin: 0;
   margin-top: 20px;
+   background-color: var(--bg-primary);
+  color: var(--text-primary);
   text-align: center;
+  
 }
 
 .tutorial-note {
   margin-top: 15px;
+   background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .tutorial-gif {
@@ -35,8 +40,8 @@
 }
 
 .tutorial-btn {
-  background: #e0e0e0;
-  color: #333;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   border: none;
   border-radius: 6px;
   width: 40%;
@@ -49,11 +54,11 @@
 }
 
 .tutorial-btn.primary {
-  background: #233b86;
-  color: #fff;
+   background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .tutorial-btn.primary:hover {
-  background: #1a4c9b;
+  background-color: var(--bg-primary);
 }

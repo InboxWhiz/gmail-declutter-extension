@@ -1,4 +1,16 @@
-:root,
+:root {
+  /* Default light mode vars */
+  --bg-primary: #ffffff;
+  --text-primary: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #121212;
+    --text-primary: #ffffff;
+  }
+}
+
 body {
-  background: transparent !important;
+  background-color: var(--bg-primary);
 }

@@ -11,6 +11,7 @@ import { useLoggedIn } from "../_shared/providers/loggedInContext.tsx";
 import { SelectedSendersProvider } from "./providers/selectedSendersContext.tsx";
 import { SendersProvider } from "./providers/sendersContext.tsx";
 import { ModalProvider } from "./providers/modalContext.tsx";
+import { ThemeProvider } from "../_shared/providers/ThemeContex.tsx";
 
 function App() {
   const { loggedIn, setLoggedIn } = useLoggedIn();
@@ -25,34 +26,36 @@ function App() {
     updateSignInStatus();
   });
 
-  if (!loggedIn) {
-    return <LoginPage />;
-  } else {
-    return (
-      <SelectedSendersProvider>
-        <SendersProvider>
-          <ModalProvider>
-            <div id="declutter-body">
-              <DeclutterHeader />
+  return (
+    <ThemeProvider>
+      {!loggedIn ? (
+        <LoginPage />
+      ) : (
+        <SelectedSendersProvider>
+          <SendersProvider>
+            <ModalProvider>
+              <div id="declutter-body">
+                <DeclutterHeader />
 
-              <div className="button-bar">
-                <div className="sender-actions">
-                  <ActionButton id="unsubscribe-button" />
-                  <ActionButton id="delete-button" />
+                <div className="button-bar">
+                  <div className="sender-actions">
+                    <ActionButton id="unsubscribe-button" />
+                    <ActionButton id="delete-button" />
+                  </div>
+
+                  <ReloadButton />
                 </div>
 
-                <ReloadButton />
+                <SendersContainer />
+
+                <ModalPopup />
               </div>
-
-              <SendersContainer />
-
-              <ModalPopup />
-            </div>
-          </ModalProvider>
-        </SendersProvider>
-      </SelectedSendersProvider>
-    );
-  }
+            </ModalProvider>
+          </SendersProvider>
+        </SelectedSendersProvider>
+      )}
+    </ThemeProvider>
+  );
 }
 
 export default App;
