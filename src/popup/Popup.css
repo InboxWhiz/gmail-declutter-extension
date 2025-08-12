@@ -1,7 +1,7 @@
 /* Add to top */
 :root, .light {
-  --bg-primary: #ffffff;
-  --text-primary: #000000;
+  --bg-primary: #fff;
+  --text-primary: #000;
   --button-bg: #f0f0f0;
   --border-color: #e0e0e0;
   --link-color: #1a0dab;
@@ -10,8 +10,8 @@
 .dark {
   --bg-primary: #1a1a1a;
   --text-primary: #f0f0f0;
-  --button-bg: #333333;
-  --border-color: #444444;
+  --button-bg: #333;
+  --border-color: #444;
   --link-color: #9dbdff;
 }
 

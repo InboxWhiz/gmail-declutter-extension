@@ -1,13 +1,13 @@
 :root {
   /* Default light mode vars */
-  --bg-primary: #ffffff;
-  --text-primary: #000000;
+  --bg-primary: #fff;
+  --text-primary: #000;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-primary: #121212;
-    --text-primary: #ffffff;
+    --text-primary: #fff;
   }
 }
 
