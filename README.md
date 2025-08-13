@@ -19,27 +19,6 @@ InboxWhiz addresses the common problem of email overload by providing users with
 - **Chrome Side Panel UI**: Modern, responsive interface built with React and TypeScript
 - **Interactive Tutorial System**: Guided onboarding with contextual help
 
-## 🐛 Known Issues & Fixes
-
-### OAuth2 Authentication Error
-
-**Issue**: Users may encounter this error when trying to authenticate:
-```
-Access blocked: InboxWhiz's request is invalid
-Error 400: invalid_request
-Custom URI scheme is not supported on Chrome apps.
-```
-
-**Root Cause**: The OAuth2 client in Google Cloud Console is configured as a "Web application" instead of a "Chrome extension".
-
-**Fix Required**: The OAuth2 client configuration needs to be updated in Google Cloud Console:
-1. Navigate to APIs & Services > Credentials
-2. Edit the OAuth2 client ID: `396720193118-fggljh2amq0jlgq4v861vqn6rb88q9dt`
-3. Change Application type to "Chrome extension"
-4. Set Application ID to: `bjcegpgebdbhkkhngbahpfjfolcmkpma`
-
-See `OAUTH_FIX.md` for detailed instructions.
-
 ## 🛠️ Technical Architecture
 
 ### Frontend Stack
