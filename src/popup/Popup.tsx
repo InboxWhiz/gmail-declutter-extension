@@ -1,4 +1,3 @@
-import ThemeToggle from "../sidebar/components/themeToggle";
 import "./Popup.css";
 
 const supportLink = "https://www.inboxwhiz.net/support.html";
@@ -15,7 +14,6 @@ const PopupApp = () => {
   return (
     <div className="popup-content">
       <h2>InboxWhiz</h2>
-      <ThemeToggle/>
       <p>Manage your inbox effortlessly with InboxWhiz!</p>
 
       <div className="centered-button-container">

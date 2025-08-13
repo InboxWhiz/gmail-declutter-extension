@@ -1,5 +1,5 @@
-/* Add to top */
-:root, .light {
+:root,
+.light {
   --bg-primary: #fff;
   --text-primary: #333;
   --header-bg: #f5f5f5;
@@ -30,7 +30,7 @@
 }
 
 /* Add to existing button styles */
-#unsubscribe-button, 
+#unsubscribe-button,
 #delete-button,
 .reload-button {
   background-color: var(--button-bg);

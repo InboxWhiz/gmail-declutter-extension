@@ -1,5 +1,6 @@
 /* Add to top */
-:root, .light {
+:root,
+.light {
   --bg-primary: #fff;
   --text-primary: #000;
   --button-bg: #f0f0f0;
@@ -22,7 +23,8 @@
 }
 
 .open-gmail-button {
-  background-color: var(--button-bg);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   border: 1px solid var(--border-color);
 }
 

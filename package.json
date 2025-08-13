@@ -13,7 +13,8 @@
     "lint:css": "stylelint **/*.css --fix",
     "lint:html": "htmlhint **/*.html",
     "lint:prettier": "prettier --write .",
-    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:prettier && jscpd ."
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:prettier",
+    "lint:dup": "jscpd ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",

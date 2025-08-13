@@ -11,7 +11,7 @@ import { useLoggedIn } from "../_shared/providers/loggedInContext.tsx";
 import { SelectedSendersProvider } from "./providers/selectedSendersContext.tsx";
 import { SendersProvider } from "./providers/sendersContext.tsx";
 import { ModalProvider } from "./providers/modalContext.tsx";
-import { ThemeProvider } from "../_shared/providers/ThemeContex.tsx";
+import { ThemeProvider } from "../_shared/providers/ThemeProvider.tsx";
 
 function App() {
   const { loggedIn, setLoggedIn } = useLoggedIn();

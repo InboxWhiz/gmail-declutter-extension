@@ -21,7 +21,7 @@ export function DeclutterHeader() {
         </div>
         <span className="email-text">{email}</span>
       </div>
-      
+
       <div className="header-right">
         <ThemeToggle />
       </div>
