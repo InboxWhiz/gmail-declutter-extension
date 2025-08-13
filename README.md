@@ -45,5 +45,3 @@ InboxWhiz addresses the common problem of email overload by providing users with
 
 - **OAuth 2.0 authentication** with minimal required Gmail scopes
 - **Zero external data storage** - all processing happens client-side for privacy
-- **Secure content script injection** with proper CSP compliance
-- **Permission-based access** following Chrome extension security best practices
