@@ -1,46 +1,71 @@
-/* Add to top */
-:root,
-.light {
-  --bg-primary: #fff;
-  --text-primary: #000;
-  --button-bg: #f0f0f0;
-  --border-color: #e0e0e0;
-  --link-color: #1a0dab;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1a1a1a;
+    --text-primary: #f0f0f0;
+    --button-bg: #333;
+    --border-color: #444;
+    --link-color: #9dbdff;
+  }
 }
 
-.dark {
-  --bg-primary: #1a1a1a;
-  --text-primary: #f0f0f0;
-  --button-bg: #333;
-  --border-color: #444;
-  --link-color: #9dbdff;
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #fff;
+    --text-primary: #000;
+    --button-bg: #f0f0f0;
+    --border-color: #e0e0e0;
+    --link-color: #1a0dab;
+  }
 }
 
-/* Update existing styles */
+* {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .popup-content {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  padding: 15px 0;
+  margin: 0 20px;
+  width: 300px;
+  text-align: center;
+}
+
+.version-info {
+  margin-top: 10px;
+  font-size: 0.85rem;
 }
 
 .open-gmail-button {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  padding: 15px 30px;
+  font-size: 0.95rem;
+  background-color: #233b86;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.open-gmail-button img {
+  background-color: #233b86;
+}
+
+.open-gmail-button:hover {
+  background-color: #1a4c9b;
 }
 
 a {
   color: var(--link-color);
 }
 
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.theme-toggle {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
+.spacer {
+  height: 5px;
 }
