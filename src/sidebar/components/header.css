@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 15px;
-  background-color: var(--header-bg);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-color);
 }
@@ -26,6 +26,7 @@
 }
 
 .email-text {
+  color: var(--text-secondary);
   font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;

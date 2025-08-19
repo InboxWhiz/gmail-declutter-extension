@@ -2,6 +2,7 @@
 .light {
   --bg-primary: #fff;
   --text-primary: #333;
+  --text-secondary: #5f6368;
   --header-bg: #f5f5f5;
   --button-bg: #e9e9e9;
   --border-color: #ddd;
@@ -10,15 +11,20 @@
 .dark {
   --bg-primary: #1e1e1e;
   --text-primary: #f0f0f0;
+  --text-secondary: #b0b3b8;
   --header-bg: #2d2d2d;
   --button-bg: #3a3a3a;
   --border-color: #444;
 }
 
-/* Update existing styles */
 #declutter-body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+  height: 97vh;
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
 }
 
 .declutter-header {
@@ -26,13 +32,8 @@
 }
 
 .button-bar {
-  border-bottom: 1px solid var(--border-color);
-}
-
-/* Add to existing button styles */
-#unsubscribe-button,
-#delete-button,
-.reload-button {
-  background-color: var(--button-bg);
-  border: 1px solid var(--border-color);
+  padding: 10px 20px 0;
+  min-width: 300px;
+  display: flex;
+  justify-content: space-between;
 }
