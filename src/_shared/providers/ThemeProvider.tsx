@@ -1,73 +1,128 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Theme, ThemeContext, defaultThemeContext } from "./themeContext";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import {
+  ThemeContext,
+  ThemeMode,
+  ThemeSetting,
+  defaultThemeContext,
+} from "./themeContext";
+
+const STORAGE_KEY = "themeSetting";
+
+function isExtContext() {
+  return typeof chrome !== "undefined" && !!chrome.storage?.local;
+}
+
+function getSystemPrefersDark(): boolean {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+async function readSetting(): Promise<ThemeSetting | null> {
+  try {
+    if (isExtContext()) {
+      const setting = await new Promise<ThemeSetting | null>((resolve) => {
+        chrome.storage.local.get([STORAGE_KEY], (res) => {
+          resolve((res?.[STORAGE_KEY] as ThemeSetting | undefined) ?? null);
+        });
+      });
+      return setting;
+    } else {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return (raw as ThemeSetting | null) ?? null;
+    }
+  } catch {
+    return null;
+  }
+}
+
+async function writeSetting(setting: ThemeSetting) {
+  try {
+    if (isExtContext()) {
+      await new Promise<void>((resolve) => {
+        chrome.storage.local.set({ [STORAGE_KEY]: setting }, () => resolve());
+      });
+    } else {
+      localStorage.setItem(STORAGE_KEY, setting);
+    }
+  } catch {
+    // ignore
+  }
+}
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [setting, setSettingState] = useState<ThemeSetting>("system");
+  const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(
+    getSystemPrefersDark(),
+  );
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const isExtensionContext =
-    typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
-
   useEffect(() => {
-    const loadTheme = async () => {
-      try {
-        let savedTheme: Theme | null = null;
-
-        if (isExtensionContext) {
-          savedTheme = await new Promise<Theme | null>((resolve) => {
-            chrome.storage.local.get(["theme"], (result) => {
-              resolve(result.theme || null);
-            });
-          });
-        } else {
-          savedTheme = localStorage.getItem("theme") as Theme | null;
-        }
-
-        setTheme(savedTheme || "light");
-      } catch (error) {
-        console.error("Error loading theme:", error);
-        setTheme("light");
-      } finally {
-        setIsInitialized(true);
+    (async () => {
+      const saved = await readSetting();
+      if (saved === "light" || saved === "dark" || saved === "system") {
+        setSettingState(saved);
+      } else {
+        setSettingState("system");
       }
-    };
-
-    loadTheme();
-  }, [isExtensionContext]);
+      setIsInitialized(true);
+    })();
+  }, []);
 
   useEffect(() => {
     if (!isInitialized) return;
+    void writeSetting(setting);
+  }, [setting, isInitialized]);
 
-    try {
-      document.documentElement.className = theme;
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => setSystemPrefersDark(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
 
-      if (isExtensionContext) {
-        chrome.storage.local.set({ theme });
-      } else {
-        localStorage.setItem("theme", theme);
-      }
-    } catch (error) {
-      console.error("Error saving theme:", error);
+  const theme: ThemeMode = useMemo<ThemeMode>(() => {
+    if (setting === "system") {
+      return systemPrefersDark ? "dark" : "light";
     }
-  }, [theme, isInitialized, isExtensionContext]);
+    return setting;
+  }, [setting, systemPrefersDark]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+  }, [theme]);
+
+  const setSetting = (s: ThemeSetting) => {
+    setSettingState(s);
+  };
+
+  const resetToSystem = () => {
+    setSettingState("system");
+  };
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    if (setting === "system") {
+      setSettingState(theme === "light" ? "dark" : "light");
+      return;
+    }
+    setSettingState(setting === "light" ? "dark" : "light");
   };
 
   if (!isInitialized) {
-    return <div className="theme-loading" style={{ display: "none" }}></div>;
+    return <div style={{ display: "none" }} />;
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ theme, setting, setSetting, toggleTheme, resetToSystem }}
+    >
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => {
-  return useContext(ThemeContext) || defaultThemeContext;
-};
+export const useTheme = () => useContext(ThemeContext) || defaultThemeContext;
