@@ -21,16 +21,23 @@ const Tutorial = () => {
   return (
     <ActionsProvider>
       <Modal
-        onClose={step === 5
-          ? () => {
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              const tab = tabs[0];
-              if (tab && tab.id !== undefined) {
-                chrome.tabs.sendMessage(tab.id, { action: "CLOSE_TUTORIAL" });
+        onClose={
+          step === 5
+            ? () => {
+                chrome.tabs.query(
+                  { active: true, currentWindow: true },
+                  (tabs) => {
+                    const tab = tabs[0];
+                    if (tab && tab.id !== undefined) {
+                      chrome.tabs.sendMessage(tab.id, {
+                        action: "CLOSE_TUTORIAL",
+                      });
+                    }
+                  },
+                );
               }
-            });
-          }
-          : () => { }}
+            : () => {}
+        }
       >
         <div className="tutorial-popup">
           {step === 0 ? (

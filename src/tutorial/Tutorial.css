@@ -1,6 +1,7 @@
 .tutorial-popup {
   z-index: 75;
-  background: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   border-radius: 12px;
   width: 400px;
   padding: 0;
@@ -50,7 +51,7 @@
 
 .tutorial-btn.primary {
   background: #233b86;
-  color: #fff;
+  color: var(--text-primary);
   font-weight: 500;
 }
 

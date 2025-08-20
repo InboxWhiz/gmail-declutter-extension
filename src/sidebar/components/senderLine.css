@@ -1,5 +1,6 @@
 .sender-line {
-  background-color: white;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-size: 0.875rem;
   display: flex;
   align-items: center;
@@ -10,7 +11,8 @@
 }
 
 .sender-line.selected {
-  background-color: #c2dbff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .begin {
@@ -26,14 +28,15 @@
 }
 
 .sender-email {
-  color: #5f6368;
+  color: var(--text-primary);
   font-size: 0.75rem;
   margin-top: 3px;
   cursor: pointer;
 }
 
 .sender-email:hover {
-  color: #007bff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .email-count span {

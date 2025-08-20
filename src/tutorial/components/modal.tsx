@@ -15,10 +15,7 @@ export const Modal = ({
   };
 
   return (
-    <div
-      className="modal"
-      onClick={handleBackgroundClick}
-    >
+    <div className="modal" onClick={handleBackgroundClick}>
       {children}
     </div>
   );

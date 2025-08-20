@@ -2,9 +2,12 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "../index.css";
 import Tutorial from "./Tutorial.tsx";
+import { ThemeProvider } from "../_shared/providers/ThemeProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Tutorial />
+    <ThemeProvider>
+      <Tutorial />
+    </ThemeProvider>
   </StrictMode>,
 );
