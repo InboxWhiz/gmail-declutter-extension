@@ -1,7 +1,6 @@
 // import { GoogleAuthButton } from "./googleAuthButton.tsx";
 // import { useActions } from "../../../_shared/providers/actionsContext.tsx";
 // import { useEffect, useState } from "react";
-import { useTheme } from "../../../_shared/providers/ThemeProvider";
 import { getAssetUrl } from "../../../_shared/utils/utils";
 
 export function LoginPage() {
@@ -12,10 +11,8 @@ export function LoginPage() {
   //   getEmailAccount().then(setEmail);
   // }, []);
 
-  const { theme } = useTheme();
-
   return (
-    <div id="declutter-body" className={`login-container ${theme}`}>
+    <div id="declutter-body" className="login">
       <img
         src={getAssetUrl("assets/logo.svg")}
         alt="InboxWhiz Logo"

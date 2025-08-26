@@ -31,9 +31,30 @@
   background-color: var(--header-bg);
 }
 
+#declutter-body.login {
+  height: 100vh;
+  color: white;
+  background-color: #233b86;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin: 0;
+}
+
+#declutter-body.login #email-account {
+  margin-top: 7px;
+  font-size: 0.75rem;
+}
+
 .button-bar {
   padding: 10px 20px 0;
   min-width: 300px;
   display: flex;
   justify-content: space-between;
+}
+
+#senders {
+  padding: 10px;
+  overflow: hidden auto;
+  flex-grow: 1;
 }
