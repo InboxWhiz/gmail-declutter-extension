@@ -1,33 +1,38 @@
+.dark *::-webkit-scrollbar,
 .light *::-webkit-scrollbar {
   width: 12px;
-  background: #f0f0f0;
   border-radius: 8px;
-}
-
-.light *::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 8px;
-  border: 2px solid #f0f0f0;
-}
-
-.light *::-webkit-scrollbar-thumb:hover {
-  background: #999;
 }
 
 .dark *::-webkit-scrollbar {
-  width: 12px;
   background: #222;
+}
+
+.light *::-webkit-scrollbar {
+  background: #f0f0f0;
+}
+
+.dark *::-webkit-scrollbar-thumb,
+.light *::-webkit-scrollbar-thumb {
   border-radius: 8px;
 }
 
 .dark *::-webkit-scrollbar-thumb {
   background: #444;
-  border-radius: 8px;
   border: 2px solid #222;
+}
+
+.light *::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border: 2px solid #f0f0f0;
 }
 
 .dark *::-webkit-scrollbar-thumb:hover {
   background: #666;
+}
+
+.light *::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 :root,
