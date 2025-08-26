@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { ActionButton } from "./components/actionButton.tsx";
 import { ReloadButton } from "./components/reloadButton.tsx";
 import { ModalPopup } from "./components/modalPopup.tsx";
@@ -11,11 +11,13 @@ import { useLoggedIn } from "../_shared/providers/loggedInContext.tsx";
 import { SelectedSendersProvider } from "./providers/selectedSendersContext.tsx";
 import { SendersProvider } from "./providers/sendersContext.tsx";
 import { ModalProvider } from "./providers/modalContext.tsx";
-import { ThemeProvider } from "../_shared/providers/ThemeProvider.tsx";
+import { ThemeContext } from "../_shared/providers/themeContext.ts";
+import ThemeToggle from "./components/themeToggle.tsx";
 
 function App() {
   const { loggedIn, setLoggedIn } = useLoggedIn();
   const { isLoggedIn } = useActions();
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const updateSignInStatus = async () => {
@@ -26,36 +28,37 @@ function App() {
     updateSignInStatus();
   });
 
-  return (
-    <ThemeProvider>
-      {!loggedIn ? (
-        <LoginPage />
-      ) : (
-        <SelectedSendersProvider>
-          <SendersProvider>
-            <ModalProvider>
-              <div id="declutter-body">
-                <DeclutterHeader />
+  if (!loggedIn) {
+    return <LoginPage />;
+  } else {
+    return (
+      <SelectedSendersProvider>
+        <SendersProvider>
+          <ModalProvider>
+            <div id="declutter-body" className={theme}>
+              <DeclutterHeader />
 
-                <div className="button-bar">
-                  <div className="sender-actions">
-                    <ActionButton id="unsubscribe-button" />
-                    <ActionButton id="delete-button" />
-                  </div>
-
-                  <ReloadButton />
+              <div className="button-bar">
+                <div className="sender-actions">
+                  <ActionButton id="unsubscribe-button" />
+                  <ActionButton id="delete-button" />
                 </div>
 
-                <SendersContainer />
-
-                <ModalPopup />
+                <div style={{ display: "flex" }}>
+                  <ReloadButton />
+                  <ThemeToggle />
+                </div>
               </div>
-            </ModalProvider>
-          </SendersProvider>
-        </SelectedSendersProvider>
-      )}
-    </ThemeProvider>
-  );
+
+              <SendersContainer />
+
+              <ModalPopup />
+            </div>
+          </ModalProvider>
+        </SendersProvider>
+      </SelectedSendersProvider>
+    );
+  }
 }
 
 export default App;

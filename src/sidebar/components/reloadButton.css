@@ -1,7 +1,4 @@
 .reload-button {
-  position: absolute;
-  top: 65px;
-  right: 8px;
   border: none;
   background-color: var(--bg-primary);
   color: var(--text-primary);

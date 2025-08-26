@@ -16,17 +16,24 @@ const PopupApp = () => {
       <h2>InboxWhiz</h2>
       <p>Manage your inbox effortlessly with InboxWhiz!</p>
 
-      <div className="centered-button-container">
-        <button className="open-gmail-button" onClick={openGmail}>
-          <img
-            src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
-            alt="Gmail Logo"
-            className="gmailLogo"
-            style={{ width: "20px", height: "20px" }}
-          />
-          Open Gmail
-        </button>
-      </div>
+      <button
+        className="open-gmail-button"
+        onClick={openGmail}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "16px auto",
+        }}
+      >
+        <img
+          src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
+          alt="Gmail Logo"
+          className="gmailLogo"
+          style={{ width: "20px", height: "20px" }}
+        />
+        Open Gmail
+      </button>
 
       <div className="popupLinks">
         <p>
@@ -35,6 +42,7 @@ const PopupApp = () => {
             Contact Us
           </a>
         </p>
+        <div className="spacer"></div>
         <p>
           <strong>Support Development:</strong>{" "}
           <a href={donateLink} target="_blank" rel="noopener noreferrer">
@@ -42,6 +50,7 @@ const PopupApp = () => {
           </a>
           💖
         </p>
+        <div className="spacer"></div>
         <p>
           <strong>Loved the tool? </strong>{" "}
           <a href={feedbackLink} target="_blank" rel="noopener noreferrer">
@@ -49,6 +58,7 @@ const PopupApp = () => {
           </a>
           ⭐
         </p>
+        <div className="spacer"></div>
       </div>
 
       <div className="version-info">
