@@ -1,6 +1,10 @@
 .reload-button {
+  position: absolute;
+  top: 65px;
+  right: 8px;
   border: none;
-  background-color: white;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   box-shadow: none;
   cursor: pointer;
 }

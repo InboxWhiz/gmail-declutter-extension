@@ -1,23 +1,39 @@
 .declutter-header {
-  text-align: center;
-  padding: 10px;
-  color: #5f6368;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  padding: 10px 15px;
+  background-color: var(--header-bg);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .header-icon {
-  width: 25px;
-  height: 25px;
-
-  /* margin-right: 10px; */
-  margin-bottom: 10px;
-  background-color: #2f2f2f;
-  color: white;
-  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  background-color: var(--icon-bg);
+  color: var(--icon-color);
+  display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
+}
+
+.email-text {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
 }

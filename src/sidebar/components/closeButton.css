@@ -1,6 +1,6 @@
 .close-button {
   background-image: url("https://www.gstatic.com/images/icons/material/system_gm/1x/close_black_20dp.png");
-  background-color: white;
+  background-color: var(--bg-primary);
   background-repeat: no-repeat;
   background-position: center;
   border-radius: 20px;
@@ -15,5 +15,5 @@
 }
 
 .close-button:hover {
-  background-color: #e7e7e7;
+  background-color: var(--bg-primary);
 }
