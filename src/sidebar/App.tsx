@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { ActionButton } from "./components/actionButton.tsx";
 import { ReloadButton } from "./components/reloadButton.tsx";
 import { ModalPopup } from "./components/modalPopup.tsx";
@@ -11,10 +11,12 @@ import { useLoggedIn } from "../_shared/providers/loggedInContext.tsx";
 import { SelectedSendersProvider } from "./providers/selectedSendersContext.tsx";
 import { SendersProvider } from "./providers/sendersContext.tsx";
 import { ModalProvider } from "./providers/modalContext.tsx";
+import { ThemeContext } from "../_shared/providers/themeContext.ts";
 
 function App() {
   const { loggedIn, setLoggedIn } = useLoggedIn();
   const { isLoggedIn } = useActions();
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const updateSignInStatus = async () => {
@@ -32,7 +34,7 @@ function App() {
       <SelectedSendersProvider>
         <SendersProvider>
           <ModalProvider>
-            <div id="declutter-body">
+            <div id="declutter-body" className={theme}>
               <DeclutterHeader />
 
               <div className="button-bar">
