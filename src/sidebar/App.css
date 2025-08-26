@@ -35,23 +35,28 @@
   --bg-primary: #fff;
   --text-primary: #333;
   --text-secondary: #5f6368;
-  --header-bg: #f5f5f5;
+  --selected-bg: #c2dbff;
   --button-bg: #e9e9e9;
   --border-color: #ddd;
+  --line-color: #f2f6fc;
 }
 
 .dark {
   --bg-primary: #1e1e1e;
   --text-primary: #f0f0f0;
   --text-secondary: #b0b3b8;
-  --header-bg: #2d2d2d;
+  --selected-bg: #34527a;
   --button-bg: #3a3a3a;
   --border-color: #444;
+  --line-color: #555;
+}
+
+:root {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 #declutter-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
   font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
   height: 97vh;
   display: flex;

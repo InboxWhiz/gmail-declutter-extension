@@ -12,6 +12,7 @@ import { SelectedSendersProvider } from "./providers/selectedSendersContext.tsx"
 import { SendersProvider } from "./providers/sendersContext.tsx";
 import { ModalProvider } from "./providers/modalContext.tsx";
 import { ThemeContext } from "../_shared/providers/themeContext.ts";
+import ThemeToggle from "./components/themeToggle.tsx";
 
 function App() {
   const { loggedIn, setLoggedIn } = useLoggedIn();
@@ -43,7 +44,10 @@ function App() {
                   <ActionButton id="delete-button" />
                 </div>
 
-                <ReloadButton />
+                <div style={{ display: "flex" }}>
+                  <ReloadButton />
+                  <ThemeToggle />
+                </div>
               </div>
 
               <SendersContainer />
