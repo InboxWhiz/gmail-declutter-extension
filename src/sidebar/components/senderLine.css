@@ -25,14 +25,13 @@
   display: inline-flex;
   flex-direction: column;
   padding: 7px 10px;
+  max-width: 65vw;
 }
 
 .sender-email {
   color: var(--text-secondary);
-
-  /* overflow: hidden;
+  overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap; */
   font-size: 0.75rem;
   margin-top: 3px;
   cursor: pointer;

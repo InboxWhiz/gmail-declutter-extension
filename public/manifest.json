@@ -20,7 +20,7 @@
   },
   "content_scripts": [
     {
-      "js": ["content.js"],
+      "js": ["content.js", "browser_email_cs.js"],
       "matches": ["https://mail.google.com/*"],
       "type": "module"
     }
