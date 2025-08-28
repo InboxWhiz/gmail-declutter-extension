@@ -4,7 +4,7 @@ import {
   ThemeMode,
   ThemeSetting,
   defaultThemeContext,
-} from "./themeContext";
+} from "./theme_context";
 
 const STORAGE_KEY = "themeSetting";
 
