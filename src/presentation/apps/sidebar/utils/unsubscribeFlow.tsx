@@ -1,5 +1,4 @@
 import { useActions } from "../../../../_shared/providers/actionsContext";
-import { useLoggedIn } from "../../_shared/providers/loggedInContext";
 import { ManualUnsubscribeData } from "../../../../_shared/types/types";
 import { useApp } from "../../../providers/app_provider";
 import { useModal } from "../providers/modalContext";
@@ -12,7 +11,6 @@ export function useUnsubscribeFlow(
   const { setModal } = useModal();
   const { reloadSenders } = useApp();
   const { selectedSenders, clearSelectedSenders } = useApp();
-  const { setLoggedIn } = useLoggedIn();
 
   let linkOnlySenders: [string, string][] = []; // List of senders that require manual unsubscribe via link, and their links to click
   let noUnsubscribeOptionSenders: string[] = []; // List of senders with no unsubscribe option
@@ -39,7 +37,7 @@ export function useUnsubscribeFlow(
     } catch (error: Error | any) {
       // If the user fails to go through the OAuth flow, we set loggedIn to false
       if (error.message == "The user did not approve access.") {
-        setLoggedIn(false);
+        // setLoggedIn(false);
       }
     }
   };

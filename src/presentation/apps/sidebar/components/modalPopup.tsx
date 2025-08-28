@@ -4,7 +4,6 @@ import { useModal } from "../providers/modalContext";
 import { useActions } from "../../../../_shared/providers/actionsContext";
 import { ToggleOption } from "./toggleOption";
 import { useUnsubscribeFlow } from "../utils/unsubscribeFlow";
-import { useLoggedIn } from "../../_shared/providers/loggedInContext";
 import { useApp } from "../../../providers/app_provider";
 
 interface ConfirmProps {
@@ -166,7 +165,6 @@ const UnsubscribeSuccess = () => {
 const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const { reloadSenders, selectedSenders, setSelectedSenders, deleteSenders, searchEmailSenders } = useApp();
   const { setModal } = useModal();
-  const { setLoggedIn } = useLoggedIn();
 
   const showEmails = () => {
     searchEmailSenders(Object.keys(selectedSenders));
@@ -197,7 +195,7 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
     } catch (error: Error | any) {
       // If the user fails to go through the OAuth flow, we set loggedIn to false
       if (error.message == "The user did not approve access.") {
-        setLoggedIn(false);
+        // setLoggedIn(false);
       }
     }
   };
