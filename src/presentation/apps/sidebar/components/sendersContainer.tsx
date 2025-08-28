@@ -1,5 +1,5 @@
 import { SenderLine } from "./senderLine";
-import { useApp } from "../../presentation/providers/app_provider";
+import { useApp } from "../../../providers/app_provider";
 import SenderLineSkeleton from "./senderLineSkeleton";
 // import LoadingBar from "./loadingBar";
 

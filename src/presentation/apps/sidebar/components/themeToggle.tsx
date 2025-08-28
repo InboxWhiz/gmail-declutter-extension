@@ -1,5 +1,5 @@
 import React from "react";
-import { useTheme } from "../../_shared/providers/ThemeProvider";
+import { useTheme } from "../../../providers/ThemeProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import "./themeToggle.css";

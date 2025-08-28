@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useActions } from "../../_shared/providers/actionsContext";
+import { useActions } from "../../../../_shared/providers/actionsContext";
 import "./loadingBar.css";
 
 const LoadingBar = () => {

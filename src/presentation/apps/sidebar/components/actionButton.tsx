@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBan, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { useModal } from "../providers/modalContext";
-import { useApp } from "../../presentation/providers/app_provider";
+import { useApp } from "../../../providers/app_provider";
 
 export const ActionButton = ({ id }: { id: string }) => {
   const text: string = id == "unsubscribe-button" ? "Unsubscribe" : "Delete";

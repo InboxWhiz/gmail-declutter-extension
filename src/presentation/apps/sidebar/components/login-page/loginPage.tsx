@@ -1,7 +1,7 @@
 // import { GoogleAuthButton } from "./googleAuthButton.tsx";
 // import { useActions } from "../../../_shared/providers/actionsContext.tsx";
 // import { useEffect, useState } from "react";
-import { getAssetUrl } from "../../../_shared/utils/utils";
+import { getAssetUrl } from "../../../../../_shared/utils/utils";
 
 export function LoginPage() {
   // const { getEmailAccount } = useActions();

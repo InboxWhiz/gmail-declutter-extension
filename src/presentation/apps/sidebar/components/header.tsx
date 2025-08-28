@@ -2,7 +2,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./header.css";
 import { useEffect, useState } from "react";
-import { useApp } from "../../presentation/providers/app_provider";
+import { useApp } from "../../../providers/app_provider";
 
 export function DeclutterHeader() {
   const { getEmailAccount } = useApp();

@@ -1,5 +1,5 @@
 import { GoogleAuthButton } from "./googleAuthButton";
-import { getAssetUrl } from "../../_shared/utils/utils";
+import { getAssetUrl } from "../../../../_shared/utils/utils";
 import { SuccessIcon } from "./successIcon";
 
 export const WelcomeStep = ({ onNext }: { onNext: () => void }) => {

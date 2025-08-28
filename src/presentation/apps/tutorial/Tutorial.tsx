@@ -9,7 +9,7 @@ import {
   WelcomeStep,
 } from "./components/steps";
 import { Modal } from "./components/modal";
-import { ActionsProvider } from "../_shared/providers/actionsContext";
+import { ActionsProvider } from "../../../_shared/providers/actionsContext";
 
 const Tutorial = () => {
   const [step, setStep] = useState(0);

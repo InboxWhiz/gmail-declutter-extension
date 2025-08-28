@@ -1,5 +1,5 @@
 import "./senderLine.css";
-import { useApp } from "../../presentation/providers/app_provider";
+import { useApp } from "../../../providers/app_provider";
 
 interface SenderLineProps {
   senderName: string;

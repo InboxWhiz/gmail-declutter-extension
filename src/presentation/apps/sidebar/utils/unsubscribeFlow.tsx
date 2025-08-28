@@ -1,7 +1,7 @@
-import { useActions } from "../../_shared/providers/actionsContext";
+import { useActions } from "../../../../_shared/providers/actionsContext";
 import { useLoggedIn } from "../../_shared/providers/loggedInContext";
-import { ManualUnsubscribeData } from "../../_shared/types/types";
-import { useApp } from "../../presentation/providers/app_provider";
+import { ManualUnsubscribeData } from "../../../../_shared/types/types";
+import { useApp } from "../../../providers/app_provider";
 import { useModal } from "../providers/modalContext";
 
 export function useUnsubscribeFlow(

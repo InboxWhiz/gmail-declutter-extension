@@ -1,11 +1,11 @@
 import "./modalPopup.css";
 import { useState } from "react";
 import { useModal } from "../providers/modalContext";
-import { useActions } from "../../_shared/providers/actionsContext";
+import { useActions } from "../../../../_shared/providers/actionsContext";
 import { ToggleOption } from "./toggleOption";
 import { useUnsubscribeFlow } from "../utils/unsubscribeFlow";
 import { useLoggedIn } from "../../_shared/providers/loggedInContext";
-import { useApp } from "../../presentation/providers/app_provider";
+import { useApp } from "../../../providers/app_provider";
 
 interface ConfirmProps {
   emailsNum: number;
