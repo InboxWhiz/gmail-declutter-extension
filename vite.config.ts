@@ -22,7 +22,7 @@ export default defineConfig({
         tutorial: resolve(root, "tutorial", "index.html"),
         browser_email_cs: resolve(
           root,
-          "data/content_scripts/browser_email_cs.js"
+          "data/content_scripts/browser_email_cs.ts"
         ),
       },
       output: {
