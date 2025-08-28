@@ -1,7 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Sender } from '../../domain/entities/sender';
 import { ChromeLocalStorageRepo } from '../../data/repositories/chrome_local_storage_repo';
-import { BrowserAuthRepo } from '../../data/repositories/browser_auth_repo';
+import { BrowserEmailRepo } from '../../data/repositories/browser_email_repo';
+import { ChromePageInteractionRepo } from '../../data/repositories/chrome_page_interaction_repo';
+import { EmailRepo } from '../../domain/repositories/email_repo';
+import { StorageRepo } from '../../domain/repositories/storage_repo';
+import { PageInteractionRepo } from '../../domain/repositories/page_interaction_repo';
 
 type AppContextType = {
   senders: Sender[];
@@ -10,6 +14,9 @@ type AppContextType = {
   reloadSenders: (fetchNew?: boolean) => void;
   setSelectedSenders: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   clearSelectedSenders: () => void;
+  searchEmailSenders: (emails: string[]) => void;
+  getEmailAccount: () => Promise<string | null>;
+  deleteSenders: (senderEmails: string[]) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -21,16 +28,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedSenders, setSelectedSenders] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState<boolean>(false);
 
-  const storageRepo = new ChromeLocalStorageRepo();
-  const authRepo = new BrowserAuthRepo();
+  const emailRepo: EmailRepo = new BrowserEmailRepo();
+  const storageRepo: StorageRepo = new ChromeLocalStorageRepo();
+  const pageInteractionRepo: PageInteractionRepo = new ChromePageInteractionRepo();
 
   const reloadSenders = useCallback(async (fetchNew = false) => {
     setLoading(true);
     try {
-      const accountEmail = await authRepo.getActiveTabEmailAccount();
+      const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
 
       if (fetchNew) {
-        const fetchedSenders = await _getSendersFromPage();
+        const fetchedSenders = await emailRepo.fetchSenders();
         storageRepo.storeSenders(fetchedSenders, accountEmail);
         setSenders(fetchedSenders);
       } else {
@@ -46,36 +54,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     setSelectedSenders({});
   }, []);
 
+  const searchEmailSenders = useCallback((emails: string[]) => {
+    pageInteractionRepo.searchEmailSenders(emails);
+  }, []);
+
+  const getEmailAccount = useCallback(async (): Promise<string | null> => {
+    const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
+    return accountEmail;
+  }, []);
+
+  const deleteSenders = useCallback(async (senderEmails: string[]) => {
+    const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
+    await emailRepo.deleteSenders(senderEmails);
+    await storageRepo.deleteSenders(senderEmails, accountEmail);
+    setSenders((prevSenders) =>
+      prevSenders.filter((sender) => !senderEmails.includes(sender.email))
+    );
+  }, []);
 
   // Automatically load senders from storage when the component mounts
   useEffect(() => {
     reloadSenders();
   }, [reloadSenders]);
 
-  const _getSendersFromPage = async () => {
-    const response = await new Promise((resolve) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]?.id) {
-          chrome.tabs.sendMessage(tabs[0].id, {
-            action: "FETCH_SENDERS",
-          }, (response) => {
-            console.log(`response: ${JSON.stringify(response)}`);
-            resolve(response.data);
-          });
-        } else {
-          console.error("No active tab found.");
-          resolve(null);
-        }
-      });
-    });
-    const senders = response as Sender[];
-    console.log(`senders: ${senders}`);
-    senders.sort((a, b) => b.emailCount - a.emailCount);
-    return senders;
-  };
-
   return (
-    <AppContext.Provider value={{ senders, selectedSenders, loading, reloadSenders, setSelectedSenders, clearSelectedSenders }}>
+    <AppContext.Provider value={{
+      senders,
+      selectedSenders,
+      loading,
+      reloadSenders,
+      setSelectedSenders,
+      clearSelectedSenders,
+      searchEmailSenders,
+      getEmailAccount,
+      deleteSenders
+    }}>
       {children}
     </AppContext.Provider>
   );

@@ -16,8 +16,7 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const [deleteEmails, setDeleteEmails] = useState<boolean>(true);
   const [blockSenders, setBlockSenders] = useState<boolean>(false);
 
-  const { searchEmailSenders } = useActions();
-  const { selectedSenders } = useApp();
+  const { selectedSenders, searchEmailSenders } = useApp();
   const { startUnsubscribeFlow } = useUnsubscribeFlow(
     deleteEmails,
     blockSenders,
@@ -165,9 +164,7 @@ const UnsubscribeSuccess = () => {
 };
 
 const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
-  const { searchEmailSenders, deleteSenders } = useActions();
-  const { selectedSenders, setSelectedSenders } = useApp();
-  const { reloadSenders } = useApp();
+  const { reloadSenders, selectedSenders, setSelectedSenders, deleteSenders, searchEmailSenders } = useApp();
   const { setModal } = useModal();
   const { setLoggedIn } = useLoggedIn();
 

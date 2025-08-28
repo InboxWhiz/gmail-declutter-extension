@@ -1,14 +1,6 @@
-import { AuthRepo } from '../../domain/repositories/auth_repo';
+import { PageInteractionRepo } from "../../domain/repositories/page_interaction_repo";
 
-export class BrowserAuthRepo implements AuthRepo {
-    /**
-     * Retrieves the Gmail account associated with the currently active browser tab.
-     *
-     * This function sends a message to the content script of the active tab to request the current email account.
-     *
-     * @returns {Promise<string>} A promise that resolves to the email address string.
-     * @throws Will reject the promise if there is no active tab or if a messaging error occurs.
-     */
+export class ChromePageInteractionRepo implements PageInteractionRepo {
     async getActiveTabEmailAccount(): Promise<string> {
         return new Promise((resolve, reject) => {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -34,6 +26,19 @@ export class BrowserAuthRepo implements AuthRepo {
                     },
                 );
             });
+        });
+    }
+
+    searchEmailSenders(senderEmailAddresses: string[]): void {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    type: "SEARCH_EMAIL_SENDERS",
+                    emails: senderEmailAddresses,
+                });
+            } else {
+                console.error("No active tab found.");
+            }
         });
     }
 }

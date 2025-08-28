@@ -1,11 +1,11 @@
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./header.css";
-import { useActions } from "../../_shared/providers/actionsContext";
 import { useEffect, useState } from "react";
+import { useApp } from "../../presentation/providers/app_provider";
 
 export function DeclutterHeader() {
-  const { getEmailAccount } = useActions();
+  const { getEmailAccount } = useApp();
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
