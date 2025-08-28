@@ -1,5 +1,7 @@
 import { BrowserEmailService } from "../services/browser_email_service";
+import { PageInteractionService } from "../services/page_interaction_service";
 
+// Fetch senders
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "FETCH_SENDERS") {
     (async () => {
@@ -19,6 +21,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
+// Delete senders
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "DELETE_SENDERS") {
     (async () => {
@@ -30,5 +33,21 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       }
     })();
     return true; // Indicates that the message port will remain open for asynchronous response
+  }
+});
+
+// Get email account
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.action === "GET_EMAIL_ACCOUNT") {
+    const value = PageInteractionService.getActiveTabEmailAccount();
+    sendResponse({ result: value });
+  }
+});
+
+// Search email senders
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "SEARCH_EMAIL_SENDERS") {
+    console.log("Received message to search email senders:", message.emails);
+    PageInteractionService.searchEmailSenders(message.emails);
   }
 });

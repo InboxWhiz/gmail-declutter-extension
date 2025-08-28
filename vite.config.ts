@@ -20,14 +20,14 @@ export default defineConfig({
         sidebar: resolve(root, "sidebar", "index.html"),
         popup: resolve(root, "popup", "index.html"),
         tutorial: resolve(root, "tutorial", "index.html"),
-        browser_email_cs: resolve(
+        content_script: resolve(
           root,
-          "data/content_scripts/browser_email_cs.ts"
+          "data/content_scripts/content.ts"
         ),
       },
       output: {
         entryFileNames: (chunkInfo) => {
-          if (chunkInfo.name === "browser_email_cs") {
+          if (chunkInfo.name === "content_script") {
             return "[name].js";
           }
           return "assets/[name].js";
