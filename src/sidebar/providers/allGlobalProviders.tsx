@@ -1,5 +1,4 @@
 import { ActionsProvider } from "../../_shared/providers/actionsContext";
-import { LoggedInProvider } from "../../_shared/providers/loggedInContext";
 import { ThemeProvider } from "../../_shared/providers/ThemeProvider";
 
 export const AllGlobalProviders: React.FC<{ children: React.ReactNode }> = ({
@@ -7,9 +6,7 @@ export const AllGlobalProviders: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   return (
     <ThemeProvider>
-      <LoggedInProvider>
         <ActionsProvider>{children}</ActionsProvider>
-      </LoggedInProvider>
     </ThemeProvider>
   );
 };
