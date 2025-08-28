@@ -1,9 +1,8 @@
 import { useActions } from "../../_shared/providers/actionsContext";
 import { useLoggedIn } from "../../_shared/providers/loggedInContext";
 import { ManualUnsubscribeData } from "../../_shared/types/types";
+import { useApp } from "../../presentation/providers/app_provider";
 import { useModal } from "../providers/modalContext";
-import { useSelectedSenders } from "../providers/selectedSendersContext";
-import { useSenders } from "../providers/sendersContext";
 
 export function useUnsubscribeFlow(
   deleteEmails: boolean,
@@ -11,8 +10,8 @@ export function useUnsubscribeFlow(
 ) {
   const { deleteSenders, blockSender, unsubscribeSendersAuto } = useActions();
   const { setModal } = useModal();
-  const { reloadSenders } = useSenders();
-  const { selectedSenders, clearSelectedSenders } = useSelectedSenders();
+  const { reloadSenders } = useApp();
+  const { selectedSenders, clearSelectedSenders } = useApp();
   const { setLoggedIn } = useLoggedIn();
 
   let linkOnlySenders: [string, string][] = []; // List of senders that require manual unsubscribe via link, and their links to click

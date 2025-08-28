@@ -2,13 +2,13 @@ import "./actionButton.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBan, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { useSelectedSenders } from "../providers/selectedSendersContext";
 import { useModal } from "../providers/modalContext";
+import { useApp } from "../../presentation/providers/app_provider";
 
 export const ActionButton = ({ id }: { id: string }) => {
   const text: string = id == "unsubscribe-button" ? "Unsubscribe" : "Delete";
   const icon: IconProp = id == "unsubscribe-button" ? faBan : faTrash;
-  const { selectedSenders } = useSelectedSenders();
+  const { selectedSenders } = useApp();
   const { setModal } = useModal();
 
   const handleClick = () => {

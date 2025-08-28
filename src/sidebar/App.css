@@ -89,7 +89,7 @@
 }
 
 .button-bar {
-  padding: 10px 20px 0;
+  padding: 10px 5px 0 15px;
   min-width: 300px;
   display: flex;
   justify-content: space-between;

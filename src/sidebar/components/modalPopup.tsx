@@ -1,12 +1,11 @@
 import "./modalPopup.css";
 import { useState } from "react";
 import { useModal } from "../providers/modalContext";
-import { useSelectedSenders } from "../providers/selectedSendersContext";
-import { useSenders } from "../providers/sendersContext";
 import { useActions } from "../../_shared/providers/actionsContext";
 import { ToggleOption } from "./toggleOption";
 import { useUnsubscribeFlow } from "../utils/unsubscribeFlow";
 import { useLoggedIn } from "../../_shared/providers/loggedInContext";
+import { useApp } from "../../presentation/providers/app_provider";
 
 interface ConfirmProps {
   emailsNum: number;
@@ -18,7 +17,7 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const [blockSenders, setBlockSenders] = useState<boolean>(false);
 
   const { searchEmailSenders } = useActions();
-  const { selectedSenders } = useSelectedSenders();
+  const { selectedSenders } = useApp();
   const { startUnsubscribeFlow } = useUnsubscribeFlow(
     deleteEmails,
     blockSenders,
@@ -167,8 +166,8 @@ const UnsubscribeSuccess = () => {
 
 const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const { searchEmailSenders, deleteSenders } = useActions();
-  const { selectedSenders, setSelectedSenders } = useSelectedSenders();
-  const { reloadSenders } = useSenders();
+  const { selectedSenders, setSelectedSenders } = useApp();
+  const { reloadSenders } = useApp();
   const { setModal } = useModal();
   const { setLoggedIn } = useLoggedIn();
 

@@ -1,6 +1,6 @@
 import "./senderLine.css";
-import { useSelectedSenders } from "../providers/selectedSendersContext";
 import { useActions } from "../../_shared/providers/actionsContext";
+import { useApp } from "../../presentation/providers/app_provider";
 
 interface SenderLineProps {
   senderName: string;
@@ -13,7 +13,7 @@ export const SenderLine = ({
   senderEmail,
   senderCount,
 }: SenderLineProps) => {
-  const { selectedSenders, setSelectedSenders } = useSelectedSenders();
+  const { selectedSenders, setSelectedSenders } = useApp();
   const { searchEmailSenders } = useActions();
 
   const selectLine = () => {

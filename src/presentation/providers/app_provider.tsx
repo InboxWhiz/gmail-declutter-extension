@@ -5,8 +5,11 @@ import { BrowserAuthRepo } from '../../data/repositories/browser_auth_repo';
 
 type AppContextType = {
   senders: Sender[];
+  selectedSenders: Record<string, number>;
   loading: boolean;
   reloadSenders: (fetchNew?: boolean) => void;
+  setSelectedSenders: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+  clearSelectedSenders: () => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -15,6 +18,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [senders, setSenders] = useState<Sender[]>([]);
+  const [selectedSenders, setSelectedSenders] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState<boolean>(false);
 
   const storageRepo = new ChromeLocalStorageRepo();
@@ -38,9 +42,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
+  const clearSelectedSenders = useCallback(() => {
+    setSelectedSenders({});
+  }, []);
+
+
+  // Automatically load senders from storage when the component mounts
   useEffect(() => {
-      reloadSenders();
-    }, [reloadSenders]);
+    reloadSenders();
+  }, [reloadSenders]);
 
   const _getSendersFromPage = async () => {
     const response = await new Promise((resolve) => {
@@ -65,7 +75,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AppContext.Provider value={{ senders, loading, reloadSenders }}>
+    <AppContext.Provider value={{ senders, selectedSenders, loading, reloadSenders, setSelectedSenders, clearSelectedSenders }}>
       {children}
     </AppContext.Provider>
   );
