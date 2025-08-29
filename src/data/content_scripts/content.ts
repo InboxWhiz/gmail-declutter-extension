@@ -70,3 +70,19 @@ chrome.runtime.onMessage.addListener((message) => {
     PageInteractionService.searchEmailSenders(message.emails);
   }
 });
+
+// Show tutorial
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "SHOW_TUTORIAL") {
+    console.log("Received message to show tutorial");
+    PageInteractionService.displayTutorial();
+  }
+});
+
+// Close tutorial
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "CLOSE_TUTORIAL") {
+    console.log("Received message to close tutorial");
+    PageInteractionService.closeTutorial();
+  }
+});

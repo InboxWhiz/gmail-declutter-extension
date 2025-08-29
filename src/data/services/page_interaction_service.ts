@@ -28,4 +28,32 @@ export class PageInteractionService {
         const title = document.querySelector("title")?.textContent;
         return title?.split(" - ")[1].trim();
     }
+
+    static displayTutorial() {
+        // Create an iframe element
+        const iframe = document.createElement("iframe");
+        iframe.id = "inboxwhiz-tutorial";
+        iframe.src = chrome.runtime.getURL("tutorial/index.html");
+
+        // Style the iframe as a modal
+        iframe.setAttribute("allowtransparency", "true");
+        iframe.style.backgroundColor = "transparent";
+        iframe.style.position = "fixed";
+        iframe.style.top = "50%";
+        iframe.style.left = "50%";
+        iframe.style.transform = "translate(-50%, -50%)";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.zIndex = "10000";
+
+        // Append the iframe to the document body
+        document.body.appendChild(iframe);
+    }
+
+    static closeTutorial() {
+        const iframe = document.getElementById("inboxwhiz-tutorial");
+        iframe?.remove();
+    }
+
 }
