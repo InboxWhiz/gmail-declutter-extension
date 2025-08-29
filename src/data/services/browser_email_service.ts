@@ -25,6 +25,54 @@ function parseEmailsToSenders(emails: { email: string, name: string }[]): Sender
  */
 export class BrowserEmailService {
 
+    // - UNSUBSCRIBE SENDERS HELPERS -
+
+    static async unsubscribeSendersFromBrowser(senderEmailAddresses: string[]): Promise<string[]> {
+        console.log("Unsubscribing senders in browser: ", senderEmailAddresses);
+        let failures = [];
+        for (const senderEmailAddress of senderEmailAddresses) {
+            const success = await this._unsubscribeSingleSender(senderEmailAddress);
+            if (!success) { failures.push(senderEmailAddress); }
+        }
+        return failures;
+    }
+
+    /**
+     * Attempts to unsubscribe a single sender by automating browser interactions.
+     * @param senderEmailAddress - The email address of the sender to unsubscribe from.
+     * @returns A promise that resolves to `true` if the unsubscribe process was successful, or `false` if the "Unsubscribe" button was not found.
+     */
+    static async _unsubscribeSingleSender(senderEmailAddress: string): Promise<boolean> {
+        console.log("Unsubscribing sender: ", senderEmailAddress);
+
+        // Search for the sender's emails
+        PageInteractionService.searchEmailSenders([senderEmailAddress]);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for search results to load
+
+        // Hover over the first email row
+        const emailRows = this._getEmailRows();
+        emailRows[0].dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); // TODO: If this fails, maybe we could go down the list of rows?
+
+        // Click the "Unsubscribe" button
+        const unsubscribeButton = Array.from(document.querySelectorAll('.aJ6'))
+            .filter(button => (button as HTMLElement).offsetParent !== null)[0];
+        if (!unsubscribeButton) {
+            console.warn('Unsubscribe button not found for sender:', senderEmailAddress);
+            return false;
+        }
+        unsubscribeButton?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        unsubscribeButton?.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+        // Confirm unsubscribe
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait for unsubscribe confirmation to load
+        const confirmButton = Array.from(document.querySelectorAll(".mUIrbf-anl"))
+            .filter(el => el.textContent?.includes('Unsubscribe'))[0] as HTMLElement;
+        confirmButton.click();
+
+        return true;
+    }
+
+
     // - DELETE SENDERS HELPERS -
 
     static async deleteSendersFromBrowser(senderEmailAddresses: string[]): Promise<void> {
@@ -59,20 +107,20 @@ export class BrowserEmailService {
     static async _waitForDeleteConfirmation(): Promise<void> {
         return new Promise<void>((resolve) => {
             const observer = new MutationObserver(() => {
-            const confirmation = Array.from(document.querySelectorAll('span'))
-                .find(span => span.textContent?.includes("conversations moved to Bin"));
-            if (confirmation) {
-                observer.disconnect();
-                resolve();
-            }
+                const confirmation = Array.from(document.querySelectorAll('span'))
+                    .find(span => span.textContent?.includes("conversations moved to Bin"));
+                if (confirmation) {
+                    observer.disconnect();
+                    resolve();
+                }
             });
 
             observer.observe(document.body, { childList: true, subtree: true });
 
             // Fallback timeout in case confirmation never appears
             setTimeout(() => {
-            observer.disconnect();
-            resolve();
+                observer.disconnect();
+                resolve();
             }, 1000);
         });
     }
@@ -206,7 +254,7 @@ export class BrowserEmailService {
      */
     static _getEmailRows(): HTMLElement[] {
         // Find the main email table body element
-        const tables = document.querySelectorAll("tbody");
+        const tables = Array.from(document.querySelectorAll("tbody")).filter(el => el.offsetParent !== null);
         const tableBody = tables[tables.length - 1];
 
         // Find all email rows within the table body

@@ -23,6 +23,14 @@ export interface EmailRepo {
     deleteSenders(senderEmailAddresses: string[]): Promise<void>;
 
     /**
+     * Attempts to unsubscribe the specified senders.
+     *
+     * @param senderEmailAddresses - An array of sender email addresses to be unsubscribed.
+     * @returns A Promise that resolves to an array of failed email addresses.
+     */
+    unsubscribeSenders(senderEmailAddresses: string[]): Promise<string[]>;
+
+    /**
      * Blocks the specified sender by their email address.
      * This creates a filter to automatically move emails from the sender to trash.
      *

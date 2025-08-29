@@ -1,5 +1,3 @@
-import { useActions } from "../../../../_shared/providers/actionsContext";
-import { ManualUnsubscribeData } from "../../../../_shared/types/types";
 import { useApp } from "../../../providers/app_provider";
 import { useModal } from "../providers/modalContext";
 
@@ -7,39 +5,27 @@ export function useUnsubscribeFlow(
   deleteEmails: boolean,
   blockSenders: boolean,
 ) {
-  const { deleteSenders, blockSender, unsubscribeSendersAuto } = useActions();
   const { setModal } = useModal();
   const { reloadSenders } = useApp();
-  const { selectedSenders, clearSelectedSenders } = useApp();
+  const { selectedSenders, clearSelectedSenders, unsubscribeSenders, deleteSenders } = useApp();
 
-  let linkOnlySenders: [string, string][] = []; // List of senders that require manual unsubscribe via link, and their links to click
-  let noUnsubscribeOptionSenders: string[] = []; // List of senders with no unsubscribe option
+  let failedSenders: string[];
 
   // Kick off the flow
   const startUnsubscribeFlow = async () => {
-    try {
-      // Set modal to pending state
-      setModal({
-        action: "unsubscribe",
-        type: "pending",
-        subtype: "working",
-      });
+    // Set modal to pending state
+    setModal({
+      action: "unsubscribe",
+      type: "pending",
+      subtype: "working",
+    });
 
-      // Attempt to unsubscribe all senders automatically
-      const unsubscribeResults: ManualUnsubscribeData =
-        await unsubscribeSendersAuto(Object.keys(selectedSenders));
-      linkOnlySenders = unsubscribeResults.linkOnlySenders;
-      noUnsubscribeOptionSenders =
-        unsubscribeResults.noUnsubscribeOptionSenders;
+    // Attempt to unsubscribe all senders automatically
+    failedSenders = await unsubscribeSenders(Object.keys(selectedSenders));
 
-      // Start processing link-only senders
-      processNextLink(0);
-    } catch (error: Error | any) {
-      // If the user fails to go through the OAuth flow, we set loggedIn to false
-      if (error.message == "The user did not approve access.") {
-        // setLoggedIn(false);
-      }
-    }
+    // Start processing failed senders by optionally blocking
+    processNextBlock(0);
+
   };
 
   // End the flow
@@ -50,15 +36,16 @@ export function useUnsubscribeFlow(
       await deleteSenders(Object.keys(selectedSenders));
     }
 
-    // Block senders if needed
-    if (blockSenders) {
-      setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
-      for (const email of Object.keys(selectedSenders)) {
-        if (!noUnsubscribeOptionSenders.includes(email)) {
-          await blockSender(email);
-        }
-      }
-    }
+    // // TODO: Block senders if needed
+    // if (blockSenders) {
+    //   setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
+    //   for (const email of Object.keys(selectedSenders)) {
+    //     if (!noUnsubscribeOptionSenders.includes(email)) {
+    //       await blockSender(email);
+    //     }
+    //   }
+    // }
+    blockSenders;
 
     // Deselect all senders
     clearSelectedSenders();
@@ -68,36 +55,14 @@ export function useUnsubscribeFlow(
     reloadSenders();
   };
 
-  // Process one link-only sender at `i`
-  const processNextLink = async (i: number) => {
-    if (i >= linkOnlySenders.length) {
-      processNextBlock(0);
-      return;
-    }
-
-    const [email, link] = linkOnlySenders[i];
-
-    setModal({
-      action: "unsubscribe",
-      type: "continue",
-      extras: {
-        email,
-        link,
-        onContinue: () => {
-          processNextLink(i + 1);
-        },
-      },
-    });
-  };
-
   // Process one block-only sender at `i`
   const processNextBlock = async (i: number) => {
-    if (i >= noUnsubscribeOptionSenders.length) {
+    if (i >= failedSenders.length) {
       endUnsubscribeFlow();
       return;
     }
 
-    const email = noUnsubscribeOptionSenders[i];
+    const email = failedSenders[i];
 
     setModal({
       action: "unsubscribe",

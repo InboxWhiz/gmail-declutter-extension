@@ -43,6 +43,25 @@ export class BrowserEmailRepo implements EmailRepo {
         });
     }
 
+    async unsubscribeSenders(senderEmailAddresses: string[]): Promise<string[]> {
+        return await new Promise((resolve) => {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (tabs[0]?.id) {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        action: "UNSUBSCRIBE_SENDERS",
+                        emails: senderEmailAddresses,
+                    }, (response) => {
+                        console.log(`response to unsubscribing: ${JSON.stringify(response)}`);
+                        resolve(response.failures || []);
+                    });
+                } else {
+                    console.error("No active tab found.");
+                    resolve(senderEmailAddresses);
+                }
+            });
+        });
+    }
+
     blockSender(senderEmailAddress: string): Promise<void> {
         throw new Error("Method not implemented.");
         senderEmailAddress
