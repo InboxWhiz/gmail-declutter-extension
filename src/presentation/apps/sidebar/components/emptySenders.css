@@ -1,0 +1,50 @@
+.e-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-primary);
+    height: 80%;
+}
+
+.e-card {
+    text-align: center;
+}
+
+.e-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+}
+
+.e-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.e-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 8px 0 24px 0;
+}
+
+.e-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    background-color: var(--plain-button);
+    color: #fff;
+}
+
+.btn:hover {
+    background-color: var(--plain-button-hover);
+}
