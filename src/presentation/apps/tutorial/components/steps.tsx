@@ -1,19 +1,40 @@
-import { GoogleAuthButton } from "./googleAuthButton";
-import { getAssetUrl } from "../../../../_shared/utils/utils";
+import { getAssetUrl } from "../../../../utils";
 import { SuccessIcon } from "./successIcon";
+
+const openSidePanel = () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.sidePanel.open({
+      tabId: tabs[0]?.id,
+    } as chrome.sidePanel.OpenOptions);
+  });
+};
+
+const closeTutorial = () => {
+  chrome.tabs.query(
+    { active: true, currentWindow: true },
+    (tabs) => {
+      const tab = tabs[0];
+      if (tab && tab.id !== undefined) {
+        chrome.tabs.sendMessage(tab.id, {
+          action: "CLOSE_TUTORIAL",
+        });
+      }
+    }
+  );
+};
 
 export const WelcomeStep = ({ onNext }: { onNext: () => void }) => {
   return (
     <div className="step">
       <img
-        src={getAssetUrl("images/icon-128.png", "../images/icon-128.png")}
+        src={getAssetUrl("images/icon-128.png", "../../../images/icon-128.png")}
         alt="Welcome"
         className="logo"
         height="100"
       />
       <h2 className="tutorial-header">Welcome to InboxWhiz!</h2>
       <p className="tutorial-note">Declutter your Gmail in seconds.</p>
-      <button className="tutorial-btn primary" onClick={onNext}>
+      <button className="tutorial-btn" onClick={onNext}>
         Get started
       </button>
     </div>
@@ -32,7 +53,7 @@ export const Step1 = ({ onNext }: { onNext: () => void }) => {
         className="tutorial-gif"
         width={400}
       />
-      <button className="tutorial-btn primary" onClick={onNext}>
+      <button className="tutorial-btn" onClick={onNext}>
         Next
       </button>
     </div>
@@ -49,7 +70,7 @@ export const Step2 = ({ onNext }: { onNext: () => void }) => {
         className="tutorial-gif"
         height={400}
       />
-      <button className="tutorial-btn primary" onClick={onNext}>
+      <button className="tutorial-btn" onClick={onNext}>
         Next
       </button>
     </div>
@@ -68,33 +89,9 @@ export const Step3 = ({ onNext }: { onNext: () => void }) => {
         className="tutorial-gif"
         height={400}
       />
-      <button className="tutorial-btn primary" onClick={onNext}>
+      <button className="tutorial-btn" onClick={onNext}>
         Next
       </button>
-    </div>
-  );
-};
-
-export const Step4 = ({ onNext }: { onNext: () => void }) => {
-  const onAuthSuccess = () => {
-    // Open the side panel after successful authentication
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.sidePanel.open({
-        tabId: tabs[0]?.id,
-      } as chrome.sidePanel.OpenOptions);
-    });
-    onNext();
-  };
-  return (
-    <div className="step">
-      <img
-        src={getAssetUrl("images/icon-128.png", "../images/icon-128.png")}
-        alt="Welcome"
-        className="logo"
-        height="100"
-      />
-      <h2 className="tutorial-header">Sign in to get started</h2>
-      <GoogleAuthButton onAuthSuccess={onAuthSuccess} />
     </div>
   );
 };
@@ -110,17 +107,24 @@ export const Success = () => {
           justifyContent: "center",
         }}
       >
+        <div style={{ height: "10px" }}></div>
         <h2
           className="tutorial-header"
           style={{ display: "flex", alignItems: "center", gap: "10px" }}
         >
           <SuccessIcon />
-          Success!
+          You're all set!
         </h2>
       </div>
       <div style={{ height: "20px" }}></div>
       <p className="tutorial-note">You are ready to clean up your inbox.</p>
+
+      <button className="tutorial-btn" onClick={() => { openSidePanel(); closeTutorial(); }}>
+        Get Started
+      </button>
+
       <div style={{ height: "10px" }}></div>
     </div>
   );
 };
+

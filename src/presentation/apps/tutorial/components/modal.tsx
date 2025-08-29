@@ -1,21 +1,9 @@
-import { ReactNode, MouseEvent } from "react";
+import { ReactNode } from "react";
 import "./modal.css";
 
-export const Modal = ({
-  children,
-  onClose,
-}: {
-  children: ReactNode;
-  onClose: () => void;
-}) => {
-  const handleBackgroundClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
-
+export const Modal = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="modal" onClick={handleBackgroundClick}>
+    <div className="modal">
       {children}
     </div>
   );

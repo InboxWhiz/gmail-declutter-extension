@@ -1,17 +1,3 @@
-function searchEmailSenders(emails) {
-  // Concatenate emails
-  const email = emails.join(" OR ");
-
-  // Get the search input element
-  const searchInput = document.querySelector("input[name='q']");
-
-  // Set the search input value to the email address
-  searchInput.value = `from:(${email})`;
-
-  // Submit the search form
-  document.querySelector("button[aria-label='Search mail']").click();
-}
-
 function displayTutorial() {
   // Create an iframe element
   const iframe = document.createElement("iframe");
@@ -39,19 +25,6 @@ function closeTutorial() {
   iframe?.remove();
 }
 
-function getEmailAccount() {
-  // Get the email account from the page
-  const title = document.querySelector("title").textContent;
-  return title.split(" - ")[1].trim();
-}
-
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.type === "SEARCH_EMAIL_SENDERS") {
-    console.log("Received message to search email senders:", message.emails);
-    searchEmailSenders(message.emails);
-  }
-});
-
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "SHOW_TUTORIAL") {
     console.log("Received message to show tutorial");
@@ -63,12 +36,5 @@ chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "CLOSE_TUTORIAL") {
     console.log("Received message to close tutorial");
     closeTutorial();
-  }
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "GET_EMAIL_ACCOUNT") {
-    const value = getEmailAccount();
-    sendResponse({ result: value });
   }
 });
