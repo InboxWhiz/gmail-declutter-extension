@@ -55,7 +55,10 @@ export class BrowserEmailService {
 
         // Click the "Unsubscribe" button
         const unsubscribeButton = Array.from(document.querySelectorAll('.aJ6'))
-            .filter(button => (button as HTMLElement).offsetParent !== null)[0];
+            .filter(button =>
+                (button as HTMLElement).offsetParent !== null
+                && button.textContent?.includes('Unsubscribe')
+            )[0];
         if (!unsubscribeButton) {
             console.warn('Unsubscribe button not found for sender:', senderEmailAddress);
             return false;
