@@ -162,7 +162,13 @@ const UnsubscribeSuccess = () => {
 };
 
 const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
-  const { reloadSenders, selectedSenders, setSelectedSenders, deleteSenders, searchEmailSenders } = useApp();
+  const {
+    reloadSenders,
+    selectedSenders,
+    setSelectedSenders,
+    deleteSenders,
+    searchEmailSenders,
+  } = useApp();
   const { setModal } = useModal();
 
   const showEmails = () => {

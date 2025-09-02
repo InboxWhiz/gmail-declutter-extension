@@ -7,11 +7,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     (async () => {
       try {
         const senders = await BrowserEmailService.fetchSendersFromBrowser();
-        const serialized = senders.map(sender => ({
+        const serialized = senders.map((sender) => ({
           email: sender.email,
-          names: Array.from(sender.names),  // convert Set -> array
+          names: Array.from(sender.names), // convert Set -> array
           emailCount: sender.emailCount,
-        }))
+        }));
         sendResponse({ success: true, data: serialized });
       } catch (error) {
         sendResponse({ success: false, error: (error as Error).message });
@@ -41,7 +41,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "UNSUBSCRIBE_SENDERS") {
     (async () => {
       try {
-        const failures = await BrowserEmailService.unsubscribeSendersFromBrowser(message.emails);
+        const failures =
+          await BrowserEmailService.unsubscribeSendersFromBrowser(
+            message.emails,
+          );
         if (failures.length > 0) {
           sendResponse({ success: false, failures });
         } else {

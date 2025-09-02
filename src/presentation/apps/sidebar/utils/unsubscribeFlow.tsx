@@ -6,7 +6,14 @@ export function useUnsubscribeFlow(
   blockSenders: boolean,
 ) {
   const { setModal } = useModal();
-  const { selectedSenders, clearSelectedSenders, unsubscribeSenders, deleteSenders, reloadSenders, blockSender } = useApp();
+  const {
+    selectedSenders,
+    clearSelectedSenders,
+    unsubscribeSenders,
+    deleteSenders,
+    reloadSenders,
+    blockSender,
+  } = useApp();
 
   let failedSenders: string[];
 
@@ -24,7 +31,6 @@ export function useUnsubscribeFlow(
 
     // Start processing failed senders by optionally blocking
     processNextBlock(0);
-
   };
 
   // End the flow
@@ -44,7 +50,7 @@ export function useUnsubscribeFlow(
         }
       }
     }
-    
+
     // Deselect all senders
     clearSelectedSenders();
 

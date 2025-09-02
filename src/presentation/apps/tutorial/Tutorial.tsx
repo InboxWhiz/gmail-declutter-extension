@@ -1,12 +1,6 @@
 import { useState } from "react";
 import "./Tutorial.css";
-import {
-  Step1,
-  Step2,
-  Step3,
-  Success,
-  WelcomeStep,
-} from "./components/steps";
+import { Step1, Step2, Step3, Success, WelcomeStep } from "./components/steps";
 import { Modal } from "./components/modal";
 
 const Tutorial = () => {

@@ -10,17 +10,14 @@ const openSidePanel = () => {
 };
 
 const closeTutorial = () => {
-  chrome.tabs.query(
-    { active: true, currentWindow: true },
-    (tabs) => {
-      const tab = tabs[0];
-      if (tab && tab.id !== undefined) {
-        chrome.tabs.sendMessage(tab.id, {
-          action: "CLOSE_TUTORIAL",
-        });
-      }
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    if (tab && tab.id !== undefined) {
+      chrome.tabs.sendMessage(tab.id, {
+        action: "CLOSE_TUTORIAL",
+      });
     }
-  );
+  });
 };
 
 export const WelcomeStep = ({ onNext }: { onNext: () => void }) => {
@@ -119,7 +116,13 @@ export const Success = () => {
       <div style={{ height: "20px" }}></div>
       <p className="tutorial-note">You are ready to clean up your inbox.</p>
 
-      <button className="tutorial-btn" onClick={() => { openSidePanel(); closeTutorial(); }}>
+      <button
+        className="tutorial-btn"
+        onClick={() => {
+          openSidePanel();
+          closeTutorial();
+        }}
+      >
         Get Started
       </button>
 
@@ -127,4 +130,3 @@ export const Success = () => {
     </div>
   );
 };
-

@@ -6,7 +6,7 @@
  * @property {number} emailCount - The number of emails received from this sender
  */
 export interface Sender {
-    email: string;
-    names: Set<string>;
-    emailCount: number;
+  email: string;
+  names: Set<string>;
+  emailCount: number;
 }

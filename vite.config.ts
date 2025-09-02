@@ -27,12 +27,16 @@ export default defineConfig({
           const to = path.join(outDir, app);
 
           // Remove existing target if necessary
-          if (fs.existsSync(to)) fs.rmSync(to, { recursive: true, force: true });
+          if (fs.existsSync(to))
+            fs.rmSync(to, { recursive: true, force: true });
           fs.renameSync(from, to);
         }
 
         // Remove now-empty parent folders
-        fs.rmSync(path.join(outDir, "presentation"), { recursive: true, force: true });
+        fs.rmSync(path.join(outDir, "presentation"), {
+          recursive: true,
+          force: true,
+        });
       },
     },
   ],
@@ -45,10 +49,7 @@ export default defineConfig({
         sidebar: resolve(root, "presentation/apps/sidebar/index.html"),
         popup: resolve(root, "presentation/apps/popup/index.html"),
         tutorial: resolve(root, "presentation/apps/tutorial/index.html"),
-        content_script: resolve(
-          root,
-          "data/content_scripts/content.ts"
-        ),
+        content_script: resolve(root, "data/content_scripts/content.ts"),
       },
       output: {
         entryFileNames: (chunkInfo) => {
