@@ -9,16 +9,13 @@ import { ModalProvider } from "./providers/modalContext.tsx";
 import ThemeToggle from "./components/themeToggle.tsx";
 import { AppProvider } from "../../providers/app_provider.tsx";
 import { ThemeProvider } from "../../providers/theme_provider.tsx";
-import { ActionsProvider } from "../../../_shared/providers/actionsContext.tsx";
 
 function App() {
   return (
     <AppProvider>
-      <ActionsProvider>
-        <ThemeProvider>
-          <AppWithTheme />
-        </ThemeProvider>
-      </ActionsProvider>
+      <ThemeProvider>
+        <AppWithTheme />
+      </ThemeProvider>
     </AppProvider>
   );
 }
