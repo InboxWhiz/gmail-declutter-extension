@@ -13,6 +13,11 @@ import { EmailRepo } from "../../domain/repositories/email_repo";
 import { StorageRepo } from "../../domain/repositories/storage_repo";
 import { PageInteractionRepo } from "../../domain/repositories/page_interaction_repo";
 
+// Mock repositories
+import { MockEmailRepo } from "../../data/repositories/mocks/mock_email_repo";
+import { MockStorageRepo } from "../../data/repositories/mocks/mock_storage_repo";
+import { MockPageInteractionRepo } from "../../data/repositories/mocks/mock_page_interaction_repo";
+
 type AppContextType = {
   senders: Sender[];
   selectedSenders: Record<string, number>;
@@ -40,10 +45,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   >({});
   const [loading, setLoading] = useState<boolean>(false);
 
-  const emailRepo: EmailRepo = new BrowserEmailRepo();
-  const storageRepo: StorageRepo = new ChromeLocalStorageRepo();
-  const pageInteractionRepo: PageInteractionRepo =
-    new ChromePageInteractionRepo();
+  // - REPOS -
+
+  const useMock = import.meta.env.VITE_USE_MOCK === "true";
+
+  const emailRepo: EmailRepo = useMock
+    ? new MockEmailRepo()
+    : new BrowserEmailRepo();
+  const storageRepo: StorageRepo = useMock
+    ? new MockStorageRepo()
+    : new ChromeLocalStorageRepo();
+  const pageInteractionRepo: PageInteractionRepo = useMock
+    ? new MockPageInteractionRepo()
+    : new ChromePageInteractionRepo();
+
+  // - METHODS -
 
   const reloadSenders = useCallback(async (fetchNew = false) => {
     setLoading(true);
@@ -81,7 +97,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     await emailRepo.deleteSenders(senderEmails);
     await storageRepo.deleteSenders(senderEmails, accountEmail);
     setSenders((prevSenders) =>
-      prevSenders.filter((sender) => !senderEmails.includes(sender.email)),
+      prevSenders.filter((sender) => !senderEmails.includes(sender.email))
     );
   }, []);
 
