@@ -29,8 +29,8 @@ export class ChromeLocalStorageRepo implements StorageRepo {
             chrome.storage.local.get([accountEmail], (result) => {
                 if (result[accountEmail].senders) {
                     const updatedSenders = result[accountEmail].senders.filter(
-                        (sender: [string, string, number]) =>
-                            !senderEmails.includes(sender[0]),
+                        (sender: { email: string; emailCount: number; names: string[] }) =>
+                            !senderEmails.includes(sender.email),
                     );
                     chrome.storage.local.set(
                         { [accountEmail]: { senders: updatedSenders } },
