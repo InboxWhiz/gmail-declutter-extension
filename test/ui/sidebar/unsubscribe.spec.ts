@@ -2,12 +2,11 @@ import { test, expect } from "@playwright/test";
 import { selectAliceBob, selectEveFrank, setupSidebarTest } from "./helpers";
 
 test.describe("UI tests for Epic 3 - Unsubscribe Flow", () => {
-  let logs: string[] = [];
-  
+  const logs: string[] = [];
+
   test.beforeEach(async ({ page }) => {
     await setupSidebarTest(page, logs);
   });
-
 
   test("3.1 - shows modal with correct email & sender count & buttons", async ({
     page,

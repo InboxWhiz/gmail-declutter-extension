@@ -97,7 +97,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     await emailRepo.deleteSenders(senderEmails);
     await storageRepo.deleteSenders(senderEmails, accountEmail);
     setSenders((prevSenders) =>
-      prevSenders.filter((sender) => !senderEmails.includes(sender.email))
+      prevSenders.filter((sender) => !senderEmails.includes(sender.email)),
     );
   }, []);
 

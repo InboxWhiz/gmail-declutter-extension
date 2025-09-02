@@ -95,7 +95,7 @@ export class BrowserEmailService {
     senderEmailAddresses: string[],
   ): Promise<string[]> {
     console.log("Unsubscribing senders in browser: ", senderEmailAddresses);
-    let failures = [];
+    const failures = [];
     for (const senderEmailAddress of senderEmailAddresses) {
       const success = await this._unsubscribeSingleSender(senderEmailAddress);
       if (!success) {
@@ -159,7 +159,7 @@ export class BrowserEmailService {
     console.log("Deleting senders in browser: ", senderEmailAddresses);
 
     PageInteractionService.searchEmailSenders(senderEmailAddresses);
-    var rows = this._getEmailRows().length;
+    let rows = this._getEmailRows().length;
     while (rows > 0) {
       console.log(`Found ${rows} email rows to delete. Deleting...`);
       await new Promise((resolve) => setTimeout(resolve, 500)); //THIS ONE
@@ -231,7 +231,7 @@ export class BrowserEmailService {
     console.log(`Total messages: ${totalMessages}, with pages: ${totalPages}`);
 
     // Fetch sender metadata for all emails from each page
-    var emails: { email: string; name: string }[] = [];
+    const emails: { email: string; name: string }[] = [];
     for (let i = 1; i <= totalPages; i++) {
       // Process emails
       console.log(`Processing page ${i} of ${totalPages}`);
@@ -318,7 +318,7 @@ export class BrowserEmailService {
    */
   static _extractSendersFromPage(): { email: string; name: string }[] {
     const emailRows = this._getEmailRows();
-    var senders: { email: string; name: string }[] = [];
+    const senders: { email: string; name: string }[] = [];
 
     // Extract sender information from each email row
     emailRows.forEach((row) => {

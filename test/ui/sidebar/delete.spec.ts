@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { selectAliceBob, setupSidebarTest } from "./helpers";
 
 test.describe("UI tests for Epic 2 - Delete Functionality", () => {
-  let logs: string[] = [];
+  const logs: string[] = [];
 
   test.beforeEach(async ({ page }) => {
     await setupSidebarTest(page, logs);
@@ -19,7 +19,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
     await expect(modal).toContainText("2 sender(s)");
     await expect(modal).toContainText("110 email(s)");
     await expect(
-      page.getByRole("button", { name: "Show all emails" })
+      page.getByRole("button", { name: "Show all emails" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Delete" })).toBeVisible();
   });
@@ -35,7 +35,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
 
     // check that the search function was called
     expect(logs).toContain(
-      "[MOCK] Searching email senders: [alice@email.com, bob@email.com]"
+      "[MOCK] Searching email senders: [alice@email.com, bob@email.com]",
     );
 
     // check that the modal is still visible
@@ -56,7 +56,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
 
     // Delete function was called with correct senders
     expect(logs).toContain(
-      "[MOCK] Deleting senders: [alice@email.com, bob@email.com]"
+      "[MOCK] Deleting senders: [alice@email.com, bob@email.com]",
     );
   });
 });

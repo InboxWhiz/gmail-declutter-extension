@@ -2,12 +2,11 @@ import { test, expect } from "@playwright/test";
 import { setupSidebarTest } from "./helpers";
 
 test.describe("UI tests for Epic 1 - Sender Management", () => {
-  let logs: string[] = [];
+  const logs: string[] = [];
 
   test.beforeEach(async ({ page }) => {
     await setupSidebarTest(page, logs);
   });
-
 
   test("1.1 - displays senders sorted by email count", async ({ page }) => {
     // Wait for the senders list to be visible

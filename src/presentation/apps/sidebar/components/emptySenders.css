@@ -25,7 +25,7 @@
 .e-subtitle {
   font-size: 14px;
   color: var(--text-secondary);
-  margin: 8px 0 24px 0;
+  margin: 8px 0 24px;
 }
 
 .e-buttons {

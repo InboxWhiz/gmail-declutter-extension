@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 
 export const selectAliceBob = async (
   page: Page,
-  action: "delete" | "unsubscribe"
+  action: "delete" | "unsubscribe",
 ) => {
   // Helper function to select Alice and Bob senders, then click action
   await page
@@ -20,7 +20,7 @@ export const selectAliceBob = async (
 
 export const selectEveFrank = async (
   page: Page,
-  action: "delete" | "unsubscribe"
+  action: "delete" | "unsubscribe",
 ) => {
   // Helper function to select Eve and Frank senders, then click action
   await page

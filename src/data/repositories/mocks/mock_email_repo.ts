@@ -53,21 +53,23 @@ export class MockEmailRepo implements EmailRepo {
   async deleteSenders(senderEmailAddresses: string[]): Promise<void> {
     console.log("[MOCK] Deleting senders:", senderEmailAddresses);
     this.mockSenders = this.mockSenders.filter(
-      (sender) => !senderEmailAddresses.includes(sender.email)
+      (sender) => !senderEmailAddresses.includes(sender.email),
     );
     return Promise.resolve();
   }
 
   async unsubscribeSenders(senderEmailAddresses: string[]): Promise<string[]> {
     console.log("[MOCK] Unsubscribing senders:", senderEmailAddresses);
-    const fails = this.failingSenders.filter(email => senderEmailAddresses.includes(email));
+    const fails = this.failingSenders.filter((email) =>
+      senderEmailAddresses.includes(email),
+    );
     return Promise.resolve(fails);
   }
 
   async blockSender(senderEmailAddress: string): Promise<void> {
     console.log("[MOCK] Blocking sender:", senderEmailAddress);
     this.mockSenders = this.mockSenders.filter(
-      (sender) => sender.email !== senderEmailAddress
+      (sender) => sender.email !== senderEmailAddress,
     );
     return Promise.resolve();
   }
