@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 
 export const selectAliceBob = async (
   page: Page,
-  action: "delete" | "unsubscribe",
+  action: "delete" | "unsubscribe"
 ) => {
   // Helper function to select Alice and Bob senders, then click action
   await page
@@ -20,7 +20,7 @@ export const selectAliceBob = async (
 
 export const selectEveFrank = async (
   page: Page,
-  action: "delete" | "unsubscribe",
+  action: "delete" | "unsubscribe"
 ) => {
   // Helper function to select Eve and Frank senders, then click action
   await page
@@ -34,4 +34,14 @@ export const selectEveFrank = async (
     .getByRole("checkbox")
     .check();
   await page.click(`#${action}-button`);
+};
+
+export const setupSidebarTest = async (page: Page, logs: string[]) => {
+  await page.goto("/presentation/apps/sidebar/");
+
+  logs.length = 0; // reset logs before each test
+  page.on("console", (msg) => logs.push(msg.text()));
+
+  // Load senders
+  await page.locator("#load-senders").click();
 };

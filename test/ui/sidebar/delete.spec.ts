@@ -1,14 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { selectAliceBob } from "./helpers";
+import { selectAliceBob, setupSidebarTest } from "./helpers";
 
 test.describe("UI tests for Epic 2 - Delete Functionality", () => {
   let logs: string[] = [];
 
   test.beforeEach(async ({ page }) => {
-    await page.goto("/sidebar/");
-
-    logs = []; // reset logs before each test
-    page.on("console", (msg) => logs.push(msg.text()));
+    await setupSidebarTest(page, logs);
   });
 
   test("2.1 - shows delete confirmation popup with correct counts and buttons", async ({
@@ -22,7 +19,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
     await expect(modal).toContainText("2 sender(s)");
     await expect(modal).toContainText("110 email(s)");
     await expect(
-      page.getByRole("button", { name: "Show all emails" }),
+      page.getByRole("button", { name: "Show all emails" })
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Delete" })).toBeVisible();
   });
@@ -38,7 +35,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
 
     // check that the search function was called
     expect(logs).toContain(
-      "[MOCK] Searching for emails: [alice@email.com, bob@email.com]",
+      "[MOCK] Searching email senders: [alice@email.com, bob@email.com]"
     );
 
     // check that the modal is still visible
@@ -59,7 +56,7 @@ test.describe("UI tests for Epic 2 - Delete Functionality", () => {
 
     // Delete function was called with correct senders
     expect(logs).toContain(
-      "[MOCK] Trashed senders successfully: [alice@email.com, bob@email.com]",
+      "[MOCK] Deleting senders: [alice@email.com, bob@email.com]"
     );
   });
 });
