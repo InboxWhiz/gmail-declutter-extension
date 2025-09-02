@@ -35,3 +35,13 @@ export const selectEveFrank = async (
     .check();
   await page.click(`#${action}-button`);
 };
+
+export const setupSidebarTest = async (page: Page, logs: string[]) => {
+  await page.goto("/presentation/apps/sidebar/");
+
+  logs.length = 0; // reset logs before each test
+  page.on("console", (msg) => logs.push(msg.text()));
+
+  // Load senders
+  await page.locator("#load-senders").click();
+};

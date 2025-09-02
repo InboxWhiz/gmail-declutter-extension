@@ -1,0 +1,114 @@
+.dark *::-webkit-scrollbar,
+.light *::-webkit-scrollbar {
+  width: 12px;
+  border-radius: 8px;
+}
+
+.dark *::-webkit-scrollbar {
+  background: #222;
+}
+
+.light *::-webkit-scrollbar {
+  background: #f0f0f0;
+}
+
+.dark *::-webkit-scrollbar-thumb,
+.light *::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: #444;
+  border: 2px solid #222;
+}
+
+.light *::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border: 2px solid #f0f0f0;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.light *::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+:root,
+.light {
+  --bg-primary: #fff;
+  --text-primary: #333;
+  --text-secondary: #5f6368;
+  --selected-bg: #c2dbff;
+  --button-bg: #e9e9e9;
+  --border-color: #c4c4c4;
+  --line-color: #f2f6fc;
+  --plain-button: #000;
+  --plain-button-hover: #333;
+  --modal-button-primary: #323232;
+  --modal-button-primary-hover: #555;
+  --modal-button-secondary: #fff;
+  --modal-button-secondary-hover: #f4f4f4;
+}
+
+.dark {
+  --bg-primary: #1e1e1e;
+  --text-primary: #f0f0f0;
+  --text-secondary: #b0b3b8;
+  --selected-bg: #34527a;
+  --button-bg: #3a3a3a;
+  --border-color: #444;
+  --line-color: #555;
+  --plain-button: #555;
+  --plain-button-hover: #333;
+  --modal-button-primary: #fff;
+  --modal-button-primary-hover: #bbb;
+  --modal-button-secondary: #323232;
+  --modal-button-secondary-hover: #444;
+}
+
+:root {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+#declutter-body {
+  font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+  height: 97vh;
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+
+.declutter-header {
+  background-color: var(--header-bg);
+}
+
+#declutter-body.login {
+  height: 100vh;
+  color: white;
+  background-color: #233b86;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin: 0;
+}
+
+#declutter-body.login #email-account {
+  margin-top: 7px;
+  font-size: 0.75rem;
+}
+
+.button-bar {
+  padding: 10px 5px 0 15px;
+  min-width: 300px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#senders {
+  padding: 10px;
+  overflow: hidden auto;
+  flex-grow: 1;
+}

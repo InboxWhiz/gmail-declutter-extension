@@ -1,0 +1,53 @@
+.tutorial-popup {
+  z-index: 75;
+  background: #fff;
+  border-radius: 12px;
+  width: 400px;
+  padding: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  border: 1px solid #e0e0e0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  margin-top: 20px;
+}
+
+.tutorial-header {
+  padding: 0;
+  margin: 0;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.tutorial-note {
+  margin-top: 15px;
+}
+
+.tutorial-gif {
+  margin: 10px;
+}
+
+.tutorial-btn {
+  background: #233b86;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 40%;
+  padding: 8px 32px;
+  margin: 20px 0;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tutorial-btn:hover {
+  background: #1a4c9b;
+}

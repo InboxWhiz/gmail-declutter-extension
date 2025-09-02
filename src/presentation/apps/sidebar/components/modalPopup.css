@@ -1,0 +1,84 @@
+.modal {
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background-color: rgb(0 0 0 / 40%);
+  color: var(--text-primary);
+}
+
+.modal-content {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 50% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 70%;
+  border-radius: 7px;
+  text-align: center;
+}
+
+p {
+  font-size: 16px;
+}
+
+.note {
+  font-size: 14px;
+}
+
+.modal-content button {
+  border: none;
+  display: block;
+  text-align: center;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+  width: 100%;
+  font-size: 16px;
+  padding: 10px 0;
+}
+
+button.primary {
+  color: var(--modal-button-secondary);
+  background-color: var(--modal-button-primary);
+  padding: 12px 0;
+}
+
+button.secondary {
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+}
+
+button.primary:hover {
+  background-color: var(--modal-button-primary-hover);
+  cursor: pointer;
+}
+
+button.secondary:hover {
+  background-color: var(--modal-button-secondary-hover);
+  cursor: pointer;
+}
+
+.loader {
+  border: 8px solid #e4e4e4;
+  border-top: 8px solid #555;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+  margin: 10px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
