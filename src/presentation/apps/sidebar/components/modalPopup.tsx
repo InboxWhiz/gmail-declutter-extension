@@ -1,7 +1,6 @@
 import "./modalPopup.css";
 import { useState } from "react";
 import { useModal } from "../providers/modalContext";
-import { useActions } from "../../../../_shared/providers/actionsContext";
 import { ToggleOption } from "./toggleOption";
 import { useUnsubscribeFlow } from "../utils/unsubscribeFlow";
 import { useApp } from "../../../providers/app_provider";
@@ -125,7 +124,7 @@ const UnsubscribeError = ({
   email: string;
   onContinue: () => void;
 }) => {
-  const { blockSender } = useActions();
+  const { blockSender } = useApp();
   const { setModal } = useModal();
 
   const handleBlockSender = async () => {

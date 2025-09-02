@@ -25,6 +25,55 @@ function parseEmailsToSenders(emails: { email: string, name: string }[]): Sender
  */
 export class BrowserEmailService {
 
+    // - BLOCK SENDER HELPERS -
+
+    static async blockSenderFromBrowser(senderEmailAddress: string): Promise<void> {
+        console.log("Blocking sender in browser: ", senderEmailAddress);
+        const originalPageUrl = window.location.href;
+
+        // Open filters page
+        const currentPage = window.location.href.split('#')[0];
+        window.location.href = `${currentPage}#settings/filters`;
+
+        // Click "Create a new filter"
+        const createFilterButtonFunc = () => {
+            return Array.from(document.querySelectorAll('span[role="link"]'))
+                .find(el => el.textContent?.includes('Create a new filter'))
+        };
+        await this._waitForElement(createFilterButtonFunc);
+        const createFilterButton = createFilterButtonFunc() as HTMLElement;
+        createFilterButton?.click();
+
+        // Create the filter
+        const confirmButtonFunc = () => {
+            return Array.from(document.querySelectorAll('div[role="link"]'))
+                .filter(el => el.textContent?.includes('Create filter'))[0] as HTMLElement;
+        };
+        await this._waitForElement(confirmButtonFunc);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait for the input to be ready
+        (document.activeElement! as HTMLInputElement).value = senderEmailAddress;
+        const confirmButton = confirmButtonFunc();
+        confirmButton?.click();
+
+        // Choose deleting 
+        const labelFunc = () => {
+            return Array.from(document.querySelectorAll('label'))
+                .find(el => el.textContent?.trim() === 'Delete it');
+        };
+        await this._waitForElement(labelFunc);
+        const label = labelFunc();
+        const checkbox = document.getElementById(label!.getAttribute('for')!)! as HTMLInputElement;
+        checkbox.checked = true;
+
+        // Confirm
+        const confirmCreateButton = Array.from(document.querySelectorAll('div[role="button"]'))
+            .filter(el => el.textContent?.includes('Create filter'))[0] as HTMLElement;
+        confirmCreateButton?.click();
+
+        // Go back to old page
+        window.location.href = originalPageUrl;
+    }
+
     // - UNSUBSCRIBE SENDERS HELPERS -
 
     static async unsubscribeSendersFromBrowser(senderEmailAddresses: string[]): Promise<string[]> {
@@ -59,10 +108,7 @@ export class BrowserEmailService {
                 (button as HTMLElement).offsetParent !== null
                 && button.textContent?.includes('Unsubscribe')
             )[0];
-        if (!unsubscribeButton) {
-            console.warn('Unsubscribe button not found for sender:', senderEmailAddress);
-            return false;
-        }
+        if (!unsubscribeButton) { return false; }
         unsubscribeButton?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
         unsubscribeButton?.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
 
@@ -264,4 +310,53 @@ export class BrowserEmailService {
         const emailRows = tableBody.querySelectorAll('tr');
         return Array.from(emailRows);
     }
+
+    /**
+     * Waits for a specific DOM element to appear in the document.
+     * @param findFn A function that returns the desired element or null if not found.
+     * @param timeout Optional timeout in milliseconds to stop waiting after a certain period. Default is 10000ms.
+     * @returns A promise that resolves with the found element or rejects if the timeout is reached.
+     */
+    static _waitForElement(
+        findFn: () => Element | undefined,
+        timeout = 10000
+    ): Promise<Element> {
+        function isVisible(el: Element) {
+            return !!(el && (el as HTMLElement).offsetParent !== null && el.getClientRects().length > 0);
+        }
+
+        return new Promise((resolve, reject) => {
+            const checkAndResolve = () => {
+                const el = findFn();
+                if (el && isVisible(el)) {
+                    return el;
+                }
+                return null;
+            };
+
+            // Check immediately in case it's already present and visible
+            const existing = checkAndResolve();
+            if (existing) {
+                resolve(existing);
+                return;
+            }
+
+            const observer = new MutationObserver(() => {
+                const el = checkAndResolve();
+                if (el) {
+                    observer.disconnect();
+                    resolve(el);
+                }
+            });
+
+            observer.observe(document.body, { childList: true, subtree: true });
+
+            setTimeout(() => {
+                observer.disconnect();
+                reject(new Error(`Element not found or not visible within ${timeout}ms`));
+            }, timeout);
+        });
+    }
+
+
 }

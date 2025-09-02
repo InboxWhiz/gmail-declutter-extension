@@ -55,6 +55,21 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
+// Block sender
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.action === "BLOCK_SENDER") {
+    (async () => {
+      try {
+        await BrowserEmailService.blockSenderFromBrowser(message.email);
+        sendResponse({ success: true });
+      } catch (error) {
+        sendResponse({ success: false, error: (error as Error).message });
+      }
+    })();
+    return true; // Indicates that the message port will remain open for asynchronous response
+  }
+});
+
 // Get email account
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "GET_EMAIL_ACCOUNT") {

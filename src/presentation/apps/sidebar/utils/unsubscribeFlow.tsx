@@ -6,8 +6,7 @@ export function useUnsubscribeFlow(
   blockSenders: boolean,
 ) {
   const { setModal } = useModal();
-  const { reloadSenders } = useApp();
-  const { selectedSenders, clearSelectedSenders, unsubscribeSenders, deleteSenders } = useApp();
+  const { selectedSenders, clearSelectedSenders, unsubscribeSenders, deleteSenders, reloadSenders, blockSender } = useApp();
 
   let failedSenders: string[];
 
@@ -36,17 +35,16 @@ export function useUnsubscribeFlow(
       await deleteSenders(Object.keys(selectedSenders));
     }
 
-    // // TODO: Block senders if needed
-    // if (blockSenders) {
-    //   setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
-    //   for (const email of Object.keys(selectedSenders)) {
-    //     if (!noUnsubscribeOptionSenders.includes(email)) {
-    //       await blockSender(email);
-    //     }
-    //   }
-    // }
-    blockSenders;
-
+    // Block senders if needed
+    if (blockSenders) {
+      setModal({ action: "unsubscribe", type: "pending", subtype: "blocking" });
+      for (const email of Object.keys(selectedSenders)) {
+        if (!failedSenders.includes(email)) {
+          await blockSender(email);
+        }
+      }
+    }
+    
     // Deselect all senders
     clearSelectedSenders();
 

@@ -62,8 +62,21 @@ export class BrowserEmailRepo implements EmailRepo {
         });
     }
 
-    blockSender(senderEmailAddress: string): Promise<void> {
-        throw new Error("Method not implemented.");
-        senderEmailAddress
+    async blockSender(senderEmailAddress: string): Promise<void> {
+        return await new Promise((resolve) => {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (tabs[0]?.id) {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        action: "BLOCK_SENDER",
+                        email: senderEmailAddress,
+                    }, (response) => {
+                        console.log(`response to blocking: ${JSON.stringify(response)}`);
+                        resolve();
+                    });
+                } else {
+                    console.error("No active tab found.");
+                }
+            });
+        });
     }
 }

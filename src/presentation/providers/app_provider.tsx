@@ -18,6 +18,7 @@ type AppContextType = {
   getEmailAccount: () => Promise<string | null>;
   deleteSenders: (senderEmails: string[]) => Promise<void>;
   unsubscribeSenders: (senderEmails: string[]) => Promise<string[]>;
+  blockSender: (senderEmail: string) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -77,6 +78,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     return await emailRepo.unsubscribeSenders(senderEmails);
   }, []);
 
+  const blockSender = useCallback(async (senderEmail: string) => {
+    await emailRepo.blockSender(senderEmail);
+  }, []);
+
   // Automatically load senders from storage when the component mounts
   useEffect(() => {
     reloadSenders();
@@ -93,7 +98,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       searchEmailSenders,
       getEmailAccount,
       deleteSenders,
-      unsubscribeSenders
+      unsubscribeSenders,
+      blockSender
     }}>
       {children}
     </AppContext.Provider>
