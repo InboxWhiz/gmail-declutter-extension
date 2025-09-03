@@ -1,32 +1,205 @@
 .action-button {
+  position: relative;
   border: none;
-  border-radius: 20px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 14px;
-  height: 32px;
-  margin: 4px;
-  padding: 0 16px;
-  box-shadow: 0 3px 5px rgb(0 0 0 / 20%);
+  font-size: 13px;
+  font-weight: 600;
+  height: 38px;
+  margin: 2px;
+  padding: 0 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-#unsubscribe-button {
-  background-color: #233b86;
-  color: white;
+.action-button:hover:not(.disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-#unsubscribe-button:hover {
-  background-color: #1a4c9b;
+.action-button:active:not(.disabled) {
+  transform: translateY(0px);
+  transition: transform 0.1s ease;
 }
 
-#delete-button {
-  background-color: #bb1826;
-  color: white;
+.action-button.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none !important;
 }
 
-#delete-button:hover {
-  background-color: #ca2633;
+/* Button States */
+.action-button#unsubscribe-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.action-button#unsubscribe-button:hover:not(.disabled) {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+}
+
+.action-button#unsubscribe-button.success {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%) !important;
+}
+
+.action-button#unsubscribe-button.error {
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%) !important;
+}
+
+.action-button#delete-button {
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%) !important;
+  color: white !important;
+}
+
+.action-button#delete-button:hover:not(.disabled) {
+  background: linear-gradient(135deg, #e73c5e 0%, #e7431f 100%) !important;
+}
+
+.action-button#delete-button.success {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%) !important;
+}
+
+.action-button#delete-button.error {
+  background: linear-gradient(135deg, #8b0000 0%, #a52a2a 100%) !important;
+}
+
+/* Loading State */
+.action-button.loading {
+  pointer-events: none;
+}
+
+.action-button.loading #unsubscribe-button,
+.action-button.loading #delete-button {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+}
+
+/* Button Content */
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
 }
 
 .action-button .i {
-  margin-right: 5px;
+  margin-right: 6px;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+/* Icon Animations */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success-icon {
+  animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+.error-icon {
+  animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes errorShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+/* Ripple Effect */
+.button-ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 70%
+  );
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s ease;
+}
+
+.action-button:active:not(.disabled) .button-ripple {
+  transform: scale(2);
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+/* Micro-interactions */
+.action-button:hover:not(.disabled) .i {
+  transform: scale(1.1);
+}
+
+.action-button.success .i {
+  color: #ffffff;
+}
+
+.action-button.error .i {
+  color: #ffffff;
+}
+
+/* Pulse animation for loading */
+.action-button.loading {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.25),
+      0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+  }
 }
