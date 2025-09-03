@@ -186,7 +186,6 @@ export class BrowserEmailService {
     )[0] as HTMLElement;
     deleteButton.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
     deleteButton.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
-    deleteButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
     await this._waitForDeleteConfirmation();
   }
