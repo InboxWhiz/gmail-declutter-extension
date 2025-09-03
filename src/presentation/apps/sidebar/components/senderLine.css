@@ -11,6 +11,7 @@
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   user-select: none;
+  animation: slide-in-from-right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sender-line-content {
@@ -26,15 +27,12 @@
   background-color: var(--bg-primary);
   transform: translateX(4px);
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.1),
-    0 1px 3px rgba(0, 0, 0, 0.06);
+    0 2px 8px rgb(0 0 0 / 10%),
+    0 1px 3px rgb(0 0 0 / 6%);
 }
 
 .sender-line.pressed {
   transform: translateX(2px) scale(0.98);
-}
-
-.sender-line.pressed {
   transition: all 0.1s ease;
 }
 
@@ -43,14 +41,9 @@
   background: linear-gradient(
     135deg,
     var(--selected-bg) 0%,
-    rgba(0, 0, 0, 0.02) 100%
+    rgb(0 0 0 / 2%) 100%
   );
   border-left: 4px solid var(--text-primary);
-}
-
-.sender-line.selected .selection-indicator {
-  opacity: 1;
-  transform: scaleX(1);
 }
 
 /* Selection Indicator */
@@ -69,6 +62,11 @@
   transform: scaleX(0);
   transform-origin: right;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sender-line.selected .selection-indicator {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 /* Custom Checkbox */
@@ -143,7 +141,7 @@
 
 .checkbox-container:hover .checkbox-checkmark {
   border-color: var(--text-primary);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 3px rgb(0 0 0 / 10%);
 }
 
 /* Sender Avatar */
@@ -161,7 +159,7 @@
   justify-content: center;
   margin-right: 12px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 15%);
 }
 
 .avatar-text {
@@ -173,7 +171,7 @@
 
 .sender-line.hovered .sender-avatar {
   transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 /* Sender Details */
@@ -234,7 +232,7 @@
   border-radius: 12px;
   min-width: 24px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 15%);
   transition: all 0.3s ease;
 }
 
@@ -245,24 +243,22 @@
     var(--text-secondary) 100%
   );
   transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 6px rgb(0 0 0 / 25%);
 }
 
 .sender-line.hovered .count-badge {
   transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 /* Animation for new items */
-.sender-line {
-  animation: slideInFromRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-@keyframes slideInFromRight {
+@keyframes slide-in-from-right {
   from {
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -271,7 +267,7 @@
 
 /* Focus states for accessibility */
 .custom-checkbox:focus + .checkbox-checkmark {
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 0 3px rgb(0 0 0 / 20%);
 }
 
 .sender-line:focus-within {

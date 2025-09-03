@@ -15,19 +15,19 @@
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.1);
+    0 2px 8px rgb(0 0 0 / 15%),
+    0 1px 3px rgb(0 0 0 / 10%);
 }
 
 .action-button:hover:not(.disabled) {
   transform: translateY(-1px);
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.2),
-    0 2px 6px rgba(0, 0, 0, 0.15);
+    0 4px 12px rgb(0 0 0 / 20%),
+    0 2px 6px rgb(0 0 0 / 15%);
 }
 
 .action-button:active:not(.disabled) {
-  transform: translateY(0px);
+  transform: translateY(0);
   transition: transform 0.1s ease;
 }
 
@@ -39,9 +39,9 @@
 
 /* Button States */
 .action-button#unsubscribe-button {
-  background: #000000 !important;
+  background: #000 !important;
   color: white !important;
-  border: 1px solid #000000 !important;
+  border: 1px solid #000 !important;
 }
 
 .action-button#unsubscribe-button:hover:not(.disabled) {
@@ -50,13 +50,13 @@
 }
 
 .action-button#unsubscribe-button.success {
-  background: #000000 !important;
-  border: 1px solid #000000 !important;
+  background: #000 !important;
+  border: 1px solid #000 !important;
 }
 
 .action-button#unsubscribe-button.error {
-  background: #333333 !important;
-  border: 1px solid #333333 !important;
+  background: #333 !important;
+  border: 1px solid #333 !important;
 }
 
 .action-button#delete-button {
@@ -79,6 +79,7 @@
 /* Loading State */
 .action-button.loading {
   pointer-events: none;
+  animation: pulse 2s infinite;
 }
 
 .action-button.loading #unsubscribe-button,
@@ -110,39 +111,44 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 .success-icon {
-  animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: success-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-@keyframes successPop {
+@keyframes success-pop {
   0% {
     transform: scale(0) rotate(0deg);
   }
+
   50% {
     transform: scale(1.2) rotate(180deg);
   }
+
   100% {
     transform: scale(1) rotate(360deg);
   }
 }
 
 .error-icon {
-  animation: errorShake 0.5s ease-in-out;
+  animation: error-shake 0.5s ease-in-out;
 }
 
-@keyframes errorShake {
+@keyframes error-shake {
   0%,
   100% {
     transform: translateX(0);
   }
+
   25% {
     transform: translateX(-3px);
   }
+
   75% {
     transform: translateX(3px);
   }
@@ -157,7 +163,7 @@
   height: 100%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.3) 0%,
+    rgb(255 255 255 / 30%) 0%,
     transparent 70%
   );
   transform: scale(0);
@@ -173,37 +179,34 @@
 }
 
 /* Micro-interactions */
-.action-button:hover:not(.disabled) .i {
-  transform: scale(1.1);
-}
-
 .action-button.success .i {
-  color: #ffffff;
+  color: #fff;
 }
 
 .action-button.error .i {
-  color: #ffffff;
+  color: #fff;
 }
 
-/* Pulse animation for loading */
-.action-button.loading {
-  animation: pulse 2s infinite;
+.action-button:hover:not(.disabled) .i {
+  transform: scale(1.1);
 }
 
 @keyframes pulse {
   0% {
     box-shadow:
-      0 2px 8px rgba(0, 0, 0, 0.15),
-      0 1px 3px rgba(0, 0, 0, 0.1);
+      0 2px 8px rgb(0 0 0 / 15%),
+      0 1px 3px rgb(0 0 0 / 10%);
   }
+
   50% {
     box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.25),
-      0 2px 6px rgba(0, 0, 0, 0.2);
+      0 4px 16px rgb(0 0 0 / 25%),
+      0 2px 6px rgb(0 0 0 / 20%);
   }
+
   100% {
     box-shadow:
-      0 2px 8px rgba(0, 0, 0, 0.15),
-      0 1px 3px rgba(0, 0, 0, 0.1);
+      0 2px 8px rgb(0 0 0 / 15%),
+      0 1px 3px rgb(0 0 0 / 10%);
   }
 }

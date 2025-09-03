@@ -5,7 +5,7 @@
   background: linear-gradient(
     135deg,
     var(--bg-primary) 0%,
-    rgba(0, 0, 0, 0.02) 100%
+    rgb(0 0 0 / 2%) 100%
   );
   border-bottom: 1px solid var(--line-color);
   gap: 20px;
@@ -32,16 +32,16 @@
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    0 2px 4px rgba(0, 0, 0, 0.1);
+    0 4px 12px rgb(0 0 0 / 15%),
+    0 2px 4px rgb(0 0 0 / 10%);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .brand-logo:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.2),
-    0 4px 8px rgba(0, 0, 0, 0.15);
+    0 8px 20px rgb(0 0 0 / 20%),
+    0 4px 8px rgb(0 0 0 / 15%);
 }
 
 .logo-text {
@@ -90,14 +90,14 @@
   gap: 12px;
   padding: 12px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgb(0 0 0 / 2%);
+  border: 1px solid rgb(0 0 0 / 5%);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .user-section:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 4%);
+  border-color: rgb(0 0 0 / 10%);
   transform: translateY(-1px);
 }
 
@@ -114,8 +114,8 @@
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.1);
+    0 2px 8px rgb(0 0 0 / 15%),
+    0 1px 3px rgb(0 0 0 / 10%);
   flex-shrink: 0;
 }
 
@@ -155,7 +155,7 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 300px) {
+@media (width <= 300px) {
   .inbox-whiz-header {
     padding: 20px 16px;
     gap: 16px;
@@ -177,12 +177,12 @@
 /* Dark mode enhancements */
 @media (prefers-color-scheme: dark) {
   .user-section {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: rgb(255 255 255 / 3%);
+    border-color: rgb(255 255 255 / 8%);
   }
 
   .user-section:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgb(255 255 255 / 6%);
+    border-color: rgb(255 255 255 / 12%);
   }
 }

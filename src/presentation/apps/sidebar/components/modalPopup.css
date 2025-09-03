@@ -6,30 +6,29 @@
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgb(0 0 0 / 40%);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  animation: backdropFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: backdrop-fade-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modal-backdrop.closing {
-  animation: backdropFadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: backdrop-fade-out 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Modal Container */
 .modal-container {
   width: 100%;
   max-width: 400px;
-  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: modal-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center bottom;
 }
 
 .modal-container.closing {
-  animation: modalSlideOut 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: modal-slide-out 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Modal Content */
@@ -37,9 +36,9 @@
   background: var(--bg-primary);
   border-radius: 16px;
   box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.15),
-    0 8px 16px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 20px 40px rgb(0 0 0 / 15%),
+    0 8px 16px rgb(0 0 0 / 10%),
+    0 0 0 1px rgb(255 255 255 / 5%);
   position: relative;
   overflow: hidden;
 }
@@ -52,7 +51,7 @@
   width: 32px;
   height: 32px;
   border: none;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgb(0 0 0 / 5%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -65,7 +64,7 @@
 }
 
 .modal-close:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
   color: var(--text-primary);
   transform: scale(1.1);
 }
@@ -81,7 +80,7 @@
   font-size: 16px;
   line-height: 1.5;
   color: var(--text-primary);
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 .modal-body p:last-child {
@@ -127,28 +126,28 @@
     var(--text-secondary) 100%
   );
   color: var(--bg-primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.modal-body button.primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 }
 
 .modal-body button.primary:active {
   transform: translateY(0);
 }
 
+.modal-body button.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 20%);
+}
+
 /* Secondary Button */
 .modal-body button.secondary {
   background: var(--bg-primary);
   color: var(--text-primary);
-  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border: 1.5px solid rgb(0 0 0 / 10%);
 }
 
 .modal-body button.secondary:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.15);
+  background: rgb(0 0 0 / 5%);
+  border-color: rgb(0 0 0 / 15%);
   transform: translateY(-1px);
 }
 
@@ -163,9 +162,9 @@
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
-  border-top: 2px solid currentColor;
+  border-top: 2px solid currentcolor;
   border-radius: 50%;
-  animation: buttonSpin 1s linear infinite;
+  animation: button-spin 1s linear infinite;
   margin-left: 8px;
 }
 
@@ -177,7 +176,7 @@
 .progress-bar {
   width: 100%;
   height: 4px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
   border-radius: 2px;
   overflow: hidden;
   margin: 16px 0;
@@ -196,7 +195,7 @@
 
 .progress-indeterminate {
   width: 100%;
-  animation: progressSlide 1.5s ease-in-out infinite;
+  animation: progress-slide 1.5s ease-in-out infinite;
 }
 
 /* Modern Loader */
@@ -212,10 +211,10 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 3px solid rgba(0, 0, 0, 0.1);
+  border: 3px solid rgb(0 0 0 / 10%);
   border-top: 3px solid var(--text-primary);
   border-radius: 50%;
-  animation: modernSpin 1s linear infinite;
+  animation: modern-spin 1s linear infinite;
 }
 
 /* Toggle Options Styling */
@@ -231,15 +230,15 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.02);
+  background: rgb(0 0 0 / 2%);
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgb(0 0 0 / 5%);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toggle-option:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 4%);
+  border-color: rgb(0 0 0 / 10%);
 }
 
 .toggle-option .label {
@@ -250,71 +249,79 @@
 }
 
 /* Animations */
-@keyframes backdropFadeIn {
+@keyframes backdrop-fade-in {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
 
-@keyframes backdropFadeOut {
+@keyframes backdrop-fade-out {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
 }
 
-@keyframes modalSlideIn {
+@keyframes modal-slide-in {
   from {
     opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
-@keyframes modalSlideOut {
+@keyframes modal-slide-out {
   from {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
 }
 
-@keyframes modernSpin {
+@keyframes modern-spin {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
 
-@keyframes buttonSpin {
+@keyframes button-spin {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
 
-@keyframes progressSlide {
+@keyframes progress-slide {
   0% {
     transform: translateX(-100%);
   }
+
   50% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -324,23 +331,25 @@
 .status-icon {
   font-size: 48px;
   margin: 16px 0;
-  animation: statusPop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: status-pop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes statusPop {
+@keyframes status-pop {
   0% {
     transform: scale(0);
   }
+
   80% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
 }
 
 /* Responsive Design */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .modal-backdrop {
     padding: 16px;
   }
