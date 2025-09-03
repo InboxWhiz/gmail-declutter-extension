@@ -1,5 +1,5 @@
 import "./modalPopup.css";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useModal } from "../providers/modalContext";
 import { ToggleOption } from "./toggleOption";
 import { useUnsubscribeFlow } from "../utils/unsubscribeFlow";
@@ -17,7 +17,7 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
   const { selectedSenders, searchEmailSenders } = useApp();
   const { startUnsubscribeFlow } = useUnsubscribeFlow(
     deleteEmails,
-    blockSenders,
+    blockSenders
   );
 
   const showEmails = () => {
@@ -61,26 +61,39 @@ const UnsubscribeConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
 
 const UnsubscribePending = ({ subtype }: { subtype: string }) => {
   let message: string;
+  let step: number;
+
   switch (subtype) {
-    case "working":
-      message = "Unsubscribing from senders...";
-      break;
     case "finding-link":
       message = "Finding unsubscribe links...";
+      step = 1;
+      break;
+    case "working":
+      message = "Unsubscribing from senders...";
+      step = 2;
       break;
     case "blocking":
       message = "Blocking sender...";
+      step = 3;
       break;
     default:
       message = "Processing...";
+      step = 1;
       break;
   }
 
   return (
     <>
       <p>{message}</p>
-      <div style={{ height: "5px" }}></div>
-      <div className="loader"></div>
+      <div className="progress-container">
+        <div className="progress-bar">
+          <div
+            className="progress-fill progress-indeterminate"
+            style={{ width: `${(step / 3) * 100}%` }}
+          />
+        </div>
+      </div>
+      <div className="modern-loader"></div>
     </>
   );
 };
@@ -152,10 +165,13 @@ const UnsubscribeError = ({
 const UnsubscribeSuccess = () => {
   return (
     <>
-      <p>✅ Success!</p>
+      <div className="status-icon">✅</div>
+      <p>
+        <strong>Success!</strong>
+      </p>
       <p>You have been unsubscribed from selected senders.</p>
       <p className="note">
-        Note: You may need to reload your browser to see changes.
+        You may need to reload your browser to see changes.
       </p>
     </>
   );
@@ -227,8 +243,12 @@ const DeletePending = () => {
   return (
     <>
       <p>Deleting emails...</p>
-      <div style={{ height: "5px" }}></div>
-      <div className="loader"></div>
+      <div className="progress-container">
+        <div className="progress-bar">
+          <div className="progress-fill progress-indeterminate" />
+        </div>
+      </div>
+      <div className="modern-loader"></div>
     </>
   );
 };
@@ -236,10 +256,13 @@ const DeletePending = () => {
 const DeleteSuccess = () => {
   return (
     <>
-      <p>✅ Success!</p>
+      <div className="status-icon">✅</div>
+      <p>
+        <strong>Success!</strong>
+      </p>
       <p>Selected senders have been deleted.</p>
       <p className="note">
-        Note: You may need to reload your browser to see changes.
+        You may need to reload your browser to see changes.
       </p>
     </>
   );
@@ -249,13 +272,15 @@ const NoSender = () => {
   const { setModal } = useModal();
   return (
     <>
-      <p>Oops!</p>
-      <p>You haven't selected a sender yet.</p>
-
-      <div style={{ height: "20px" }}></div>
+      <div className="status-icon">⚠️</div>
+      <p>
+        <strong>No Selection</strong>
+      </p>
+      <p>You haven't selected any senders yet.</p>
+      <p className="note">Please select one or more senders to continue.</p>
 
       <button className="primary" onClick={() => setModal(null)}>
-        Go back
+        Got it
       </button>
     </>
   );
@@ -263,16 +288,40 @@ const NoSender = () => {
 
 export const ModalPopup = () => {
   const { modal, setModal } = useModal();
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setModal(null);
+      setIsClosing(false);
+    }, 200);
+  };
+
+  const handleBackgroundClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      handleClose();
+    }
+  };
+
+  const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      handleClose();
+    }
+  }, []);
+
+  // Add keyboard listener - must be before early return
+  React.useEffect(() => {
+    if (modal) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [modal, handleKeyDown]);
+
   if (!modal) return null;
 
   const { action, type, subtype, extras } = modal;
   const id: string = action ? `${action}-${type}-modal` : `${type}-modal`;
-
-  const handleBackgroundClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) {
-      setModal(null);
-    }
-  };
 
   const getChild = (): React.ReactNode => {
     switch (true) {
@@ -323,11 +372,24 @@ export const ModalPopup = () => {
   return (
     <div
       id={id}
-      className="modal"
-      style={{ display: "block" }}
+      className={`modal-backdrop ${isClosing ? "closing" : ""}`}
       onClick={handleBackgroundClick}
     >
-      <div className="modal-content">{getChild()}</div>
+      <div className={`modal-container ${isClosing ? "closing" : ""}`}>
+        <div className="modal-content">
+          {/* Close button */}
+          <button
+            className="modal-close"
+            onClick={handleClose}
+            aria-label="Close modal"
+          >
+            ×
+          </button>
+
+          {/* Modal content */}
+          <div className="modal-body">{getChild()}</div>
+        </div>
+      </div>
     </div>
   );
 };

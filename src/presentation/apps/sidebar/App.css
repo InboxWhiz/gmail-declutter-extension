@@ -107,6 +107,12 @@
   justify-content: space-between;
 }
 
+.sender-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 #senders {
   padding: 10px;
   overflow: hidden auto;
