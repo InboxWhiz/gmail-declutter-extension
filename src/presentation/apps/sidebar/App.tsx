@@ -4,7 +4,7 @@ import { ActionButton } from "./components/actionButton.tsx";
 import { ReloadButton } from "./components/reloadButton.tsx";
 import { ModalPopup } from "./components/modalPopup.tsx";
 import { SendersContainer } from "./components/sendersContainer.tsx";
-import { DeclutterHeader } from "./components/header.tsx";
+import { InboxWhizHeader } from "./components/header.tsx";
 import { ModalProvider } from "./providers/modalContext.tsx";
 import ThemeToggle from "./components/themeToggle.tsx";
 import { AppProvider } from "../../providers/app_provider.tsx";
@@ -25,7 +25,7 @@ function AppWithTheme() {
   return (
     <ModalProvider>
       <div id="declutter-body" className={theme}>
-        <DeclutterHeader />
+        <InboxWhizHeader />
 
         <div className="button-bar">
           <div className="sender-actions">
