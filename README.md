@@ -15,7 +15,7 @@ InboxWhiz addresses the common problem of email overload by providing users with
 - **Smart Sender Analytics**: Analyzes email patterns to identify top senders by frequency and volume
 - **Bulk Email Management**: Select multiple senders and perform actions on all their emails simultaneously
 - **Automated Unsubscribe**: Intelligent detection and execution of unsubscribe processes
-- **Gmail API Integration**: Secure read/write access to Gmail data with OAuth authentication
+- ~~**Gmail API Integration**: Secure read/write access to Gmail data with OAuth authentication~~ (deprecated in favor of browser automation to bypass CASA fees)
 - **Chrome Side Panel UI**: Modern, responsive interface built with React and TypeScript
 - **Interactive Tutorial System**: Guided onboarding with contextual help
 
@@ -29,19 +29,18 @@ InboxWhiz addresses the common problem of email overload by providing users with
 
 ### APIs & Integration
 
-- **Gmail API** for email data access and manipulation
-- **Google OAuth 2.0** for secure user authentication
+- ~~**Gmail API** for email data access and manipulation~~
+- ~~**Google OAuth 2.0** for secure user authentication~~
 - **Chrome Extensions API** for side panel, content scripts, and background processes
 - **Chrome Storage API** for efficient local data caching
 
 ### Testing & Quality Assurance
 
-- **Comprehensive Test Suite**: Unit tests with Jest covering Gmail API utilities and core business logic
+- **Comprehensive Test Suite**: Unit tests with Jest covering core business logic
 - **End-to-End Testing**: Playwright tests for critical user workflows including sender management, deletion, and unsubscribe flows
 - **Automated CI/CD Pipeline**: GitHub Actions workflows for automated testing, linting, and release management
 - **Code Quality Tools**: ESLint, Prettier, and Stylelint for consistent code standards
 
 ## 🔒 Security & Privacy
 
-- **OAuth 2.0 authentication** with minimal required Gmail scopes
 - **Zero external data storage** - all processing happens client-side for privacy
