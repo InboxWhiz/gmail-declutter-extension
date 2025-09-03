@@ -39,20 +39,24 @@
 
 /* Button States */
 .action-button#unsubscribe-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: #000000 !important;
   color: white !important;
+  border: 1px solid #000000 !important;
 }
 
 .action-button#unsubscribe-button:hover:not(.disabled) {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  background: #1a1a1a !important;
+  border: 1px solid #1a1a1a !important;
 }
 
 .action-button#unsubscribe-button.success {
-  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%) !important;
+  background: #000000 !important;
+  border: 1px solid #000000 !important;
 }
 
 .action-button#unsubscribe-button.error {
-  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%) !important;
+  background: #333333 !important;
+  border: 1px solid #333333 !important;
 }
 
 .action-button#delete-button {
