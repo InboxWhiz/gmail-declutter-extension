@@ -2,7 +2,7 @@ import "./header.css";
 import { useEffect, useState } from "react";
 import { useApp } from "../../../providers/app_provider";
 
-export function InboxWhizHeader() {
+export function DeclutterHeader() {
   const { getEmailAccount } = useApp();
   const [email, setEmail] = useState<string | null>(null);
 
@@ -33,7 +33,7 @@ export function InboxWhizHeader() {
   };
 
   return (
-    <div className="inbox-whiz-header">
+    <div className="declutter-header">
       {/* Brand Section */}
       <div className="brand-section">
         <div className="brand-logo">
