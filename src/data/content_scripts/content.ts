@@ -10,102 +10,95 @@ chrome.runtime.onConnect.addListener(function (port) {
     console.log("sidepanel said: ", msg);
 
     if (msg.action === "FETCH_SENDERS") {
-      (async () => {
-        try {
-          const senders = await BrowserEmailService.fetchSendersFromBrowser();
-          const serialized = senders.map((sender) => ({
-            email: sender.email,
-            names: Array.from(sender.names), // convert Set -> array
-            emailCount: sender.emailCount,
-          }));
-          port.postMessage({
-            action: "FETCH_SENDERS_RESPONSE",
-            success: true,
-            data: serialized,
-          });
-        } catch (error) {
-          port.postMessage({
-            action: "FETCH_SENDERS_RESPONSE",
-            success: false,
-            error: (error as Error).message,
-          });
-        }
-      })();
+      fetchSenders(port);
+    } else if (msg.action === "DELETE_SENDERS") {
+      deleteSenders(port, msg.emails);
+    } else if (msg.action === "UNSUBSCRIBE_SENDERS") {
+      unsubscribeSenders(port, msg.emails);
+    } else if (msg.action === "BLOCK_SENDER") {
+      blockSender(port, msg.email);
     }
   });
 });
 
-// Fetch senders
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.action === "FETCH_SENDERS") {
-    (async () => {
-      try {
-        const senders = await BrowserEmailService.fetchSendersFromBrowser();
-        const serialized = senders.map((sender) => ({
-          email: sender.email,
-          names: Array.from(sender.names), // convert Set -> array
-          emailCount: sender.emailCount,
-        }));
-        sendResponse({ success: true, data: serialized });
-      } catch (error) {
-        sendResponse({ success: false, error: (error as Error).message });
-      }
-    })();
-    return true; // Indicates that the message port will remain open for asynchronous response
+async function fetchSenders(port: chrome.runtime.Port) {
+  try {
+    const senders = await BrowserEmailService.fetchSendersFromBrowser();
+    const serialized = senders.map((sender) => ({
+      email: sender.email,
+      names: Array.from(sender.names), // convert Set -> array
+      emailCount: sender.emailCount,
+    }));
+    port.postMessage({
+      action: "FETCH_SENDERS_RESPONSE",
+      success: true,
+      data: serialized,
+    });
+  } catch (error) {
+    port.postMessage({
+      action: "FETCH_SENDERS_RESPONSE",
+      success: false,
+      error: (error as Error).message,
+    });
   }
-});
+}
 
-// Delete senders
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.action === "DELETE_SENDERS") {
-    (async () => {
-      try {
-        await BrowserEmailService.deleteSendersFromBrowser(message.emails);
-        sendResponse({ success: true });
-      } catch (error) {
-        sendResponse({ success: false, error: (error as Error).message });
-      }
-    })();
-    return true; // Indicates that the message port will remain open for asynchronous response
+async function deleteSenders(port: chrome.runtime.Port, emails: string[]) {
+  try {
+    await BrowserEmailService.deleteSendersFromBrowser(emails);
+    port.postMessage({
+      action: "DELETE_SENDERS_RESPONSE",
+      success: true,
+    });
+  } catch (error) {
+    port.postMessage({
+      action: "DELETE_SENDERS_RESPONSE",
+      success: false,
+      error: (error as Error).message,
+    });
   }
-});
+}
 
-// Unsubscribe senders
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.action === "UNSUBSCRIBE_SENDERS") {
-    (async () => {
-      try {
-        const failures =
-          await BrowserEmailService.unsubscribeSendersFromBrowser(
-            message.emails,
-          );
-        if (failures.length > 0) {
-          sendResponse({ success: false, failures });
-        } else {
-          sendResponse({ success: true });
-        }
-      } catch (error) {
-        sendResponse({ success: false, error: (error as Error).message });
-      }
-    })();
-    return true; // Indicates that the message port will remain open for asynchronous response
+async function unsubscribeSenders(port: chrome.runtime.Port, emails: string[]) {
+  try {
+    const failures =
+      await BrowserEmailService.unsubscribeSendersFromBrowser(emails);
+    if (failures.length > 0) {
+      port.postMessage({
+        action: "UNSUBSCRIBE_SENDERS_RESPONSE",
+        success: false,
+        failures,
+      });
+    } else {
+      port.postMessage({
+        action: "UNSUBSCRIBE_SENDERS_RESPONSE",
+        success: true,
+      });
+    }
+  } catch (error) {
+    port.postMessage({
+      action: "UNSUBSCRIBE_SENDERS_RESPONSE",
+      success: false,
+      error: (error as Error).message,
+    });
   }
-});
+}
 
-// Block sender
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.action === "BLOCK_SENDER") {
-    (async () => {
-      try {
-        await BrowserEmailService.blockSenderFromBrowser(message.email);
-        sendResponse({ success: true });
-      } catch (error) {
-        sendResponse({ success: false, error: (error as Error).message });
-      }
-    })();
-    return true; // Indicates that the message port will remain open for asynchronous response
+async function blockSender(port: chrome.runtime.Port, email: string) {
+  try {
+    await BrowserEmailService.blockSenderFromBrowser(email);
+    port.postMessage({
+      action: "BLOCK_SENDER_RESPONSE",
+      success: true,
+    });
+  } catch (error) {
+    port.postMessage({
+      action: "BLOCK_SENDER_RESPONSE",
+      success: false,
+      error: (error as Error).message,
+    });
   }
-});
+}
 
 // Get email account
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -118,7 +111,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 // Search email senders
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "SEARCH_EMAIL_SENDERS") {
-    console.log("Received message to search email senders:", message.emails);
     PageInteractionService.searchEmailSenders(message.emails);
   }
 });
@@ -126,7 +118,6 @@ chrome.runtime.onMessage.addListener((message) => {
 // Show tutorial
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "SHOW_TUTORIAL") {
-    console.log("Received message to show tutorial");
     PageInteractionService.displayTutorial();
   }
 });
@@ -134,7 +125,6 @@ chrome.runtime.onMessage.addListener((message) => {
 // Close tutorial
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "CLOSE_TUTORIAL") {
-    console.log("Received message to close tutorial");
     PageInteractionService.closeTutorial();
   }
 });
