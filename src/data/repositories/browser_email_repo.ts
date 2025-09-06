@@ -1,31 +1,35 @@
 import { Sender } from "../../domain/entities/sender";
 import { EmailRepo } from "../../domain/repositories/email_repo";
+import { PortManager } from "../ports/port_manager";
 
 export class BrowserEmailRepo implements EmailRepo {
   async fetchSenders(): Promise<Sender[]> {
-    const response = await new Promise((resolve) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]?.id) {
-          chrome.tabs.sendMessage(
-            tabs[0].id,
-            {
-              action: "FETCH_SENDERS",
-            },
-            (response) => {
-              console.log(`response: ${JSON.stringify(response)}`);
-              resolve(response.data);
-            },
-          );
-        } else {
-          console.error("No active tab found.");
-          resolve(null);
+    const port = PortManager.gmailPort;
+    if (!port) return Promise.reject("Port not connected");
+
+    // Send message
+    port.postMessage({ action: "FETCH_SENDERS" });
+
+    // Wait for response
+    return await new Promise<Sender[]>((resolve, reject) => {
+      const listener = (msg: any) => {
+        if (msg.action === "FETCH_SENDERS_RESPONSE") {
+          port.onMessage.removeListener(listener);
+
+          if (msg.success) {
+            const senders = msg.data as Sender[];
+            senders.sort((a, b) => b.emailCount - a.emailCount);
+            resolve(senders);
+          } else {
+            console.error(
+              `Error fetching senders from content script: ${msg.error}`,
+            );
+            reject(new Error(msg.error));
+          }
         }
-      });
+      };
+      port.onMessage.addListener(listener);
     });
-    const senders = response as Sender[];
-    console.log(`senders: ${senders}`);
-    senders.sort((a, b) => b.emailCount - a.emailCount);
-    return senders;
   }
 
   async deleteSenders(senderEmailAddresses: string[]): Promise<void> {

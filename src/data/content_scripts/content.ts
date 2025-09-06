@@ -8,14 +8,32 @@ chrome.runtime.onConnect.addListener(function (port) {
 
   port.onMessage.addListener(function (msg) {
     console.log("sidepanel said: ", msg);
-  });
 
-  port.onMessage.addListener(function (msg) {
-    if (msg.action === "PING") {
-      port.postMessage({ action: "PONG" });
+    if (msg.action === "FETCH_SENDERS") {
+      console.log("Fetching senders in content script...");
+      (async () => {
+        try {
+          const senders = await BrowserEmailService.fetchSendersFromBrowser();
+          const serialized = senders.map((sender) => ({
+            email: sender.email,
+            names: Array.from(sender.names), // convert Set -> array
+            emailCount: sender.emailCount,
+          }));
+          port.postMessage({
+            action: "FETCH_SENDERS_RESPONSE",
+            success: true,
+            data: serialized,
+          });
+        } catch (error) {
+          port.postMessage({
+            action: "FETCH_SENDERS_RESPONSE",
+            success: false,
+            error: (error as Error).message,
+          });
+        }
+      })();
     }
   });
-
 });
 
 // Fetch senders
@@ -60,7 +78,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       try {
         const failures =
           await BrowserEmailService.unsubscribeSendersFromBrowser(
-            message.emails,
+            message.emails
           );
         if (failures.length > 0) {
           sendResponse({ success: false, failures });

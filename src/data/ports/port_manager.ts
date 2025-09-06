@@ -12,7 +12,7 @@ export class PortManager {
 
       this.gmailPort.postMessage({ message: "Sidepanel connected" });
       this.gmailPort.onMessage.addListener((msg) => {
-        console.log("content script said: " + msg.message);
+        console.log("content script said: ", msg);
       });
     }
   }
