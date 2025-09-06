@@ -1,6 +1,23 @@
 import { BrowserEmailService } from "../services/browser_email_service";
 import { PageInteractionService } from "../services/page_interaction_service";
 
+// Establish connection with the side panel
+chrome.runtime.onConnect.addListener(function (port) {
+  console.assert(port.name === "gmail-port");
+  port.postMessage({ message: "Content script connected" });
+
+  port.onMessage.addListener(function (msg) {
+    console.log("sidepanel said: ", msg);
+  });
+
+  port.onMessage.addListener(function (msg) {
+    if (msg.action === "PING") {
+      port.postMessage({ action: "PONG" });
+    }
+  });
+
+});
+
 // Fetch senders
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "FETCH_SENDERS") {
