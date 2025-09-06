@@ -10,7 +10,6 @@ chrome.runtime.onConnect.addListener(function (port) {
     console.log("sidepanel said: ", msg);
 
     if (msg.action === "FETCH_SENDERS") {
-      console.log("Fetching senders in content script...");
       (async () => {
         try {
           const senders = await BrowserEmailService.fetchSendersFromBrowser();
@@ -78,7 +77,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       try {
         const failures =
           await BrowserEmailService.unsubscribeSendersFromBrowser(
-            message.emails
+            message.emails,
           );
         if (failures.length > 0) {
           sendResponse({ success: false, failures });
