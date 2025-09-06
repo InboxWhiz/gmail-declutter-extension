@@ -283,8 +283,7 @@ export class BrowserEmailService {
       (totalMessages?.textContent || "0").replace(/,/g, ""),
     );
     const pages = Math.ceil(
-      messages /
-        (parseInt((pageSize?.textContent || "0").replace(/,/g, "")) + 1),
+      messages / parseInt((pageSize?.textContent || "0").replace(/,/g, "")) + 1,
     );
 
     return { messages, pages };
