@@ -280,7 +280,7 @@ export class BrowserEmailService {
     );
     const [_, pageSize, totalMessages] = infoDiv?.querySelectorAll(".ts") || [];
     const messages = parseInt(
-      (totalMessages?.textContent || "0").replace(/,/g, ""),
+      (totalMessages?.textContent || "0").replace(/[.,\s]/g, ""),
     );
     const pages = Math.ceil(
       messages / parseInt((pageSize?.textContent || "0").replace(/,/g, "")) + 1,
