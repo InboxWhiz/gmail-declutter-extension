@@ -159,14 +159,11 @@ export class BrowserEmailService {
     console.log("Deleting senders in browser: ", senderEmailAddresses);
 
     PageInteractionService.searchEmailSenders(senderEmailAddresses);
-    let rows = this._getEmailRows().length;
-    while (rows > 0) {
-      console.log(`Found ${rows} email rows to delete. Deleting...`);
-      await new Promise((resolve) => setTimeout(resolve, 500)); //THIS ONE
+    await this._waitForEmailBodyToLoad();
+    while (!document.querySelector("td.TC")) {
+      // No 'No messages matched your search'
       await this._deleteEmailsOnPage();
-      rows = this._getEmailRows().length;
     }
-    console.log("Finished deleting senders in browser.");
   }
 
   static async _deleteEmailsOnPage(): Promise<void> {
@@ -335,8 +332,10 @@ export class BrowserEmailService {
     const tableBody = tables[tables.length - 1];
 
     // Find all email rows within the table body
-    const emailRows = tableBody.querySelectorAll("tr");
-    return Array.from(emailRows);
+    const emailRows = Array.from(tableBody.querySelectorAll("tr")).filter(
+      (row) => !(row as HTMLElement).innerText.includes("No messages"),
+    );
+    return emailRows;
   }
 
   /**
@@ -389,6 +388,31 @@ export class BrowserEmailService {
           new Error(`Element not found or not visible within ${timeout}ms`),
         );
       }, timeout);
+    });
+  }
+
+  /**
+   * Waits until the email body is loaded in the DOM.
+   *
+   * This method repeatedly checks for the presence of exactly three visible `<tbody>` elements,
+   * which indicates that the email table has finished loading. The check is performed every 100 milliseconds.
+   * The returned promise resolves once the condition is met.
+   *
+   * @returns {Promise<void>} A promise that resolves when the email body is detected as loaded.
+   */
+  static async _waitForEmailBodyToLoad(): Promise<void> {
+    return await new Promise<void>((resolve) => {
+      const checkTables = () => {
+        const tables = Array.from(document.querySelectorAll("tbody")).filter(
+          (el) => (el as HTMLElement).offsetParent !== null,
+        );
+        if (tables.length === 3) {
+          resolve();
+        } else {
+          setTimeout(checkTables, 100);
+        }
+      };
+      checkTables();
     });
   }
 }
