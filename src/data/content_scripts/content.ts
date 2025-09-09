@@ -63,18 +63,11 @@ async function unsubscribeSenders(port: chrome.runtime.Port, emails: string[]) {
   try {
     const failures =
       await BrowserEmailService.unsubscribeSendersFromBrowser(emails);
-    if (failures.length > 0) {
-      port.postMessage({
-        action: "UNSUBSCRIBE_SENDERS_RESPONSE",
-        success: false,
-        failures,
-      });
-    } else {
-      port.postMessage({
-        action: "UNSUBSCRIBE_SENDERS_RESPONSE",
-        success: true,
-      });
-    }
+    port.postMessage({
+      action: "UNSUBSCRIBE_SENDERS_RESPONSE",
+      success: true,
+      failures: failures,
+    });
   } catch (error) {
     port.postMessage({
       action: "UNSUBSCRIBE_SENDERS_RESPONSE",
