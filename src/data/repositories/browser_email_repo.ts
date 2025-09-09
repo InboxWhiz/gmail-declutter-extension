@@ -79,7 +79,7 @@ export class BrowserEmailRepo implements EmailRepo {
           port.onMessage.removeListener(listener);
 
           if (msg.success) {
-            resolve(msg.data as string[]);
+            resolve(msg.failures as string[]);
           } else {
             console.error(
               `Error unsubscribing senders from content script: ${msg.error}`,

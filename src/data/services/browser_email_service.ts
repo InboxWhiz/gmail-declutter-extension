@@ -117,7 +117,7 @@ export class BrowserEmailService {
 
     // Search for the sender's emails
     PageInteractionService.searchEmailSenders([senderEmailAddress]);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for search results to load
+    await this._waitForEmailBodyToLoad();
 
     // Hover over the first email row
     const emailRows = this._getEmailRows();
@@ -148,6 +148,7 @@ export class BrowserEmailService {
     ).filter((el) => el.textContent?.includes("Unsubscribe"))[0] as HTMLElement;
     confirmButton.click();
 
+    console.log("Unsubscribe process completed for: ", senderEmailAddress);
     return true;
   }
 
