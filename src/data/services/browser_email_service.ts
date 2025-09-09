@@ -215,13 +215,9 @@ export class BrowserEmailService {
   // - FETCH SENDERS HELPERS -
 
   static async fetchSendersFromBrowser(): Promise<Sender[]> {
-    // In the sidebar, click "More"
-    (document.querySelector(".CJ") as HTMLElement)!.click();
-
-    // Click "All Mail"
-    Array.from(document.querySelectorAll("a"))
-      .find((a) => a!.textContent!.trim() === "All Mail")!
-      .click();
+    // Go to "All Mail" page
+    const currentPage = window.location.href.split("#")[0];
+    window.location.href = `${currentPage}#all`;
 
     // Take note of the number of emails it says we have
     await this._waitForLoaderToHide();
@@ -232,15 +228,14 @@ export class BrowserEmailService {
     // Fetch sender metadata for all emails from each page
     const emails: { email: string; name: string }[] = [];
     for (let i = 1; i <= totalPages; i++) {
+      // Go to page
+      window.location.href = `${currentPage}#all/p${i}`;
+      await this._waitForLoaderToHide(); // Wait for loading indicator to disappear
+
       // Process emails
       console.log(`Processing page ${i} of ${totalPages}`);
       const pageEmails = this._extractSendersFromPage();
       emails.push(...pageEmails);
-
-      // Wait for the next page to load
-      if (i < totalPages) {
-        await this._goToNextPage();
-      }
     }
 
     const senders = parseEmailsToSenders(emails);
@@ -248,27 +243,10 @@ export class BrowserEmailService {
   }
 
   /**
-   * Navigates to the next page of emails in the Gmail interface.
-   * Waits for the loading indicator to disappear before resolving.
-   */
-  static async _goToNextPage(): Promise<void> {
-    const buttons = document.querySelectorAll('[aria-label="Older"]');
-    const nextButton = buttons[buttons.length - 1] as HTMLElement;
-    if (nextButton) {
-      // Dispatch a real mouse event
-      nextButton.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-      nextButton.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
-      nextButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-
-      await this._waitForLoaderToHide(); // Wait for loading indicator to disappear
-    }
-  }
-
-  /**
    * Waits for the Gmail loading indicator to disappear, indicating that the page has finished loading.
-   * @param timeout Optional timeout in milliseconds to stop waiting after a certain period. Default is 1000ms.
+   * @param timeout Optional timeout in milliseconds to stop waiting after a certain period. Default is 10000ms.
    */
-  static async _waitForLoaderToHide(timeout = 1000): Promise<void> {
+  static async _waitForLoaderToHide(timeout = 10000): Promise<void> {
     const selector = ".vX.UC";
     return new Promise((resolve, reject) => {
       const el = document.querySelector(selector) as HTMLElement;
@@ -302,11 +280,10 @@ export class BrowserEmailService {
     );
     const [_, pageSize, totalMessages] = infoDiv?.querySelectorAll(".ts") || [];
     const messages = parseInt(
-      (totalMessages?.textContent || "0").replace(/,/g, ""),
+      (totalMessages?.textContent || "0").replace(/[.,\s]/g, ""),
     );
     const pages = Math.ceil(
-      messages /
-        (parseInt((pageSize?.textContent || "0").replace(/,/g, "")) + 1),
+      messages / parseInt((pageSize?.textContent || "0").replace(/,/g, "")) + 1,
     );
 
     return { messages, pages };
