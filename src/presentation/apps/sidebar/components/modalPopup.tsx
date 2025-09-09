@@ -197,7 +197,7 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
       setTimeout(() => {
         reloadSenders();
       }, 1000);
-    } catch (error: Error | any) {
+    } catch {
       setModal({ action: "delete", type: "error" });
     }
   };
