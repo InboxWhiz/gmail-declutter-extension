@@ -32,6 +32,8 @@ type AppContextType = {
   deleteSenders: (senderEmails: string[]) => Promise<void>;
   unsubscribeSenders: (senderEmails: string[]) => Promise<string[]>;
   blockSender: (senderEmail: string) => Promise<void>;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -39,11 +41,12 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [senders, setSenders] = useState<Sender[]>([]);
+  const [allSenders, setAllSenders] = useState<Sender[]>([]);
   const [selectedSenders, setSelectedSenders] = useState<
     Record<string, number>
   >({});
   const [loading, setLoading] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   // - REPOS -
 
@@ -69,10 +72,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       if (fetchNew) {
         const fetchedSenders = await emailRepo.fetchSenders();
         storageRepo.storeSenders(fetchedSenders, accountEmail);
-        setSenders(fetchedSenders);
+        setAllSenders(fetchedSenders);
       } else {
         const storedData = await storageRepo.readSenders(accountEmail);
-        setSenders(storedData);
+        setAllSenders(storedData);
       }
     } finally {
       setLoading(false);
@@ -96,7 +99,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
     await emailRepo.deleteSenders(senderEmails);
     await storageRepo.deleteSenders(senderEmails, accountEmail);
-    setSenders((prevSenders) =>
+    setAllSenders((prevSenders) =>
       prevSenders.filter((sender) => !senderEmails.includes(sender.email)),
     );
   }, []);
@@ -114,6 +117,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     reloadSenders();
   }, [reloadSenders]);
 
+  const senders = allSenders.filter(
+    (sender) =>
+      (sender.names.size > 0 &&
+        Array.from(sender.names)[0]
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())) ||
+      sender.email.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   return (
     <AppContext.Provider
       value={{
@@ -128,6 +140,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteSenders,
         unsubscribeSenders,
         blockSender,
+        searchTerm,
+        setSearchTerm,
       }}
     >
       {children}
