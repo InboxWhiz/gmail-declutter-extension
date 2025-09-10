@@ -9,6 +9,7 @@ import { ModalProvider } from "./providers/modalContext.tsx";
 import ThemeToggle from "./components/themeToggle.tsx";
 import { AppProvider } from "../../providers/app_provider.tsx";
 import { ThemeProvider } from "../../providers/theme_provider.tsx";
+import { SearchBar } from "./components/searchBar.tsx";
 
 function App() {
   return (
@@ -32,6 +33,8 @@ function AppWithTheme() {
             <ActionButton id="unsubscribe-button" />
             <ActionButton id="delete-button" />
           </div>
+
+          <SearchBar />
 
           <div style={{ display: "flex" }}>
             <ReloadButton />
