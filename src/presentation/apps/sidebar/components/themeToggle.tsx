@@ -8,16 +8,28 @@ const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <button
-      className={`theme-toggle ${theme}`}
-      onClick={toggleTheme}
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-    >
-      <FontAwesomeIcon
-        icon={theme === "light" ? faSun : faMoon}
-        className="icon"
-      />
-    </button>
+    <div className="theme-toggle-container">
+      <label
+        className="theme-toggle-switch"
+        aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      >
+        <input
+          type="checkbox"
+          checked={theme === "dark"}
+          onChange={toggleTheme}
+          className="theme-toggle-input"
+        />
+        <span className="theme-toggle-slider">
+          <span className="theme-toggle-icon sun-icon">
+            <FontAwesomeIcon icon={faSun} />
+          </span>
+          <span className="theme-toggle-icon moon-icon">
+            <FontAwesomeIcon icon={faMoon} />
+          </span>
+          <span className="theme-toggle-knob"></span>
+        </span>
+      </label>
+    </div>
   );
 };
 
