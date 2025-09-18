@@ -213,11 +213,8 @@ const DeleteConfirm = ({ emailsNum, sendersNum }: ConfirmProps) => {
       setTimeout(() => {
         reloadSenders();
       }, 1000);
-    } catch (error: Error | any) {
-      // If the user fails to go through the OAuth flow, we set loggedIn to false
-      if (error.message == "The user did not approve access.") {
-        // setLoggedIn(false);
-      }
+    } catch {
+      setModal({ action: "delete", type: "error" });
     }
   };
 
@@ -264,6 +261,15 @@ const DeleteSuccess = () => {
       <p className="note">
         You may need to reload your browser to see changes.
       </p>
+    </>
+  );
+};
+
+const DeleteError = () => {
+  return (
+    <>
+      <p>❌ Error!</p>
+      <p>There was an error deleting the selected senders.</p>
     </>
   );
 };
@@ -362,6 +368,8 @@ export const ModalPopup = () => {
         return <DeletePending />;
       case action === "delete" && type === "success":
         return <DeleteSuccess />;
+      case action === "delete" && type === "error":
+        return <DeleteError />;
       case type === "no-sender":
         return <NoSender />;
       default:
