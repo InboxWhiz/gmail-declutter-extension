@@ -9,8 +9,11 @@ export function DeclutterHeader() {
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    getEmailAccount().then(setEmail);
-  });
+    (async () => {
+      const email = await getEmailAccount();
+      setEmail(email);
+    })();
+  }, [getEmailAccount]);
 
   return (
     <div className="declutter-header">
