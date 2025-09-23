@@ -1,9 +1,11 @@
+// src/presentation/providers/app_provider.tsx
 import React, {
   createContext,
   useContext,
   useState,
   useCallback,
   useEffect,
+  useMemo, // ADD THIS IMPORT
 } from "react";
 import { Sender } from "../../domain/entities/sender";
 import { ChromeLocalStorageRepo } from "../../data/repositories/chrome_local_storage_repo";
@@ -32,8 +34,10 @@ type AppContextType = {
   deleteSenders: (senderEmails: string[]) => Promise<void>;
   unsubscribeSenders: (senderEmails: string[]) => Promise<string[]>;
   blockSender: (senderEmail: string) => Promise<void>;
+  // Add new search-related properties
   searchTerm: string;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  setSearchTerm: (term: string) => void;
+  filteredSenders: Sender[];
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -41,7 +45,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [allSenders, setAllSenders] = useState<Sender[]>([]);
+  const [senders, setSenders] = useState<Sender[]>([]);
   const [selectedSenders, setSelectedSenders] = useState<
     Record<string, number>
   >({});
@@ -52,79 +56,100 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const useMock = import.meta.env.VITE_USE_MOCK === "true";
 
-  const emailRepo: EmailRepo = useMock
-    ? new MockEmailRepo()
-    : new BrowserEmailRepo();
-  const storageRepo: StorageRepo = useMock
-    ? new MockStorageRepo()
-    : new ChromeLocalStorageRepo();
-  const pageInteractionRepo: PageInteractionRepo = useMock
-    ? new MockPageInteractionRepo()
-    : new ChromePageInteractionRepo();
+  const emailRepo: EmailRepo = useMemo(
+    () => (useMock ? new MockEmailRepo() : new BrowserEmailRepo()),
+    [useMock]
+  );
+  const storageRepo: StorageRepo = useMemo(
+    () => (useMock ? new MockStorageRepo() : new ChromeLocalStorageRepo()),
+    [useMock]
+  );
+  const pageInteractionRepo: PageInteractionRepo = useMemo(
+    () =>
+      useMock ? new MockPageInteractionRepo() : new ChromePageInteractionRepo(),
+    [useMock]
+  );
 
   // - METHODS -
 
-  const reloadSenders = useCallback(async (fetchNew = false) => {
-    setLoading(true);
-    try {
-      const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
+  const reloadSenders = useCallback(
+    async (fetchNew = false) => {
+      setLoading(true);
+      try {
+        const accountEmail =
+          await pageInteractionRepo.getActiveTabEmailAccount();
 
-      if (fetchNew) {
-        const fetchedSenders = await emailRepo.fetchSenders();
-        storageRepo.storeSenders(fetchedSenders, accountEmail);
-        setAllSenders(fetchedSenders);
-      } else {
-        const storedData = await storageRepo.readSenders(accountEmail);
-        setAllSenders(storedData);
+        if (fetchNew) {
+          const fetchedSenders = await emailRepo.fetchSenders();
+          storageRepo.storeSenders(fetchedSenders, accountEmail);
+          setSenders(fetchedSenders);
+        } else {
+          const storedData = await storageRepo.readSenders(accountEmail);
+          setSenders(storedData);
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [emailRepo, pageInteractionRepo, storageRepo]
+  );
 
   const clearSelectedSenders = useCallback(() => {
     setSelectedSenders({});
   }, []);
 
-  const searchEmailSenders = useCallback((emails: string[]) => {
-    pageInteractionRepo.searchEmailSenders(emails);
-  }, []);
+  const searchEmailSenders = useCallback(
+    (emails: string[]) => {
+      pageInteractionRepo.searchEmailSenders(emails);
+    },
+    [pageInteractionRepo]
+  );
 
   const getEmailAccount = useCallback(async (): Promise<string | null> => {
     const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
     return accountEmail;
-  }, []);
+  }, [pageInteractionRepo]);
 
-  const deleteSenders = useCallback(async (senderEmails: string[]) => {
-    const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
-    await emailRepo.deleteSenders(senderEmails);
-    await storageRepo.deleteSenders(senderEmails, accountEmail);
-    setAllSenders((prevSenders) =>
-      prevSenders.filter((sender) => !senderEmails.includes(sender.email)),
-    );
-  }, []);
+  const deleteSenders = useCallback(
+    async (senderEmails: string[]) => {
+      const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
+      await emailRepo.deleteSenders(senderEmails);
+      await storageRepo.deleteSenders(senderEmails, accountEmail);
+      setSenders((prevSenders) =>
+        prevSenders.filter((sender) => !senderEmails.includes(sender.email))
+      );
+    },
+    [emailRepo, pageInteractionRepo, storageRepo]
+  );
 
   const unsubscribeSenders = useCallback(async (senderEmails: string[]) => {
     return await emailRepo.unsubscribeSenders(senderEmails);
-  }, []);
+  }, [emailRepo]);
 
   const blockSender = useCallback(async (senderEmail: string) => {
     await emailRepo.blockSender(senderEmail);
-  }, []);
+  }, [emailRepo]);
+
+  // Add filtered senders computation
+  const filteredSenders = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return senders;
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return senders.filter((sender) => {
+      const matchesEmail = sender.email.toLowerCase().includes(lowerSearchTerm);
+      const matchesName = Array.from(sender.names).some((name) =>
+        name.toLowerCase().includes(lowerSearchTerm)
+      );
+      return matchesEmail || matchesName;
+    });
+  }, [senders, searchTerm]);
 
   // Automatically load senders from storage when the component mounts
   useEffect(() => {
     reloadSenders();
   }, [reloadSenders]);
-
-  const senders = allSenders.filter(
-    (sender) =>
-      (sender.names.size > 0 &&
-        Array.from(sender.names)[0]
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())) ||
-      sender.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   return (
     <AppContext.Provider
@@ -142,6 +167,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         blockSender,
         searchTerm,
         setSearchTerm,
+        filteredSenders,
       }}
     >
       {children}

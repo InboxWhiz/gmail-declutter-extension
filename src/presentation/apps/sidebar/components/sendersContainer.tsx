@@ -4,7 +4,7 @@ import SenderLineSkeleton from "./senderLineSkeleton";
 import { EmptySenders } from "./emptySenders";
 
 export const SendersContainer = () => {
-  const { senders, loading } = useApp();
+  const { filteredSenders, loading, searchTerm } = useApp();
 
   return (
     <div id="senders">
@@ -14,12 +14,24 @@ export const SendersContainer = () => {
             <SenderLineSkeleton key={i} />
           ))}
         </>
-      ) : senders.length === 0 ? (
-        <EmptySenders />
+      ) : filteredSenders.length === 0 ? (
+        searchTerm ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px 20px",
+              color: "var(--text-secondary)",
+            }}
+          >
+            <p>No senders match "{searchTerm}"</p>
+          </div>
+        ) : (
+          <EmptySenders />
+        )
       ) : (
-        senders.map((sender, index) => (
+        filteredSenders.map((sender, _index) => (
           <SenderLine
-            key={index}
+            key={sender.email}
             senderName={Array.from(sender.names)[0] || sender.email}
             senderEmail={sender.email}
             senderCount={sender.emailCount}
