@@ -1,4 +1,3 @@
-// src/presentation/providers/app_provider.tsx
 import React, {
   createContext,
   useContext,
