@@ -4,7 +4,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
-  useMemo, // ADD THIS IMPORT
+  useMemo,
 } from "react";
 import { Sender } from "../../domain/entities/sender";
 import { ChromeLocalStorageRepo } from "../../data/repositories/chrome_local_storage_repo";
@@ -13,6 +13,7 @@ import { ChromePageInteractionRepo } from "../../data/repositories/chrome_page_i
 import { EmailRepo } from "../../domain/repositories/email_repo";
 import { StorageRepo } from "../../domain/repositories/storage_repo";
 import { PageInteractionRepo } from "../../domain/repositories/page_interaction_repo";
+import { FetchProgress } from "../../data/services/browser_email_service";
 
 // Mock repositories
 import { MockEmailRepo } from "../../data/repositories/mocks/mock_email_repo";
@@ -37,6 +38,8 @@ type AppContextType = {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   filteredSenders: Sender[];
+  fetchProgress: FetchProgress | null;
+  cancelFetch: () => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -50,6 +53,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   >({});
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [fetchProgress, setFetchProgress] = useState<FetchProgress | null>(
+    null,
+  );
 
   // - REPOS -
 
@@ -74,11 +80,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const reloadSenders = useCallback(
     async (fetchNew = false) => {
       setLoading(true);
+      setFetchProgress(null);
+
       try {
         const accountEmail =
           await pageInteractionRepo.getActiveTabEmailAccount();
 
         if (fetchNew) {
+          // Set up progress callback
+          if (emailRepo instanceof BrowserEmailRepo) {
+            emailRepo.setProgressCallback((progress) => {
+              setFetchProgress(progress);
+            });
+          }
+
           const fetchedSenders = await emailRepo.fetchSenders();
           storageRepo.storeSenders(fetchedSenders, accountEmail);
           setSenders(fetchedSenders);
@@ -88,10 +103,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       } finally {
         setLoading(false);
+        setFetchProgress(null);
       }
     },
     [emailRepo, pageInteractionRepo, storageRepo],
   );
+
+  const cancelFetch = useCallback(() => {
+    if (emailRepo instanceof BrowserEmailRepo) {
+      emailRepo.cancelFetch();
+    }
+  }, [emailRepo]);
 
   const clearSelectedSenders = useCallback(() => {
     setSelectedSenders({});
@@ -173,6 +195,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         searchTerm,
         setSearchTerm,
         filteredSenders,
+        fetchProgress,
+        cancelFetch,
       }}
     >
       {children}

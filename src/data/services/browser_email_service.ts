@@ -1,27 +1,19 @@
 import { Sender } from "../../domain/entities/sender";
 import { PageInteractionService } from "./page_interaction_service";
 
-// Parse email list (list of email/name entries) to sender entities
-function parseEmailsToSenders(
-  emails: { email: string; name: string }[],
-): Sender[] {
-  const senderMap = new Map<string, Sender>();
-  emails.forEach((email) => {
-    if (senderMap.has(email.email)) {
-      const sender = senderMap.get(email.email)!;
-      sender.names.add(email.name);
-      sender.emailCount += 1;
-    } else {
-      const sender = {
-        email: email.email,
-        names: new Set([email.name]),
-        emailCount: 1,
-      };
-      senderMap.set(email.email, sender);
-    }
-  });
+export interface FetchProgress {
+  currentPage: number;
+  totalPages: number;
+  processedEmails: number;
+  totalEmails: number;
+  percentage: number;
+}
 
-  return Array.from(senderMap.values());
+export interface FetchOptions {
+  onProgress?: (progress: FetchProgress) => void;
+  batchSize?: number;
+  maxPages?: number;
+  signal?: AbortSignal;
 }
 
 /**
@@ -212,32 +204,107 @@ export class BrowserEmailService {
 
   // - FETCH SENDERS HELPERS -
 
-  static async fetchSendersFromBrowser(): Promise<Sender[]> {
+  static async fetchSendersFromBrowser(
+    options: FetchOptions = {},
+  ): Promise<Sender[]> {
+    const {
+      onProgress,
+      batchSize = 10, // Process 10 pages at a time
+      maxPages,
+      signal,
+    } = options;
+
     // Go to "All Mail" page
     const currentPage = window.location.href.split("#")[0];
     window.location.href = `${currentPage}#all`;
 
-    // Take note of the number of emails it says we have
+    // Wait for loading to complete
     await this._waitForLoaderToHide();
     const { messages: totalMessages, pages: totalPages } =
       this._getTotalMessagesPages();
-    console.log(`Total messages: ${totalMessages}, with pages: ${totalPages}`);
 
-    // Fetch sender metadata for all emails from each page
-    const emails: { email: string; name: string }[] = [];
-    for (let i = 1; i <= totalPages; i++) {
-      // Go to page
-      window.location.href = `${currentPage}#all/p${i}`;
-      await this._waitForLoaderToHide(); // Wait for loading indicator to disappear
+    const pagesToProcess = maxPages
+      ? Math.min(totalPages, maxPages)
+      : totalPages;
+    console.log(
+      `Total messages: ${totalMessages}, pages to process: ${pagesToProcess}`,
+    );
 
-      // Process emails
-      console.log(`Processing page ${i} of ${totalPages}`);
-      const pageEmails = this._extractSendersFromPage();
-      emails.push(...pageEmails);
+    // Use a Map for efficient sender aggregation
+    const senderMap = new Map<string, Sender>();
+    let processedEmails = 0;
+
+    // Process pages in batches
+    for (
+      let batchStart = 1;
+      batchStart <= pagesToProcess;
+      batchStart += batchSize
+    ) {
+      // Check for cancellation
+      if (signal?.aborted) {
+        console.log("Fetch cancelled by user");
+        break;
+      }
+
+      const batchEnd = Math.min(batchStart + batchSize - 1, pagesToProcess);
+
+      // Process batch of pages
+      for (let i = batchStart; i <= batchEnd; i++) {
+        if (signal?.aborted) break;
+
+        // Go to page
+        window.location.href = `${currentPage}#all/p${i}`;
+        await this._waitForLoaderToHide();
+
+        // Process emails
+        console.log(`Processing page ${i} of ${pagesToProcess}`);
+        const pageEmails = this._extractSendersFromPage();
+
+        // Aggregate senders incrementally
+        this._aggregateSenders(pageEmails, senderMap);
+        processedEmails += pageEmails.length;
+
+        // Report progress
+        if (onProgress) {
+          const progress: FetchProgress = {
+            currentPage: i,
+            totalPages: pagesToProcess,
+            processedEmails,
+            totalEmails: totalMessages,
+            percentage: Math.round((i / pagesToProcess) * 100),
+          };
+          onProgress(progress);
+        }
+      }
+
+      // Small delay between batches to prevent browser freezing
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    const senders = parseEmailsToSenders(emails);
+    // Convert map to sorted array
+    const senders = Array.from(senderMap.values());
+    senders.sort((a, b) => b.emailCount - a.emailCount);
+
     return senders;
+  }
+
+  private static _aggregateSenders(
+    emails: { email: string; name: string }[],
+    senderMap: Map<string, Sender>,
+  ): void {
+    emails.forEach(({ email, name }) => {
+      if (senderMap.has(email)) {
+        const sender = senderMap.get(email)!;
+        sender.names.add(name);
+        sender.emailCount += 1;
+      } else {
+        senderMap.set(email, {
+          email,
+          names: new Set([name]),
+          emailCount: 1,
+        });
+      }
+    });
   }
 
   /**

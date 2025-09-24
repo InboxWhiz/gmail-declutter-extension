@@ -6,11 +6,15 @@ chrome.runtime.onConnect.addListener(function (port) {
   console.assert(port.name === "gmail-port");
   port.postMessage({ message: "Content script connected" });
 
+  let currentAbortController: AbortController | null = null;
+
   port.onMessage.addListener(function (msg) {
     console.log("sidepanel said: ", msg);
 
     if (msg.action === "FETCH_SENDERS") {
-      fetchSenders(port);
+      currentAbortController = fetchSenders(port);
+    } else if (msg.action === "CANCEL_FETCH") {
+      currentAbortController?.abort();
     } else if (msg.action === "DELETE_SENDERS") {
       deleteSenders(port, msg.emails);
     } else if (msg.action === "UNSUBSCRIBE_SENDERS") {
@@ -21,26 +25,51 @@ chrome.runtime.onConnect.addListener(function (port) {
   });
 });
 
-async function fetchSenders(port: chrome.runtime.Port) {
-  try {
-    const senders = await BrowserEmailService.fetchSendersFromBrowser();
-    const serialized = senders.map((sender) => ({
-      email: sender.email,
-      names: Array.from(sender.names), // convert Set -> array
-      emailCount: sender.emailCount,
-    }));
-    port.postMessage({
-      action: "FETCH_SENDERS_RESPONSE",
-      success: true,
-      data: serialized,
-    });
-  } catch (error) {
-    port.postMessage({
-      action: "FETCH_SENDERS_RESPONSE",
-      success: false,
-      error: (error as Error).message,
-    });
-  }
+function fetchSenders(port: chrome.runtime.Port): AbortController {
+  const abortController = new AbortController();
+
+  (async () => {
+    try {
+      const senders = await BrowserEmailService.fetchSendersFromBrowser({
+        onProgress: (progress) => {
+          // Send progress updates to the side panel
+          port.postMessage({
+            action: "FETCH_PROGRESS",
+            progress,
+          });
+        },
+        batchSize: 10,
+        maxPages: undefined, // Process all pages by default
+        signal: abortController.signal,
+      });
+
+      if (abortController.signal.aborted) {
+        console.log("Fetch was cancelled, not sending final response.");
+        return;
+      }
+
+      const serialized = senders.map((sender) => ({
+        email: sender.email,
+        names: Array.from(sender.names), // convert Set -> array
+        emailCount: sender.emailCount,
+      }));
+      port.postMessage({
+        action: "FETCH_SENDERS_RESPONSE",
+        success: true,
+        data: serialized,
+      });
+    } catch (error) {
+      if (!abortController.signal.aborted) {
+        port.postMessage({
+          action: "FETCH_SENDERS_RESPONSE",
+          success: false,
+          error: (error as Error).message,
+        });
+      }
+    }
+  })();
+
+  return abortController;
 }
 
 async function deleteSenders(port: chrome.runtime.Port, emails: string[]) {

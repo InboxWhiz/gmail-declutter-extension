@@ -2,13 +2,17 @@ import { SenderLine } from "./senderLine";
 import { useApp } from "../../../providers/app_provider";
 import SenderLineSkeleton from "./senderLineSkeleton";
 import { EmptySenders } from "./emptySenders";
+import { FetchProgressBar } from "./fetchProgress";
 
 export const SendersContainer = () => {
-  const { filteredSenders, loading, searchTerm } = useApp();
+  const { filteredSenders, loading, searchTerm, fetchProgress, cancelFetch } =
+    useApp();
 
   return (
     <div id="senders">
-      {loading ? (
+      {fetchProgress ? (
+        <FetchProgressBar progress={fetchProgress} onCancel={cancelFetch} />
+      ) : loading ? (
         <>
           {Array.from({ length: 7 }).map((_, i) => (
             <SenderLineSkeleton key={i} />
