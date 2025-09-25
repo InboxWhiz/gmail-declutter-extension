@@ -45,3 +45,30 @@ export const setupSidebarTest = async (page: Page, logs: string[]) => {
   // Load senders
   await page.locator("#load-senders").click();
 };
+
+export const waitForProgressToComplete = async (
+  page: Page,
+  timeout = 10000,
+) => {
+  // Wait for progress bar to appear and then disappear
+  await page.waitForSelector(".fetch-progress-container", {
+    state: "visible",
+    timeout: 5000,
+  });
+
+  await page.waitForSelector(".fetch-progress-container", {
+    state: "hidden",
+    timeout,
+  });
+};
+
+export const getProgressPercentage = async (page: Page): Promise<number> => {
+  const percentageText = await page
+    .locator(".progress-percentage")
+    .textContent();
+  return parseInt(percentageText?.replace("%", "") || "0");
+};
+
+export const isProgressBarVisible = async (page: Page): Promise<boolean> => {
+  return await page.locator(".fetch-progress-container").isVisible();
+};

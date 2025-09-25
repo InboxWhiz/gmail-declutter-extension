@@ -1,6 +1,14 @@
 import { Sender } from "../../../domain/entities/sender";
 import { EmailRepo } from "../../../domain/repositories/email_repo";
 
+export interface FetchProgress {
+  currentPage: number;
+  totalPages: number;
+  processedEmails: number;
+  totalEmails: number;
+  percentage: number;
+}
+
 export class MockEmailRepo implements EmailRepo {
   private mockSenders: Sender[] = [
     { email: "alice@email.com", names: new Set(["Alice"]), emailCount: 32 },
@@ -26,6 +34,9 @@ export class MockEmailRepo implements EmailRepo {
   ];
 
   private failingSenders: string[];
+  private progressCallback?: (progress: FetchProgress) => void;
+  private abortController?: AbortController;
+  private isProgressiveLoadEnabled: boolean = true;
 
   constructor(initialSenders: Sender[] = this.mockSenders) {
     this.mockSenders = initialSenders;
@@ -40,14 +51,57 @@ export class MockEmailRepo implements EmailRepo {
     this.failingSenders = senders;
   }
 
-  // - Mock implementations -
+  setProgressCallback(callback: (progress: FetchProgress) => void) {
+    this.progressCallback = callback;
+  }
+
+  setProgressiveLoadEnabled(enabled: boolean) {
+    this.isProgressiveLoadEnabled = enabled;
+  }
 
   async fetchSenders(): Promise<Sender[]> {
     console.log("[MOCK] Fetching senders...");
+
+    if (this.isProgressiveLoadEnabled && this.progressCallback) {
+      // Simulate progressive loading
+      const totalPages = 5;
+      const emailsPerPage = 4;
+      const totalEmails = this.mockSenders.length;
+
+      this.abortController = new AbortController();
+
+      for (let page = 1; page <= totalPages; page++) {
+        // Check if cancelled
+        if (this.abortController.signal.aborted) {
+          console.log("[MOCK] Fetch cancelled");
+          throw new Error("Fetch cancelled");
+        }
+
+        // Simulate page processing delay
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        // Report progress
+        const progress: FetchProgress = {
+          currentPage: page,
+          totalPages: totalPages,
+          processedEmails: Math.min(page * emailsPerPage, totalEmails),
+          totalEmails: totalEmails,
+          percentage: Math.round((page / totalPages) * 100),
+        };
+        this.progressCallback(progress);
+      }
+    } else {
+      // Original behavior without progress
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
     this.mockSenders.sort((a, b) => b.emailCount - a.emailCount);
-    return new Promise<Sender[]>((resolve) => {
-      setTimeout(() => resolve(this.mockSenders), 500);
-    });
+    return this.mockSenders;
+  }
+
+  async cancelFetch(): Promise<void> {
+    console.log("[MOCK] Cancel fetch requested");
+    this.abortController?.abort();
   }
 
   async deleteSenders(senderEmailAddresses: string[]): Promise<void> {

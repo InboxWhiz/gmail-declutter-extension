@@ -13,10 +13,12 @@ import { ChromePageInteractionRepo } from "../../data/repositories/chrome_page_i
 import { EmailRepo } from "../../domain/repositories/email_repo";
 import { StorageRepo } from "../../domain/repositories/storage_repo";
 import { PageInteractionRepo } from "../../domain/repositories/page_interaction_repo";
-import { FetchProgress } from "../../data/services/browser_email_service";
 
 // Mock repositories
-import { MockEmailRepo } from "../../data/repositories/mocks/mock_email_repo";
+import {
+  MockEmailRepo,
+  FetchProgress,
+} from "../../data/repositories/mocks/mock_email_repo";
 import { MockStorageRepo } from "../../data/repositories/mocks/mock_storage_repo";
 import { MockPageInteractionRepo } from "../../data/repositories/mocks/mock_page_interaction_repo";
 
@@ -34,7 +36,6 @@ type AppContextType = {
   deleteSenders: (senderEmails: string[]) => Promise<void>;
   unsubscribeSenders: (senderEmails: string[]) => Promise<string[]>;
   blockSender: (senderEmail: string) => Promise<void>;
-  // Add new search-related properties
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   filteredSenders: Sender[];
@@ -58,13 +59,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   // - REPOS -
-
   const useMock = import.meta.env.VITE_USE_MOCK === "true";
 
-  const emailRepo: EmailRepo = useMemo(
-    () => (useMock ? new MockEmailRepo() : new BrowserEmailRepo()),
-    [useMock],
-  );
+  const emailRepo: EmailRepo = useMemo(() => {
+    if (useMock) {
+      const mockRepo = new MockEmailRepo();
+      // Set up progress callback for mock
+      mockRepo.setProgressCallback((progress) => {
+        setFetchProgress(progress);
+      });
+      return mockRepo;
+    }
+    return new BrowserEmailRepo();
+  }, [useMock]);
+
   const storageRepo: StorageRepo = useMemo(
     () => (useMock ? new MockStorageRepo() : new ChromeLocalStorageRepo()),
     [useMock],
@@ -81,19 +89,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     async (fetchNew = false) => {
       setLoading(true);
       setFetchProgress(null);
-
       try {
         const accountEmail =
           await pageInteractionRepo.getActiveTabEmailAccount();
 
         if (fetchNew) {
-          // Set up progress callback
-          if (emailRepo instanceof BrowserEmailRepo) {
-            emailRepo.setProgressCallback((progress) => {
-              setFetchProgress(progress);
-            });
-          }
-
           const fetchedSenders = await emailRepo.fetchSenders();
           storageRepo.storeSenders(fetchedSenders, accountEmail);
           setSenders(fetchedSenders);
@@ -110,9 +110,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const cancelFetch = useCallback(() => {
-    if (emailRepo instanceof BrowserEmailRepo) {
+    if (emailRepo instanceof MockEmailRepo) {
       emailRepo.cancelFetch();
     }
+    setFetchProgress(null);
   }, [emailRepo]);
 
   const clearSelectedSenders = useCallback(() => {

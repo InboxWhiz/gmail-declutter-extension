@@ -1,5 +1,3 @@
-/* src/presentation/apps/sidebar/components/fetchProgress.css */
-
 .fetch-progress-container {
   padding: 20px;
   background-color: var(--bg-primary);
@@ -18,6 +16,7 @@
 .fetch-progress-header h3 {
   margin: 0;
   font-size: 16px;
+  color: var(--text-primary);
 }
 
 .cancel-button {
@@ -61,4 +60,5 @@
   text-align: center;
   font-weight: bold;
   font-size: 14px;
+  color: var(--text-primary);
 }
