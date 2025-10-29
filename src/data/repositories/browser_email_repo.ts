@@ -1,13 +1,20 @@
 import { Sender } from "../../domain/entities/sender";
 import { EmailRepo } from "../../domain/repositories/email_repo";
+import { FetchProgress } from "../../domain/types/progress";
 import { PortManager } from "../ports/port_manager";
-import { FetchProgress } from "../services/browser_email_service";
 
 export class BrowserEmailRepo implements EmailRepo {
   private onProgressCallback?: (progress: FetchProgress) => void;
 
-  setProgressCallback(callback: (progress: FetchProgress) => void) {
+  setProgressCallback(callback: (progress: FetchProgress) => void): void {
     this.onProgressCallback = callback;
+  }
+
+  async cancelFetch(): Promise<void> {
+    const port = PortManager.gmailPort;
+    if (!port) return Promise.reject("Port not connected");
+    port.postMessage({ action: "CANCEL_FETCH" });
+    return Promise.resolve();
   }
 
   async fetchSenders(): Promise<Sender[]> {
@@ -28,18 +35,15 @@ export class BrowserEmailRepo implements EmailRepo {
             senders.sort((a, b) => b.emailCount - a.emailCount);
             resolve(senders);
           } else {
+            console.error(
+              `Error fetching senders from content script: ${msg.error}`,
+            );            
             reject(new Error(msg.error));
           }
         }
       };
       port.onMessage.addListener(listener);
     });
-  }
-
-  async cancelFetch(): Promise<void> {
-    const port = PortManager.gmailPort;
-    if (!port) return;
-    port.postMessage({ action: "CANCEL_FETCH" });
   }
 
   async deleteSenders(senderEmailAddresses: string[]): Promise<void> {

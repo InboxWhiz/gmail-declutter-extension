@@ -1,13 +1,8 @@
-import { Sender } from "../../domain/entities/sender";
-import { PageInteractionService } from "./page_interaction_service";
+// src/data/services/browser_email_service.ts
 
-export interface FetchProgress {
-  currentPage: number;
-  totalPages: number;
-  processedEmails: number;
-  totalEmails: number;
-  percentage: number;
-}
+import { Sender } from "../../domain/entities/sender";
+import { FetchProgress } from "../../domain/types/progress";
+import { PageInteractionService } from "./page_interaction_service";
 
 export interface FetchOptions {
   onProgress?: (progress: FetchProgress) => void;
@@ -22,6 +17,101 @@ export interface FetchOptions {
  * All methods here must be run in the content script to work properly.
  */
 export class BrowserEmailService {
+  
+  static async fetchSendersFromBrowser(
+    options: FetchOptions = {}
+  ): Promise<Sender[]> {
+    const { 
+      onProgress, 
+      batchSize = 10, // Process pages sequentially in batches of 10, with a delay between batches
+      maxPages, 
+      signal 
+    } = options;
+
+    // Go to "All Mail" page
+    const currentPage = window.location.href.split("#")[0];
+    window.location.href = `${currentPage}#all`;
+
+    // Wait for loading to complete
+    await this._waitForLoaderToHide();
+    const { messages: totalMessages, pages: totalPages } = this._getTotalMessagesPages();
+    
+    const pagesToProcess = maxPages ? Math.min(totalPages, maxPages) : totalPages;
+    console.log(`Total messages: ${totalMessages}, pages to process: ${pagesToProcess}`);
+
+    // Use a Map for efficient sender aggregation
+    const senderMap = new Map<string, Sender>();
+    let processedEmails = 0;
+
+    // Process pages in batches
+    for (let batchStart = 1; batchStart <= pagesToProcess; batchStart += batchSize) {
+      // Check for cancellation
+      if (signal?.aborted) {
+        console.log("Fetch cancelled by user");
+        break;
+      }
+
+      const batchEnd = Math.min(batchStart + batchSize - 1, pagesToProcess);
+      
+      // Process batch of pages sequentially
+      for (let i = batchStart; i <= batchEnd; i++) {
+        if (signal?.aborted) break;
+
+        // Go to page
+        window.location.href = `${currentPage}#all/p${i}`;
+        await this._waitForLoaderToHide();
+
+        // Process emails
+        console.log(`Processing page ${i} of ${pagesToProcess}`);
+        const pageEmails = this._extractSendersFromPage();
+        
+        // Aggregate senders incrementally
+        this._aggregateSenders(pageEmails, senderMap);
+        processedEmails += pageEmails.length;
+
+        // Report progress
+        if (onProgress) {
+          const progress: FetchProgress = {
+            currentPage: i,
+            totalPages: pagesToProcess,
+            processedEmails,
+            totalEmails: totalMessages,
+            percentage: Math.round((i / pagesToProcess) * 100)
+          };
+          onProgress(progress);
+        }
+      }
+
+      // Small delay between batches to prevent browser freezing
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    // Convert map to sorted array
+    const senders = Array.from(senderMap.values());
+    senders.sort((a, b) => b.emailCount - a.emailCount);
+    
+    return senders;
+  }
+
+  private static _aggregateSenders(
+    emails: { email: string; name: string }[],
+    senderMap: Map<string, Sender>
+  ): void {
+    emails.forEach(({ email, name }) => {
+      if (senderMap.has(email)) {
+        const sender = senderMap.get(email)!;
+        sender.names.add(name);
+        sender.emailCount += 1;
+      } else {
+        senderMap.set(email, {
+          email,
+          names: new Set([name]),
+          emailCount: 1
+        });
+      }
+    });
+  }
+
   // - BLOCK SENDER HELPERS -
 
   static async blockSenderFromBrowser(
@@ -202,110 +292,7 @@ export class BrowserEmailService {
     });
   }
 
-  // - FETCH SENDERS HELPERS -
-
-  static async fetchSendersFromBrowser(
-    options: FetchOptions = {},
-  ): Promise<Sender[]> {
-    const {
-      onProgress,
-      batchSize = 10, // Process 10 pages at a time
-      maxPages,
-      signal,
-    } = options;
-
-    // Go to "All Mail" page
-    const currentPage = window.location.href.split("#")[0];
-    window.location.href = `${currentPage}#all`;
-
-    // Wait for loading to complete
-    await this._waitForLoaderToHide();
-    const { messages: totalMessages, pages: totalPages } =
-      this._getTotalMessagesPages();
-
-    const pagesToProcess = maxPages
-      ? Math.min(totalPages, maxPages)
-      : totalPages;
-    console.log(
-      `Total messages: ${totalMessages}, pages to process: ${pagesToProcess}`,
-    );
-
-    // Use a Map for efficient sender aggregation
-    const senderMap = new Map<string, Sender>();
-    let processedEmails = 0;
-
-    // Process pages in batches
-    for (
-      let batchStart = 1;
-      batchStart <= pagesToProcess;
-      batchStart += batchSize
-    ) {
-      // Check for cancellation
-      if (signal?.aborted) {
-        console.log("Fetch cancelled by user");
-        break;
-      }
-
-      const batchEnd = Math.min(batchStart + batchSize - 1, pagesToProcess);
-
-      // Process batch of pages
-      for (let i = batchStart; i <= batchEnd; i++) {
-        if (signal?.aborted) break;
-
-        // Go to page
-        window.location.href = `${currentPage}#all/p${i}`;
-        await this._waitForLoaderToHide();
-
-        // Process emails
-        console.log(`Processing page ${i} of ${pagesToProcess}`);
-        const pageEmails = this._extractSendersFromPage();
-
-        // Aggregate senders incrementally
-        this._aggregateSenders(pageEmails, senderMap);
-        processedEmails += pageEmails.length;
-
-        // Report progress
-        if (onProgress) {
-          const progress: FetchProgress = {
-            currentPage: i,
-            totalPages: pagesToProcess,
-            processedEmails,
-            totalEmails: totalMessages,
-            percentage: Math.round((i / pagesToProcess) * 100),
-          };
-          onProgress(progress);
-        }
-      }
-
-      // Small delay between batches to prevent browser freezing
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-
-    // Convert map to sorted array
-    const senders = Array.from(senderMap.values());
-    senders.sort((a, b) => b.emailCount - a.emailCount);
-
-    return senders;
-  }
-
-  private static _aggregateSenders(
-    emails: { email: string; name: string }[],
-    senderMap: Map<string, Sender>,
-  ): void {
-    emails.forEach(({ email, name }) => {
-      if (senderMap.has(email)) {
-        const sender = senderMap.get(email)!;
-        sender.names.add(name);
-        sender.emailCount += 1;
-      } else {
-        senderMap.set(email, {
-          email,
-          names: new Set([name]),
-          emailCount: 1,
-        });
-      }
-    });
-  }
+  // - GENERAL HELPERS -
 
   /**
    * Waits for the Gmail loading indicator to disappear, indicating that the page has finished loading.
@@ -386,8 +373,6 @@ export class BrowserEmailService {
 
     return { email, name };
   }
-
-  // - GENERAL HELPERS -
 
   /**
    * Retrieves all email row elements from the current page.

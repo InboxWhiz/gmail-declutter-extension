@@ -1,13 +1,6 @@
 import React from "react";
+import { FetchProgress } from "../../../../domain/types/progress";
 import "./fetchProgress.css";
-
-export interface FetchProgress {
-  currentPage: number;
-  totalPages: number;
-  processedEmails: number;
-  totalEmails: number;
-  percentage: number;
-}
 
 interface FetchProgressProps {
   progress: FetchProgress;

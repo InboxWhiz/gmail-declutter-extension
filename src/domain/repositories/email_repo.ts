@@ -1,4 +1,5 @@
 import { Sender } from "../entities/sender";
+import { FetchProgress } from "../types/progress";
 
 /**
  * Repository interface for managing email operations.
@@ -37,4 +38,18 @@ export interface EmailRepo {
    * @returns A promise that resolves when the sender has been blocked.
    */
   blockSender(senderEmailAddress: string): Promise<void>;
+  
+  /**
+   * Sets a callback function to receive progress updates during fetch operations.
+   * 
+   * @param callback - Function called with progress updates
+   */
+  setProgressCallback?(callback: (progress: FetchProgress) => void): void;
+
+  /**
+   * Cancels any ongoing fetch operation.
+   * 
+   * @returns A promise that resolves when the operation is cancelled
+   */
+  cancelFetch?(): Promise<void>;
 }
