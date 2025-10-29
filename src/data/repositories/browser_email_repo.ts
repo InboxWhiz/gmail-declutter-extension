@@ -37,7 +37,7 @@ export class BrowserEmailRepo implements EmailRepo {
           } else {
             console.error(
               `Error fetching senders from content script: ${msg.error}`,
-            );            
+            );
             reject(new Error(msg.error));
           }
         }

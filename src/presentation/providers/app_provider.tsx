@@ -55,7 +55,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [fetchProgress, setFetchProgress] = useState<FetchProgress | null>(
-    null
+    null,
   );
 
   // - REPOS -
@@ -75,12 +75,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const storageRepo: StorageRepo = useMemo(
     () => (useMock ? new MockStorageRepo() : new ChromeLocalStorageRepo()),
-    [useMock]
+    [useMock],
   );
   const pageInteractionRepo: PageInteractionRepo = useMemo(
     () =>
       useMock ? new MockPageInteractionRepo() : new ChromePageInteractionRepo(),
-    [useMock]
+    [useMock],
   );
 
   // - METHODS -
@@ -106,7 +106,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         setFetchProgress(null);
       }
     },
-    [emailRepo, pageInteractionRepo, storageRepo]
+    [emailRepo, pageInteractionRepo, storageRepo],
   );
 
   const cancelFetch = useCallback(() => {
@@ -124,7 +124,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     (emails: string[]) => {
       pageInteractionRepo.searchEmailSenders(emails);
     },
-    [pageInteractionRepo]
+    [pageInteractionRepo],
   );
 
   const getEmailAccount = useCallback(async (): Promise<string | null> => {
@@ -138,24 +138,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       await emailRepo.deleteSenders(senderEmails);
       await storageRepo.deleteSenders(senderEmails, accountEmail);
       setSenders((prevSenders) =>
-        prevSenders.filter((sender) => !senderEmails.includes(sender.email))
+        prevSenders.filter((sender) => !senderEmails.includes(sender.email)),
       );
     },
-    [emailRepo, pageInteractionRepo, storageRepo]
+    [emailRepo, pageInteractionRepo, storageRepo],
   );
 
   const unsubscribeSenders = useCallback(
     async (senderEmails: string[]) => {
       return await emailRepo.unsubscribeSenders(senderEmails);
     },
-    [emailRepo]
+    [emailRepo],
   );
 
   const blockSender = useCallback(
     async (senderEmail: string) => {
       await emailRepo.blockSender(senderEmail);
     },
-    [emailRepo]
+    [emailRepo],
   );
 
   // Add filtered senders computation
@@ -168,7 +168,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     return senders.filter((sender) => {
       const matchesEmail = sender.email.toLowerCase().includes(lowerSearchTerm);
       const matchesName = Array.from(sender.names).some((name) =>
-        name.toLowerCase().includes(lowerSearchTerm)
+        name.toLowerCase().includes(lowerSearchTerm),
       );
       return matchesEmail || matchesName;
     });

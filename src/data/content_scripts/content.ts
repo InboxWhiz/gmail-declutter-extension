@@ -39,11 +39,11 @@ async function fetchSenders(port: chrome.runtime.Port) {
         // Send progress updates to the side panel
         port.postMessage({
           action: "FETCH_PROGRESS",
-          progress
+          progress,
         });
       },
       batchSize: 10,
-      signal: currentAbortController.signal
+      signal: currentAbortController.signal,
     });
 
     const serialized = senders.map((sender) => ({
@@ -51,7 +51,7 @@ async function fetchSenders(port: chrome.runtime.Port) {
       names: Array.from(sender.names), // convert Set -> array
       emailCount: sender.emailCount,
     }));
-    
+
     port.postMessage({
       action: "FETCH_SENDERS_RESPONSE",
       success: true,

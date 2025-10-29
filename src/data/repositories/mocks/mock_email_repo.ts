@@ -62,40 +62,40 @@ export class MockEmailRepo implements EmailRepo {
 
   async fetchSenders(): Promise<Sender[]> {
     console.log("[MOCK] Fetching senders...");
-    
+
     if (this.isProgressiveLoadEnabled && this.progressCallback) {
       // Simulate progressive loading
       const totalPages = 5;
       const emailsPerPage = 4;
       const totalEmails = this.mockSenders.length;
-      
+
       this.abortController = new AbortController();
-      
+
       for (let page = 1; page <= totalPages; page++) {
         // Check if cancelled
         if (this.abortController.signal.aborted) {
           console.log("[MOCK] Fetch cancelled");
           throw new Error("Fetch cancelled");
         }
-        
+
         // Simulate page processing delay
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
         // Report progress
         const progress: FetchProgress = {
           currentPage: page,
           totalPages: totalPages,
           processedEmails: Math.min(page * emailsPerPage, totalEmails),
           totalEmails: totalEmails,
-          percentage: Math.round((page / totalPages) * 100)
+          percentage: Math.round((page / totalPages) * 100),
         };
         this.progressCallback(progress);
       }
     } else {
       // Original behavior without progress
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
-    
+
     this.mockSenders.sort((a, b) => b.emailCount - a.emailCount);
     return this.mockSenders;
   }
