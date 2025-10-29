@@ -1,5 +1,8 @@
+// src/data/content_scripts/content.ts
 import { BrowserEmailService } from "../services/browser_email_service";
 import { PageInteractionService } from "../services/page_interaction_service";
+
+let currentAbortController: AbortController | null = null;
 
 // Establish connection with the side panel
 chrome.runtime.onConnect.addListener(function (port) {
@@ -17,18 +20,38 @@ chrome.runtime.onConnect.addListener(function (port) {
       unsubscribeSenders(port, msg.emails);
     } else if (msg.action === "BLOCK_SENDER") {
       blockSender(port, msg.email);
+    } else if (msg.action === "CANCEL_FETCH") {
+      if (currentAbortController) {
+        currentAbortController.abort();
+        console.log("Fetch cancelled by user");
+      }
     }
   });
 });
 
 async function fetchSenders(port: chrome.runtime.Port) {
   try {
-    const senders = await BrowserEmailService.fetchSendersFromBrowser();
+    // Create new abort controller for this fetch
+    currentAbortController = new AbortController();
+
+    const senders = await BrowserEmailService.fetchSendersFromBrowser({
+      onProgress: (progress) => {
+        // Send progress updates to the side panel
+        port.postMessage({
+          action: "FETCH_PROGRESS",
+          progress,
+        });
+      },
+      batchSize: 10,
+      signal: currentAbortController.signal,
+    });
+
     const serialized = senders.map((sender) => ({
       email: sender.email,
       names: Array.from(sender.names), // convert Set -> array
       emailCount: sender.emailCount,
     }));
+
     port.postMessage({
       action: "FETCH_SENDERS_RESPONSE",
       success: true,
@@ -40,6 +63,8 @@ async function fetchSenders(port: chrome.runtime.Port) {
       success: false,
       error: (error as Error).message,
     });
+  } finally {
+    currentAbortController = null;
   }
 }
 
