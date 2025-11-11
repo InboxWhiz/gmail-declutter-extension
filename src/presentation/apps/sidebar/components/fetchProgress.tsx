@@ -15,8 +15,12 @@ export const FetchProgressBar: React.FC<FetchProgressProps> = ({
     <div className="fetch-progress-container">
       <div className="fetch-progress-header">
         <h3>Scanning inbox...</h3>
-        <button className="cancel-button" onClick={onCancel}>
-          Cancel
+        <button 
+          className="cancel-button" 
+          onClick={onCancel}
+          data-tooltip="Stop scanning and view results from emails loaded so far"
+        >
+          Stop
         </button>
       </div>
 
