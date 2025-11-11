@@ -3,7 +3,7 @@
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  margin: 10px 15px;
+  margin: 0 5px;
 }
 
 .fetch-progress-header {
@@ -27,10 +27,52 @@
   padding: 5px 15px;
   cursor: pointer;
   font-size: 14px;
+  position: relative;
 }
 
 .cancel-button:hover {
   background-color: #c82333;
+}
+
+/* Custom tooltip that appears instantly */
+.cancel-button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  padding: 8px 4px;
+  background-color: rgb(0 0 0 / 90%);
+  color: white;
+  font-size: 12px;
+  width: 120px;
+  text-align: center;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+  z-index: 9999;
+}
+
+.cancel-button::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 2px;
+  border: 5px solid transparent;
+  border-bottom-color: rgb(0 0 0 / 90%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+  z-index: 9999;
+}
+
+.cancel-button:hover::after,
+.cancel-button:hover::before {
+  opacity: 1;
 }
 
 .progress-stats {
