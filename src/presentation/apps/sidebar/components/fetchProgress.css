@@ -43,7 +43,7 @@
   transform: translateX(-50%);
   margin-top: 8px;
   padding: 8px 4px;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgb(0 0 0 / 90%);
   color: white;
   font-size: 12px;
   width: 120px;
@@ -63,7 +63,7 @@
   transform: translateX(-50%);
   margin-top: 2px;
   border: 5px solid transparent;
-  border-bottom-color: rgba(0, 0, 0, 0.9);
+  border-bottom-color: rgb(0 0 0 / 90%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.1s ease;
