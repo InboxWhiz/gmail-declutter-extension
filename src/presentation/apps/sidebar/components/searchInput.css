@@ -3,17 +3,19 @@
   display: flex;
   align-items: center;
   margin: 10px 15px;
-  background-color: var(--button-bg);
+  background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
+  border-radius: 8px;
   padding: 0 12px;
   height: 36px;
+  min-height: 36px;
 }
 
 .search-icon {
   color: var(--text-secondary);
   font-size: 14px;
   margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .search-input {
@@ -23,7 +25,9 @@
   outline: none;
   color: var(--text-primary);
   font-size: 14px;
-  padding: 8px 0;
+  padding: 0;
+  line-height: 36px;
+  height: 36px;
 }
 
 .search-input::placeholder {
