@@ -44,3 +44,44 @@ chrome.runtime.onInstalled.addListener(function (object) {
 
 // Shows an uninstall survey when extension is removed
 chrome.runtime.setUninstallURL("https://tally.so/r/w4yg5X");
+
+
+
+// adding archiveAutomation content script 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'archiveEmails') {
+    handleArchiveEmails(message.data)
+      .then(result => sendResponse({ success: true, result }))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true; // Required for async response
+  }
+  // ... existing handlers
+});
+
+async function handleArchiveEmails(data: { sender: string }) {
+  const { sender } = data;
+  
+  try {
+    // Query the active Gmail tab
+    const tabs = await chrome.tabs.query({ 
+      active: true, 
+      currentWindow: true,
+      url: "*://mail.google.com/*"
+    });
+    
+    if (!tabs[0]?.id) {
+      throw new Error('No active Gmail tab found');
+    }
+
+    // Execute archive operation in content script
+    const result = await chrome.tabs.sendMessage(tabs[0].id, {
+      action: 'performArchive',
+      sender: sender
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Archive error:', error);
+    throw error;
+  }
+}

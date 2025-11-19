@@ -158,6 +158,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     [emailRepo],
   );
 
+
+
+
+
+
   // Add filtered senders computation
   const filteredSenders = useMemo(() => {
     if (!searchTerm.trim()) {

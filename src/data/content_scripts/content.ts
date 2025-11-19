@@ -1,6 +1,23 @@
-// src/data/content_scripts/content.ts
+
 import { BrowserEmailService } from "../services/browser_email_service";
 import { PageInteractionService } from "../services/page_interaction_service";
+import { ArchiveAutomation } from './archiveAutomation';
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'performArchive') {
+    const archiver = new ArchiveAutomation();
+    archiver.archiveEmailsFromSender(message.sender)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ 
+        success: false, 
+        archivedCount: 0, 
+        error: error.message 
+      }));
+    return true; // Required for async response
+  }
+  // ... existing handlers
+});
+
 
 let currentAbortController: AbortController | null = null;
 
