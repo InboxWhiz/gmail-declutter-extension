@@ -11,6 +11,15 @@ export const ActionButton = ({ id }: { id: string }) => {
   const { selectedSenders } = useApp();
   const { setModal } = useModal();
 
+  const [isArchiving, setIsArchiving] = useState(false);
+const [archiveStatus, setArchiveStatus] = useState('');
+
+{archiveStatus && (
+  
+    {archiveStatus}
+  
+)}
+
   const handleClick = () => {
     const selectedSenderKeys: string[] = Object.keys(selectedSenders);
     if (selectedSenderKeys.length > 0) {
