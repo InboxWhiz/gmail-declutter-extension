@@ -1,7 +1,7 @@
 {
   "name": "gmail-declutter",
   "private": true,
-  "version": "2.0.1",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "dev": "cross-env VITE_USE_MOCK=true vite",
@@ -10,7 +10,7 @@
     "test:ui": "playwright test",
     "test": "jest --passWithNoTests",
     "lint:js": "eslint . --fix",
-    "lint:css": "stylelint '**/*.css' --fix",
+    "lint:css": "stylelint **/*.css --fix",
     "lint:html": "htmlhint **/*.html",
     "lint:prettier": "prettier --write .",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:prettier",

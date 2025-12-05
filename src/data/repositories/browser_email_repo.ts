@@ -1,19 +1,33 @@
 import { Sender } from "../../domain/entities/sender";
 import { EmailRepo } from "../../domain/repositories/email_repo";
+import { FetchProgress } from "../../domain/types/progress";
 import { PortManager } from "../ports/port_manager";
 
 export class BrowserEmailRepo implements EmailRepo {
+  private onProgressCallback?: (progress: FetchProgress) => void;
+
+  setProgressCallback(callback: (progress: FetchProgress) => void): void {
+    this.onProgressCallback = callback;
+  }
+
+  async cancelFetch(): Promise<void> {
+    const port = PortManager.gmailPort;
+    if (!port) return Promise.reject("Port not connected");
+    port.postMessage({ action: "CANCEL_FETCH" });
+    return Promise.resolve();
+  }
+
   async fetchSenders(): Promise<Sender[]> {
     const port = PortManager.gmailPort;
     if (!port) return Promise.reject("Port not connected");
 
-    // Send message
     port.postMessage({ action: "FETCH_SENDERS" });
 
-    // Wait for response
     return await new Promise<Sender[]>((resolve, reject) => {
       const listener = (msg: any) => {
-        if (msg.action === "FETCH_SENDERS_RESPONSE") {
+        if (msg.action === "FETCH_PROGRESS" && this.onProgressCallback) {
+          this.onProgressCallback(msg.progress);
+        } else if (msg.action === "FETCH_SENDERS_RESPONSE") {
           port.onMessage.removeListener(listener);
 
           if (msg.success) {

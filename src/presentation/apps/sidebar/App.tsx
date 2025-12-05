@@ -9,6 +9,8 @@ import { ModalProvider } from "./providers/modalContext.tsx";
 import ThemeToggle from "./components/themeToggle.tsx";
 import { AppProvider } from "../../providers/app_provider.tsx";
 import { ThemeProvider } from "../../providers/theme_provider.tsx";
+import { SearchInput } from "./components/searchInput.tsx";
+import { useApp } from "../../providers/app_provider.tsx";
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
 
 function AppWithTheme() {
   const { theme } = useTheme();
+  const { searchTerm, setSearchTerm } = useApp();
+
   return (
     <ModalProvider>
       <div id="declutter-body" className={theme}>
@@ -38,6 +42,8 @@ function AppWithTheme() {
             <ThemeToggle />
           </div>
         </div>
+
+        <SearchInput value={searchTerm} onChange={setSearchTerm} />
 
         <SendersContainer />
 

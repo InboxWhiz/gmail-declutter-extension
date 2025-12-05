@@ -7,7 +7,10 @@ export function DeclutterHeader() {
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    getEmailAccount().then(setEmail);
+    (async () => {
+      const email = await getEmailAccount();
+      setEmail(email);
+    })();
   }, [getEmailAccount]);
 
   // Extract initials from email
@@ -31,7 +34,6 @@ export function DeclutterHeader() {
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(" ");
   };
-
   return (
     <div className="declutter-header">
       {/* Brand Section */}
