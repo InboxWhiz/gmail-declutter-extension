@@ -22,10 +22,8 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
   };
 
   const handleUnhideAll = async () => {
-    // Unhide all senders
-    for (const email of hiddenSenders) {
-      await unhideSender(email);
-    }
+    // Unhide all senders concurrently
+    await Promise.all(hiddenSenders.map((email) => unhideSender(email)));
   };
 
   return (
