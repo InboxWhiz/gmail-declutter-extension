@@ -51,11 +51,15 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin: 16px auto;
   gap: 8px;
 }
 
 .open-gmail-button img {
   background-color: #233b86;
+  width: 20px;
+  height: 20px;
 }
 
 .open-gmail-button:hover {

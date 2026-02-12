@@ -19,18 +19,11 @@ const PopupApp = () => {
       <button
         className="open-gmail-button"
         onClick={openGmail}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          margin: "16px auto",
-        }}
       >
         <img
           src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
           alt="Gmail Logo"
           className="gmailLogo"
-          style={{ width: "20px", height: "20px" }}
         />
         Open Gmail
       </button>

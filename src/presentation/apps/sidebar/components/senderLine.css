@@ -51,3 +51,7 @@
   align-items: center;
   gap: 6px;
 }
+
+.checkbox-spacer {
+  margin-right: 18px;
+}

@@ -79,7 +79,7 @@ const UnsubscribePending = ({ subtype }: { subtype: string }) => {
   return (
     <>
       <p>{message}</p>
-      <div style={{ height: "5px" }}></div>
+      <div className="spacer-5"></div>
       <div className="loader"></div>
     </>
   );
@@ -224,7 +224,7 @@ const DeletePending = () => {
   return (
     <>
       <p>Deleting emails...</p>
-      <div style={{ height: "5px" }}></div>
+      <div className="spacer-5"></div>
       <div className="loader"></div>
     </>
   );
@@ -258,7 +258,7 @@ const NoSender = () => {
       <p>Oops!</p>
       <p>You haven't selected a sender yet.</p>
 
-      <div style={{ height: "20px" }}></div>
+      <div className="spacer-20"></div>
 
       <button className="primary" onClick={() => setModal(null)}>
         Go back
