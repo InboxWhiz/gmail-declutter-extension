@@ -1,0 +1,182 @@
+.settings-modal {
+  position: absolute;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background-color: rgb(0 0 0 / 40%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-modal-content {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  width: 85%;
+  max-width: 500px;
+  max-height: 80%;
+  border-radius: 12px;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: var(--text-primary);
+}
+
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+}
+
+.theme-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.theme-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  background-color: var(--bg-secondary);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.theme-option:hover {
+  background-color: var(--bg-hover);
+}
+
+.theme-option.active {
+  background-color: var(--bg-hover);
+  border-color: var(--modal-button-primary);
+}
+
+.theme-option svg {
+  font-size: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state p {
+  margin: 5px 0;
+}
+
+.empty-state .note {
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.hidden-senders-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.hidden-sender-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.hidden-sender-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.sender-email {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.unhide-button {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.unhide-button:hover {
+  background-color: var(--bg-hover);
+  transform: scale(1.1);
+}
+
+.unhide-all-button {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--modal-button-primary);
+  color: var(--modal-button-secondary);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.unhide-all-button:hover {
+  opacity: 0.9;
+}

@@ -27,6 +27,15 @@
   background-color: #ca2633;
 }
 
+#hide-button {
+  background-color: #5a6c7d;
+  color: white;
+}
+
+#hide-button:hover {
+  background-color: #6b7c8d;
+}
+
 .action-button .i {
   margin-right: 5px;
 }

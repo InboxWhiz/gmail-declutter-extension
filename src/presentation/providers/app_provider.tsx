@@ -41,6 +41,9 @@ type AppContextType = {
   filteredSenders: Sender[];
   fetchProgress: FetchProgress | null;
   cancelFetch: () => void;
+  hiddenSenders: string[];
+  hideSenders: (emails: string[]) => Promise<void>;
+  unhideSender: (email: string) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -57,6 +60,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const [fetchProgress, setFetchProgress] = useState<FetchProgress | null>(
     null,
   );
+  const [hiddenSenders, setHiddenSenders] = useState<string[]>([]);
 
   // - REPOS -
   const useMock = import.meta.env.VITE_USE_MOCK === "true";
@@ -158,26 +162,71 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     [emailRepo],
   );
 
+  const hideSenders = useCallback(
+    async (emails: string[]) => {
+      const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
+      await storageRepo.storeHiddenSenders(emails, accountEmail);
+      setHiddenSenders((prev) => Array.from(new Set([...prev, ...emails])));
+      // Clear selection after hiding
+      setSelectedSenders({});
+    },
+    [pageInteractionRepo, storageRepo],
+  );
+
+  const unhideSender = useCallback(
+    async (email: string) => {
+      const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
+      await storageRepo.removeHiddenSenders([email], accountEmail);
+      setHiddenSenders((prev) => prev.filter((e) => e !== email));
+    },
+    [pageInteractionRepo, storageRepo],
+  );
+
   // Add filtered senders computation
   const filteredSenders = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return senders;
+    let result = senders;
+
+    // Always filter out hidden senders
+    if (hiddenSenders.length > 0) {
+      result = result.filter((sender) => !hiddenSenders.includes(sender.email));
     }
 
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    return senders.filter((sender) => {
-      const matchesEmail = sender.email.toLowerCase().includes(lowerSearchTerm);
-      const matchesName = Array.from(sender.names).some((name) =>
-        name.toLowerCase().includes(lowerSearchTerm),
-      );
-      return matchesEmail || matchesName;
-    });
-  }, [senders, searchTerm]);
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      result = result.filter((sender) => {
+        const matchesEmail = sender.email
+          .toLowerCase()
+          .includes(lowerSearchTerm);
+        const matchesName = Array.from(sender.names).some((name) =>
+          name.toLowerCase().includes(lowerSearchTerm),
+        );
+        return matchesEmail || matchesName;
+      });
+    }
+
+    return result;
+  }, [senders, searchTerm, hiddenSenders]);
 
   // Automatically load senders from storage when the component mounts
   useEffect(() => {
     reloadSenders();
   }, [reloadSenders]);
+
+  // Load hidden senders when the component mounts
+  useEffect(() => {
+    const loadHiddenSenders = async () => {
+      try {
+        const accountEmail =
+          await pageInteractionRepo.getActiveTabEmailAccount();
+        const hidden = await storageRepo.readHiddenSenders(accountEmail);
+        setHiddenSenders(hidden);
+      } catch (error) {
+        console.error("Failed to load hidden senders:", error);
+      }
+    };
+    loadHiddenSenders();
+  }, [pageInteractionRepo, storageRepo]);
 
   return (
     <AppContext.Provider
@@ -198,6 +247,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         filteredSenders,
         fetchProgress,
         cancelFetch,
+        hiddenSenders,
+        hideSenders,
+        unhideSender,
       }}
     >
       {children}

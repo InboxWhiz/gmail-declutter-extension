@@ -38,10 +38,13 @@
 :root,
 .light {
   --bg-primary: #fff;
+  --bg-secondary: #f8f9fa;
+  --bg-hover: #e8eaed;
   --text-primary: #333;
   --text-secondary: #5f6368;
   --selected-bg: #c2dbff;
   --button-bg: #e9e9e9;
+  --button-hover: #d8d8d8;
   --border-color: #c4c4c4;
   --line-color: #f2f6fc;
   --plain-button: #000;
@@ -54,10 +57,13 @@
 
 .dark {
   --bg-primary: #1e1e1e;
+  --bg-secondary: #2a2a2a;
+  --bg-hover: #353535;
   --text-primary: #f0f0f0;
   --text-secondary: #b0b3b8;
   --selected-bg: #34527a;
   --button-bg: #3a3a3a;
+  --button-hover: #4a4a4a;
   --border-color: #444;
   --line-color: #555;
   --plain-button: #555;
@@ -112,4 +118,19 @@
   padding: 10px;
   overflow: hidden auto;
   flex-grow: 1;
+}
+
+.icon-button {
+  border: none;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+}
+
+.icon-button:hover {
+  transform: scale(1.2);
+  transition: transform 0.2s ease-in-out;
 }

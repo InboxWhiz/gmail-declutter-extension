@@ -3,6 +3,7 @@ import { Sender } from "../../../domain/entities/sender";
 
 export class MockStorageRepo implements StorageRepo {
   private mockSenders: Sender[] = [];
+  private mockHiddenSenders: string[] = [];
 
   constructor(initialSenders: Sender[] = this.mockSenders) {
     this.mockSenders = initialSenders;
@@ -32,6 +33,35 @@ export class MockStorageRepo implements StorageRepo {
     senderEmails.forEach((email) => {
       console.log(`[MOCK] Deleting sender: ${email}`);
     });
+    return Promise.resolve();
+  }
+
+  storeHiddenSenders(emails: string[], accountEmail: string): Promise<void> {
+    console.log(`[MOCK] Storing hidden senders for account: ${accountEmail}`);
+    emails.forEach((email) => {
+      console.log(`[MOCK] Hiding sender: ${email}`);
+    });
+    this.mockHiddenSenders = Array.from(
+      new Set([...this.mockHiddenSenders, ...emails]),
+    );
+    return Promise.resolve();
+  }
+
+  readHiddenSenders(accountEmail: string): Promise<string[]> {
+    console.log(`[MOCK] Reading hidden senders for account: ${accountEmail}`);
+    return Promise.resolve(this.mockHiddenSenders);
+  }
+
+  removeHiddenSenders(emails: string[], accountEmail: string): Promise<void> {
+    console.log(
+      `[MOCK] Removing hidden senders for account: ${accountEmail}`,
+    );
+    emails.forEach((email) => {
+      console.log(`[MOCK] Unhiding sender: ${email}`);
+    });
+    this.mockHiddenSenders = this.mockHiddenSenders.filter(
+      (email) => !emails.includes(email),
+    );
     return Promise.resolve();
   }
 }

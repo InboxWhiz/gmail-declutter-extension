@@ -45,4 +45,93 @@ export class ChromeLocalStorageRepo implements StorageRepo {
       });
     });
   }
+
+  async storeHiddenSenders(
+    emails: string[],
+    accountEmail: string,
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get([accountEmail], (result) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+          return;
+        }
+
+        const accountData = result[accountEmail] || { senders: [] };
+        const currentHidden = accountData.hiddenSenderEmails || [];
+        const updatedHidden = Array.from(
+          new Set([...currentHidden, ...emails]),
+        );
+
+        chrome.storage.local.set(
+          {
+            [accountEmail]: {
+              ...accountData,
+              hiddenSenderEmails: updatedHidden,
+            },
+          },
+          () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+              return;
+            }
+            console.log("Updated hidden senders in local storage.");
+            resolve();
+          },
+        );
+      });
+    });
+  }
+
+  async readHiddenSenders(accountEmail: string): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get([accountEmail], (result) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+          return;
+        }
+
+        const hiddenSenders =
+          result[accountEmail]?.hiddenSenderEmails || [];
+        resolve(hiddenSenders);
+      });
+    });
+  }
+
+  async removeHiddenSenders(
+    emails: string[],
+    accountEmail: string,
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get([accountEmail], (result) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+          return;
+        }
+
+        const accountData = result[accountEmail] || { senders: [] };
+        const currentHidden = accountData.hiddenSenderEmails || [];
+        const updatedHidden = currentHidden.filter(
+          (email: string) => !emails.includes(email),
+        );
+
+        chrome.storage.local.set(
+          {
+            [accountEmail]: {
+              ...accountData,
+              hiddenSenderEmails: updatedHidden,
+            },
+          },
+          () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+              return;
+            }
+            console.log("Removed hidden senders from local storage.");
+            resolve();
+          },
+        );
+      });
+    });
+  }
 }

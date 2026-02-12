@@ -45,3 +45,9 @@
   font-weight: bold;
   padding: 0 7px;
 }
+
+.email-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
