@@ -10,7 +10,10 @@ interface DeclutterHeaderProps {
   settingsButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export function DeclutterHeader({ onOpenSettings, settingsButtonRef }: DeclutterHeaderProps) {
+export function DeclutterHeader({
+  onOpenSettings,
+  settingsButtonRef,
+}: DeclutterHeaderProps) {
   const { getEmailAccount } = useApp();
   const [email, setEmail] = useState<string | null>(null);
 

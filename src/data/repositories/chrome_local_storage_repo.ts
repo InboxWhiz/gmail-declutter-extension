@@ -91,8 +91,7 @@ export class ChromeLocalStorageRepo implements StorageRepo {
           return;
         }
 
-        const hiddenSenders =
-          result[accountEmail]?.hiddenSenderEmails || [];
+        const hiddenSenders = result[accountEmail]?.hiddenSenderEmails || [];
         resolve(hiddenSenders);
       });
     });

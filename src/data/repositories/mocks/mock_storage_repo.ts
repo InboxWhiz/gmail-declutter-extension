@@ -53,9 +53,7 @@ export class MockStorageRepo implements StorageRepo {
   }
 
   removeHiddenSenders(emails: string[], accountEmail: string): Promise<void> {
-    console.log(
-      `[MOCK] Removing hidden senders for account: ${accountEmail}`,
-    );
+    console.log(`[MOCK] Removing hidden senders for account: ${accountEmail}`);
     emails.forEach((email) => {
       console.log(`[MOCK] Unhiding sender: ${email}`);
     });

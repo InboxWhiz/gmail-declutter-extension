@@ -2,7 +2,13 @@ import "./settingsModal.css";
 import { useApp } from "../../../providers/app_provider";
 import { useTheme } from "../../../providers/theme_provider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faTimes, faSun, faMoon, faDesktop } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEye,
+  faTimes,
+  faSun,
+  faMoon,
+  faDesktop,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef } from "react";
 
 interface SettingsModalProps {
@@ -11,9 +17,14 @@ interface SettingsModalProps {
   triggerRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export const SettingsModal = ({ isOpen, onClose, triggerRef }: SettingsModalProps) => {
+export const SettingsModal = ({
+  isOpen,
+  onClose,
+  triggerRef,
+}: SettingsModalProps) => {
   const { hiddenSenders, unhideSender } = useApp();
-  const { setting: themeSetting, setSetting: setThemeSetting } = useTheme();  const modalContentRef = useRef<HTMLDivElement>(null);
+  const { setting: themeSetting, setSetting: setThemeSetting } = useTheme();
+  const modalContentRef = useRef<HTMLDivElement>(null);
 
   // Focus management
   useEffect(() => {
@@ -56,7 +67,11 @@ export const SettingsModal = ({ isOpen, onClose, triggerRef }: SettingsModalProp
 
   return (
     <div className="settings-modal" onClick={handleBackgroundClick}>
-      <div className="settings-modal-content" ref={modalContentRef} tabIndex={-1}>
+      <div
+        className="settings-modal-content"
+        ref={modalContentRef}
+        tabIndex={-1}
+      >
         <div className="settings-header">
           <h2>Settings</h2>
           <button className="close-button" onClick={onClose} aria-label="Close">

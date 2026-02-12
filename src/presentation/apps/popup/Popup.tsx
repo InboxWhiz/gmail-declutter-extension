@@ -16,10 +16,7 @@ const PopupApp = () => {
       <h2>InboxWhiz</h2>
       <p>Manage your inbox effortlessly with InboxWhiz!</p>
 
-      <button
-        className="open-gmail-button"
-        onClick={openGmail}
-      >
+      <button className="open-gmail-button" onClick={openGmail}>
         <img
           src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
           alt="Gmail Logo"

@@ -59,9 +59,7 @@ test.describe("UI tests for Hide Senders Functionality", () => {
     await expect(unhideButtons).toHaveCount(2);
 
     // Unhide All button should be visible
-    await expect(
-      settingsModal.locator(".unhide-all-button"),
-    ).toBeVisible();
+    await expect(settingsModal.locator(".unhide-all-button")).toBeVisible();
   });
 
   test("unhiding a sender restores it to the main list", async ({ page }) => {
@@ -144,9 +142,7 @@ test.describe("UI tests for Hide Senders Functionality", () => {
     );
 
     // Unhide All button should not be visible
-    await expect(
-      settingsModal.locator(".unhide-all-button"),
-    ).not.toBeVisible();
+    await expect(settingsModal.locator(".unhide-all-button")).not.toBeVisible();
   });
 
   test("clicking background closes settings modal", async ({ page }) => {

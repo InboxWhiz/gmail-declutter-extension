@@ -168,9 +168,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         const accountEmail =
           await pageInteractionRepo.getActiveTabEmailAccount();
         await storageRepo.storeHiddenSenders(emails, accountEmail);
-        setHiddenSenders((prev) =>
-          Array.from(new Set([...prev, ...emails])),
-        );
+        setHiddenSenders((prev) => Array.from(new Set([...prev, ...emails])));
         // Clear selection after hiding
         setSelectedSenders({});
       } catch (error) {
