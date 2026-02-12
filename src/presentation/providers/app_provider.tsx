@@ -105,6 +105,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
           const storedData = await storageRepo.readSenders(accountEmail);
           setSenders(storedData);
         }
+      } catch (error) {
+        // Handle fetch cancellation and other errors gracefully
+        if (error instanceof Error && error.message === "Fetch cancelled") {
+          console.log("Fetch was cancelled by user");
+        } else {
+          console.error("Error loading senders:", error);
+        }
       } finally {
         setLoading(false);
         setFetchProgress(null);
