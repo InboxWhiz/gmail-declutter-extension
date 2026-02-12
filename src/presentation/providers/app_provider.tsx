@@ -164,20 +164,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const hideSenders = useCallback(
     async (emails: string[]) => {
-      const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
-      await storageRepo.storeHiddenSenders(emails, accountEmail);
-      setHiddenSenders((prev) => Array.from(new Set([...prev, ...emails])));
-      // Clear selection after hiding
-      setSelectedSenders({});
+      try {
+        const accountEmail =
+          await pageInteractionRepo.getActiveTabEmailAccount();
+        await storageRepo.storeHiddenSenders(emails, accountEmail);
+        setHiddenSenders((prev) =>
+          Array.from(new Set([...prev, ...emails])),
+        );
+        // Clear selection after hiding
+        setSelectedSenders({});
+      } catch (error) {
+        console.error("Failed to hide senders:", error);
+        throw error;
+      }
     },
     [pageInteractionRepo, storageRepo],
   );
 
   const unhideSender = useCallback(
     async (email: string) => {
-      const accountEmail = await pageInteractionRepo.getActiveTabEmailAccount();
-      await storageRepo.removeHiddenSenders([email], accountEmail);
-      setHiddenSenders((prev) => prev.filter((e) => e !== email));
+      try {
+        const accountEmail =
+          await pageInteractionRepo.getActiveTabEmailAccount();
+        await storageRepo.removeHiddenSenders([email], accountEmail);
+        setHiddenSenders((prev) => prev.filter((e) => e !== email));
+      } catch (error) {
+        console.error("Failed to unhide sender:", error);
+        throw error;
+      }
     },
     [pageInteractionRepo, storageRepo],
   );
