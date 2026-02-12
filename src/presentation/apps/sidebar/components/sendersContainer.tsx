@@ -20,13 +20,7 @@ export const SendersContainer = () => {
         </>
       ) : filteredSenders.length === 0 ? (
         searchTerm ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "40px 20px",
-              color: "var(--text-secondary)",
-            }}
-          >
+          <div className="no-results-message">
             <p>No senders match "{searchTerm}"</p>
           </div>
         ) : (

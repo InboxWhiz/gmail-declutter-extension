@@ -38,10 +38,13 @@
 :root,
 .light {
   --bg-primary: #fff;
+  --bg-secondary: #f8f9fa;
+  --bg-hover: #e8eaed;
   --text-primary: #333;
   --text-secondary: #5f6368;
   --selected-bg: #c2dbff;
   --button-bg: #e9e9e9;
+  --button-hover: #d8d8d8;
   --border-color: #c4c4c4;
   --line-color: #f2f6fc;
   --plain-button: #000;
@@ -54,10 +57,13 @@
 
 .dark {
   --bg-primary: #1e1e1e;
+  --bg-secondary: #2a2a2a;
+  --bg-hover: #353535;
   --text-primary: #f0f0f0;
   --text-secondary: #b0b3b8;
   --selected-bg: #34527a;
   --button-bg: #3a3a3a;
+  --button-hover: #4a4a4a;
   --border-color: #444;
   --line-color: #555;
   --plain-button: #555;
@@ -73,6 +79,12 @@
   color: var(--text-primary);
 }
 
+.no-results-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
 #declutter-body {
   font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
   height: 97vh;
@@ -81,31 +93,17 @@
   margin: 5px;
 }
 
-.declutter-header {
-  background-color: var(--header-bg);
-}
-
-#declutter-body.login {
-  height: 100vh;
-  color: white;
-  background-color: #233b86;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  margin: 0;
-}
-
-#declutter-body.login #email-account {
-  margin-top: 7px;
-  font-size: 0.75rem;
-}
-
 .button-bar {
   padding: 10px 5px 0 15px;
   min-width: 300px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.sender-actions {
+  display: flex;
+  gap: 8px;
 }
 
 #senders {

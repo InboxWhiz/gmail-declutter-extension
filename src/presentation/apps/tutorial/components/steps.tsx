@@ -111,20 +111,10 @@ export const Step3 = ({ onNext }: { onNext: () => void }) => {
 
 export const Success = () => {
   return (
-    <div className="step" style={{ height: "200px" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+    <div className="step success-container">
+      <div className="success-content">
         <div style={{ height: "10px" }}></div>
-        <h2
-          className="tutorial-header"
-          style={{ display: "flex", alignItems: "center", gap: "10px" }}
-        >
+        <h2 className="tutorial-header success-header">
           <SuccessIcon />
           You're all set!
         </h2>

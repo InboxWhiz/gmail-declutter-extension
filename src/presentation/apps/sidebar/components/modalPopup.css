@@ -21,12 +21,17 @@
   text-align: center;
 }
 
-p {
+.modal-content p {
   font-size: 16px;
 }
 
-.note {
+.modal-content .note {
   font-size: 14px;
+}
+
+.toggle-options {
+  margin: 15px 0;
+  text-align: left;
 }
 
 .modal-content button {

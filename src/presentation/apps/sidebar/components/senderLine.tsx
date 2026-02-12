@@ -28,11 +28,9 @@ export const SenderLine = ({
 
   return (
     <div
-      className={
-        selectedSenders[senderEmail]
-          ? "sender-line sender-line-real selected"
-          : "sender-line sender-line-real"
-      }
+      className={`sender-line sender-line-real ${
+        selectedSenders[senderEmail] ? "selected" : ""
+      }`}
     >
       <div className="begin">
         <div>
