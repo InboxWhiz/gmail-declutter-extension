@@ -6,6 +6,8 @@ test.describe("Search functionality", () => {
 
   test.beforeEach(async ({ page }) => {
     await setupSidebarTest(page, logs);
+    // Wait for senders to load
+    await page.waitForSelector(".sender-line-real", { timeout: 10000 });
   });
 
   test("should display search input", async ({ page }) => {
@@ -18,7 +20,8 @@ test.describe("Search functionality", () => {
   });
 
   test("should filter senders by email address", async ({ page }) => {
-    // Initially all senders should be visible
+    // Initially all senders should be visible (wait a bit for any rendering)
+    await page.waitForTimeout(100);
     await expect(page.locator(".sender-line-real")).toHaveCount(20);
 
     // Type in search input

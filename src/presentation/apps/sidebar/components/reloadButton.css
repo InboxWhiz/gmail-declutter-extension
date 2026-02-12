@@ -1,9 +1,12 @@
 .reload-button {
   border: none;
-  background-color: var(--bg-primary);
+  background: none;
   color: var(--text-primary);
   box-shadow: none;
   cursor: pointer;
+  padding: 4px 8px;
+  font-size: 18px;
+  transition: transform 0.2s ease-in-out;
 }
 
 .reload-button .i {
@@ -12,5 +15,4 @@
 
 .reload-button:hover {
   transform: scale(1.2);
-  transition: transform 0.2s ease-in-out;
 }

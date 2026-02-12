@@ -4,7 +4,6 @@
   cursor: pointer;
   font-size: 14px;
   height: 32px;
-  margin: 4px;
   padding: 0 16px;
   box-shadow: 0 3px 5px rgb(0 0 0 / 20%);
 }
@@ -25,6 +24,15 @@
 
 #delete-button:hover {
   background-color: #ca2633;
+}
+
+#hide-button {
+  background-color: #5a6c7d;
+  color: white;
+}
+
+#hide-button:hover {
+  background-color: #6b7c8d;
 }
 
 .action-button .i {

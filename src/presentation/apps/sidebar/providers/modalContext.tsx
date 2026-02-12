@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 
 type ModalState = null | {
-  action?: "delete" | "unsubscribe";
+  action?: "delete" | "unsubscribe" | "hide";
   type: "confirm" | "pending" | "continue" | "success" | "error" | "no-sender";
   subtype?: "working" | "finding-link" | "blocking";
   extras?: any;

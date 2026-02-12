@@ -23,4 +23,27 @@ export interface StorageRepo {
    * @param accountEmail - The email address of the account to associate the deletion with.
    */
   deleteSenders(senderEmails: string[], accountEmail: string): Promise<void>;
+
+  /**
+   * Stores a list of hidden sender emails for a specific account.
+   *
+   * @param emails - An array of email addresses to hide.
+   * @param accountEmail - The email address of the account to associate the hidden senders with.
+   */
+  storeHiddenSenders(emails: string[], accountEmail: string): Promise<void>;
+
+  /**
+   * Retrieves the list of hidden sender emails for a specific account.
+   *
+   * @param accountEmail - The email address of the account to retrieve hidden senders for.
+   */
+  readHiddenSenders(accountEmail: string): Promise<string[]>;
+
+  /**
+   * Removes sender emails from the hidden list for a specific account.
+   *
+   * @param emails - An array of email addresses to unhide.
+   * @param accountEmail - The email address of the account to associate the unhiding with.
+   */
+  removeHiddenSenders(emails: string[], accountEmail: string): Promise<void>;
 }
