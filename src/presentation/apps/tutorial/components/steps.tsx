@@ -113,13 +113,13 @@ export const Success = () => {
   return (
     <div className="step success-container">
       <div className="success-content">
-        <div className="spacer-10"></div>
+        <div style={{ height: "10px" }}></div>
         <h2 className="tutorial-header success-header">
           <SuccessIcon />
           You're all set!
         </h2>
       </div>
-      <div className="spacer-20"></div>
+      <div style={{ height: "20px" }}></div>
       <p className="tutorial-note">You are ready to clean up your inbox.</p>
 
       <button
@@ -132,7 +132,7 @@ export const Success = () => {
         Get Started
       </button>
 
-      <div className="spacer-10"></div>
+      <div style={{ height: "10px" }}></div>
     </div>
   );
 };

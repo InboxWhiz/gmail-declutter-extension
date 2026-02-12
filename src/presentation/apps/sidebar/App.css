@@ -79,19 +79,6 @@
   color: var(--text-primary);
 }
 
-/* Utility classes */
-.spacer-5 {
-  height: 5px;
-}
-
-.spacer-10 {
-  height: 10px;
-}
-
-.spacer-20 {
-  height: 20px;
-}
-
 .no-results-message {
   text-align: center;
   padding: 40px 20px;

@@ -7,9 +7,10 @@ import { ReloadButton } from "./reloadButton";
 
 interface DeclutterHeaderProps {
   onOpenSettings: () => void;
+  settingsButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export function DeclutterHeader({ onOpenSettings }: DeclutterHeaderProps) {
+export function DeclutterHeader({ onOpenSettings, settingsButtonRef }: DeclutterHeaderProps) {
   const { getEmailAccount } = useApp();
   const [email, setEmail] = useState<string | null>(null);
 
@@ -26,6 +27,7 @@ export function DeclutterHeader({ onOpenSettings }: DeclutterHeaderProps) {
         <ReloadButton />
       </div>
       <button
+        ref={settingsButtonRef}
         className="settings-button"
         onClick={onOpenSettings}
         aria-label="Settings"
