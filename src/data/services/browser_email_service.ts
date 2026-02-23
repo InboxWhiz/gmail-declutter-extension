@@ -249,55 +249,270 @@ export class BrowserEmailService {
   ): Promise<void> {
     console.log("Deleting senders in browser: ", senderEmailAddresses);
 
+    const expectedSearchQuery =
+      this._buildSenderSearchQuery(senderEmailAddresses);
     PageInteractionService.searchEmailSenders(senderEmailAddresses);
-    await this._waitForEmailBodyToLoad();
-    while (!document.querySelector("td.TC")) {
-      // No 'No messages matched your search'
-      await this._deleteEmailsOnPage();
-    }
+    await this._waitForSearchScope(expectedSearchQuery);
+    await this._assertSearchScope(expectedSearchQuery, "after search");
+
+    // Ensure "Most recent" filter is active
+    await this._ensureMostRecentFilter();
+    await this._assertSearchScope(expectedSearchQuery, "after sort change");
+
+    // Perform bulk delete
+    await this._performBulkDelete(expectedSearchQuery);
   }
 
-  static async _deleteEmailsOnPage(): Promise<void> {
-    const checkboxes = Array.from(
-      document.querySelectorAll('span[role="checkbox"]'),
-    );
-    const checkbox = checkboxes.filter(
-      (checkbox) => (checkbox as HTMLElement).offsetParent !== null,
-    )[0] as HTMLElement;
-    checkbox.click();
+  static async _performBulkDelete(expectedSearchQuery: string): Promise<void> {
+    const isVisibleInFlow = (el: Element | null): el is HTMLElement => {
+      return !!(
+        el &&
+        (el as HTMLElement).offsetParent !== null &&
+        (el as HTMLElement).getClientRects().length > 0
+      );
+    };
 
+    const isActuallyVisible = (el: Element | null): el is HTMLElement => {
+      if (!el) return false;
+      const htmlEl = el as HTMLElement;
+      const style = getComputedStyle(htmlEl);
+      return (
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        style.opacity !== "0" &&
+        htmlEl.getClientRects().length > 0
+      );
+    };
+
+    const findBulkDeleteConfirmButton = (): HTMLElement | null => {
+      const visibleDialogs = Array.from(
+        document.querySelectorAll(
+          'div[role="dialog"], div[role="alertdialog"], div[aria-modal="true"]',
+        ),
+      ).filter((el) => isActuallyVisible(el));
+
+      for (const dialog of visibleDialogs) {
+        const dialogText = dialog.textContent?.toLowerCase() || "";
+        const isBulkActionDialog =
+          dialogText.includes("confirm bulk action") &&
+          dialogText.includes("all conversations in this search");
+        if (!isBulkActionDialog) continue;
+
+        const byDialogAction = dialog.querySelector(
+          'button[data-mdc-dialog-action="ok"]',
+        );
+        if (isActuallyVisible(byDialogAction)) {
+          return byDialogAction;
+        }
+      }
+
+      const confirmLabelRegex = /^(ok|yes|delete)$/i;
+      for (const dialog of visibleDialogs) {
+        const dialogText = dialog.textContent?.toLowerCase() || "";
+        const isBulkActionDialog =
+          dialogText.includes("confirm bulk action") &&
+          dialogText.includes("all conversations in this search");
+        if (!isBulkActionDialog) continue;
+
+        const candidates = Array.from(
+          dialog.querySelectorAll(
+            'button, button[name="ok"], div[role="button"]',
+          ),
+        ).filter((el) => isActuallyVisible(el));
+
+        const match = candidates.find((el) =>
+          confirmLabelRegex.test(el.textContent?.trim() || ""),
+        );
+        if (match) return match as HTMLElement;
+      }
+
+      return null;
+    };
+
+    // Select all on current page
+    await this._assertSearchScope(expectedSearchQuery, "before select all");
+    const checkbox = await this._waitForElement(() =>
+      Array.from(document.querySelectorAll('span[role="checkbox"]')).find(
+        (checkbox) => isVisibleInFlow(checkbox),
+      ),
+    );
+    (checkbox as HTMLElement).click();
+
+    // Check for "Select all conversations that match this search" banner
+    // The banner usually looks like "Select all N conversations in ..."
+    // We wait a brief moment for it to appear after clicking select all
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const selectAllConversations = Array.from(
+      document.querySelectorAll("span"),
+    ).find(
+      (el) =>
+        el.textContent &&
+        el.textContent.includes("Select all") &&
+        el.textContent.includes("conversations") &&
+        isVisibleInFlow(el),
+    );
+    const usedBulkSelection = Boolean(selectAllConversations);
+
+    if (selectAllConversations) {
+      console.log("Found 'Select all conversations' banner, clicking it");
+      (selectAllConversations as HTMLElement).click();
+      // Wait for the selection to register
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    // Click Delete
+    await this._assertSearchScope(expectedSearchQuery, "before delete click");
     const deleteButtons = Array.from(
       document.querySelectorAll('div[aria-label="Delete"]'),
     );
-    const deleteButton = deleteButtons.filter(
-      (button) => (button as HTMLElement).offsetParent !== null,
-    )[0] as HTMLElement;
-    deleteButton.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-    deleteButton.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+    const deleteButton = deleteButtons.find((button) =>
+      isVisibleInFlow(button),
+    ) as HTMLElement;
+
+    if (deleteButton) {
+      deleteButton.dispatchEvent(
+        new MouseEvent("mousedown", { bubbles: true }),
+      );
+      deleteButton.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+      deleteButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      deleteButton.click();
+    } else {
+      throw new Error("Could not find visible delete button");
+    }
+
+    // Confirm bulk delete only when "Select all conversations" was chosen.
+    if (usedBulkSelection) {
+      try {
+        const confirmButton = (await this._waitForElement(
+          () => findBulkDeleteConfirmButton() || undefined,
+          5000,
+        )) as HTMLElement;
+        console.log("Confirming bulk delete");
+        confirmButton.dispatchEvent(
+          new MouseEvent("mousedown", { bubbles: true }),
+        );
+        confirmButton.dispatchEvent(
+          new MouseEvent("mouseup", { bubbles: true }),
+        );
+        confirmButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        confirmButton.click();
+      } catch {
+        throw new Error("Bulk confirm dialog not detected");
+      }
+    }
 
     await this._waitForDeleteConfirmation();
   }
 
   static async _waitForDeleteConfirmation(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      const observer = new MutationObserver(() => {
-        const confirmation = Array.from(document.querySelectorAll("span")).find(
-          (span) => span.textContent?.includes("conversations moved to Bin"),
+    return new Promise<void>((resolve, reject) => {
+      const hasDeleteSuccessToast = (): boolean => {
+        const movedToTrashRegex =
+          /(moved (some )?(conversation|conversations|message|messages) to (the )?(trash|bin)|moved to (trash|bin)|moved to the trash|sent to (trash|bin))/i;
+        const asyncDeleteRegex =
+          /(we('|’)ll do the same for (any )?remaining conversations in (a )?few minutes|remaining conversations in (a )?few minutes|delet(ing|ed).*(may|might).*(take|while|minute|few moments|longer)|might take longer|may take longer|may take.*(delete|deleting))/i;
+        const scopeRegex = /(conversation|conversations|message|messages)/i;
+
+        const liveRegions = Array.from(
+          document.querySelectorAll(
+            '[role="alert"], [role="status"], [aria-live]',
+          ),
         );
-        if (confirmation) {
+        for (const region of liveRegions) {
+          const text = region.textContent?.trim() || "";
+          if (
+            (movedToTrashRegex.test(text) && scopeRegex.test(text)) ||
+            asyncDeleteRegex.test(text)
+          ) {
+            return true;
+          }
+        }
+
+        const genericNodes = Array.from(document.querySelectorAll("span, div"));
+        return genericNodes.some((node) => {
+          const text = node.textContent?.trim() || "";
+          return (
+            (movedToTrashRegex.test(text) && scopeRegex.test(text)) ||
+            asyncDeleteRegex.test(text)
+          );
+        });
+      };
+
+      if (hasDeleteSuccessToast()) {
+        resolve();
+        return;
+      }
+
+      const observer = new MutationObserver(() => {
+        if (hasDeleteSuccessToast()) {
           observer.disconnect();
+          clearInterval(pollTimer);
+          clearTimeout(timeoutTimer);
           resolve();
         }
       });
 
-      observer.observe(document.body, { childList: true, subtree: true });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
 
-      // Fallback timeout in case confirmation never appears
-      setTimeout(() => {
+      const pollTimer = setInterval(() => {
+        if (hasDeleteSuccessToast()) {
+          observer.disconnect();
+          clearInterval(pollTimer);
+          clearTimeout(timeoutTimer);
+          resolve();
+        }
+      }, 250);
+
+      // Timeout is treated as failure to avoid false positives.
+      const timeoutTimer = setTimeout(() => {
         observer.disconnect();
-        resolve();
-      }, 1000);
+        clearInterval(pollTimer);
+        reject(new Error("Timed out waiting for delete confirmation toast"));
+      }, 10000);
     });
+  }
+
+  static _buildSenderSearchQuery(senderEmailAddresses: string[]): string {
+    return `from:(${senderEmailAddresses.join(" OR ")})`;
+  }
+
+  static _getCurrentSearchQuery(): string {
+    const searchInput = document.querySelector(
+      "input[name='q']",
+    ) as HTMLInputElement | null;
+    return searchInput?.value?.trim() || "";
+  }
+
+  static async _waitForSearchScope(expectedQuery: string): Promise<void> {
+    const deadline = Date.now() + 10000;
+    while (Date.now() < deadline) {
+      const currentQuery = this._getCurrentSearchQuery();
+      if (currentQuery === expectedQuery) {
+        await this._waitForEmailBodyToLoad();
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    }
+    throw new Error(
+      `Search scope did not settle to expected query. Expected "${expectedQuery}", got "${this._getCurrentSearchQuery()}"`,
+    );
+  }
+
+  static async _assertSearchScope(
+    expectedQuery: string,
+    step: string,
+  ): Promise<void> {
+    const currentQuery = this._getCurrentSearchQuery();
+    if (currentQuery !== expectedQuery) {
+      throw new Error(
+        `Unsafe delete scope at ${step}. Expected "${expectedQuery}", got "${currentQuery}"`,
+      );
+    }
   }
 
   // - GENERAL HELPERS -
@@ -475,5 +690,123 @@ export class BrowserEmailService {
       };
       checkTables();
     });
+  }
+  static async _ensureMostRecentFilter(): Promise<void> {
+    console.log("Ensuring 'Most recent' filter is active");
+    const isVisible = (el: Element | null): el is HTMLElement => {
+      return !!(
+        el &&
+        (el as HTMLElement).offsetParent !== null &&
+        (el as HTMLElement).getClientRects().length > 0
+      );
+    };
+
+    const getSortButton = (): HTMLElement | null => {
+      const buttons = Array.from(
+        document.querySelectorAll('div[role="button"]'),
+      );
+      return (
+        (buttons.find((btn) => {
+          if (!isVisible(btn)) return false;
+          const label =
+            btn.querySelector(".Bn")?.textContent?.trim() ||
+            btn.textContent?.trim() ||
+            "";
+          const title = (btn as HTMLElement).title || "";
+          return (
+            title.includes("Sort by") ||
+            label.includes("Most relevant") ||
+            label.includes("Most recent")
+          );
+        }) as HTMLElement | undefined) || null
+      );
+    };
+
+    const getSortLabel = (button: HTMLElement | null): string => {
+      return (
+        button?.querySelector(".Bn")?.textContent?.trim() ||
+        button?.textContent?.trim() ||
+        ""
+      );
+    };
+
+    const activateElement = (el: HTMLElement): void => {
+      const rect = el.getBoundingClientRect();
+      const eventInit = {
+        bubbles: true,
+        cancelable: true,
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2,
+      };
+      el.focus();
+
+      if (typeof PointerEvent !== "undefined") {
+        el.dispatchEvent(new PointerEvent("pointerdown", eventInit));
+      }
+      el.dispatchEvent(new MouseEvent("mousedown", eventInit));
+      if (typeof PointerEvent !== "undefined") {
+        el.dispatchEvent(new PointerEvent("pointerup", eventInit));
+      }
+      el.dispatchEvent(new MouseEvent("mouseup", eventInit));
+      el.dispatchEvent(new MouseEvent("click", eventInit));
+      el.click();
+    };
+
+    try {
+      const sortButton = getSortButton();
+      if (!sortButton) {
+        console.warn("Could not find sort button");
+        return;
+      }
+
+      if (getSortLabel(sortButton).includes("Most recent")) {
+        console.log("Already sorted by Most recent");
+        return;
+      }
+
+      activateElement(sortButton);
+
+      await this._waitForElement(() => {
+        const menus = Array.from(document.querySelectorAll('div[role="menu"]'));
+        return menus.find((menu) => isVisible(menu));
+      }, 4000);
+
+      const mostRecentOption = Array.from(
+        document.querySelectorAll('div[role="menuitem"]'),
+      ).find((item) => {
+        if (!isVisible(item)) return false;
+        const text = item.textContent?.trim() || "";
+        return text.includes("Most recent");
+      }) as HTMLElement | undefined;
+
+      if (!mostRecentOption) {
+        console.warn(
+          "Could not find visible 'Most recent' option in open menu",
+        );
+        return;
+      }
+
+      if (mostRecentOption.classList.contains("J-Ks-KO")) {
+        console.log("'Most recent' is already the active menu item");
+        return;
+      }
+
+      activateElement(mostRecentOption);
+
+      const verifyDeadline = Date.now() + 5000;
+      while (Date.now() < verifyDeadline) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        if (getSortLabel(getSortButton()).includes("Most recent")) {
+          console.log("Successfully set sort to Most recent");
+          return;
+        }
+      }
+
+      console.warn(
+        "Attempted to set 'Most recent', but could not verify change",
+      );
+    } catch (error) {
+      console.warn("Failed to ensure 'Most recent' filter:", error);
+    }
   }
 }
