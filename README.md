@@ -6,6 +6,8 @@ A live Chrome extension that helps declutter Gmail inboxes through intelligent s
 
 **🌐 [Visit InboxWhiz Website](https://www.inboxwhiz.net/)**
 
+**🎥 [Watch devlogs on YouTube](https://youtube.com/playlist?list=PL67JwNpb_l5oGKtrGsq2a3yoxNyv_NgDk)**
+
 ## 🎯 Project Overview
 
 InboxWhiz addresses the common problem of email overload by providing users with actionable insights about their email patterns and efficient tools to manage unwanted messages. The extension integrates seamlessly with Gmail's interface and processes thousands of emails locally for optimal performance.
